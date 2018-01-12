@@ -1,8 +1,10 @@
 project(os)
 
+link_directories(/usr/local/lib)
+
 set(BUILD_NAME os)
 set(CMAKE_C_COMPILER ../i686-elf-4.9.1-Linux-x86_64/bin/i686-elf-gcc)
-set(COMPILE_FLAGS "-T linker.ld -ffreestanding -nostdlib -nostartfiles -o ${BUILD_NAME}.bin -w")
+set(COMPILE_FLAGS " -T linker.ld -ffreestanding -nostdlib -nostartfiles -g -std=gnu99")
 
 cmake_minimum_required(VERSION 3.5)
 
@@ -26,4 +28,4 @@ include_directories(
   ${CMAKE_CURRENT_LIST_DIR}/../include/${BUILD_NAME}
 )
 
-add_executable(${BUILD_NAME} ${SOURCES} ${HEADERS})
+add_executable(${BUILD_NAME}.bin ${SOURCES} ${HEADERS})

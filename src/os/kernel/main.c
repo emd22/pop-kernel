@@ -1,5 +1,3 @@
-
-
-int main() {
-    while (1);
+void kernel_main(void) {
+    
 }
