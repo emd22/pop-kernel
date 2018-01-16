@@ -1,3 +1,3 @@
 cross-compiler
-build/obj/*
+build/*
 .vscode

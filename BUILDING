@@ -1,0 +1,12 @@
+For first time building:
+
+1. run ./install.sh, follow link if cross-compiler is not installed.
+2. cd into build folder
+3. build cmake files: "cmake ../src"
+4. build c, asm files: "make"
+5. cd out of build dir, run genisoimg.sh
+6. open VM of choice, using iso generated.
+
+Later building:
+
+do steps 2-6. 
