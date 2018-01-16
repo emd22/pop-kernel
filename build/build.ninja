@@ -1,5 +1,0 @@
-cflags = -Wall -Werror -nostdlib -ffreestanding
-compiler = cross-compiler/bin/i686-elf-gcc
-
-rule cc
-    command = $compiler $cflags -c $in -o $out
