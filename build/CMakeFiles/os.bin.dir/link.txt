@@ -1,1 +1,1 @@
-../cross-compiler/bin/i686-elf-gcc -ffreestanding -nostdlib   CMakeFiles/os.bin.dir/os/kernel/main.c.o  -o os.bin 
+../cross-compiler/bin/i686-elf-gcc  -ffreestanding -nostdlib   CMakeFiles/os.bin.dir/os/kernel/main.c.o  -o os.bin 
