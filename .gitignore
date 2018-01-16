@@ -1,3 +1,4 @@
 cross-compiler
-build/*
+build
 .vscode
+os.iso

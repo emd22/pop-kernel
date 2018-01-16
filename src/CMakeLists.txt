@@ -21,6 +21,14 @@ foreach(f IN LISTS SOURCES)
     COMPILE_DEFINITIONS "__FILENAME__=${b}")
 endforeach()
 
+foreach(f IN LISTS ASM_SRCS)
+  message(STATUS "FOUND ASM FILE ${f}")
+  get_filename_component(b ${f} NAME)
+  set_source_files_properties(${f} PROPERTIES
+    COMPILE_DEFINITIONS "__FILENAME__=${b}")
+
+endforeach()
+
 foreach(f IN LISTS HEADERS)
   get_filename_component(b ${f} NAME)
   set_source_files_properties(${f} PROPERTIES
