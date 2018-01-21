@@ -31,5 +31,6 @@ uint8_t  bvga_get_colour(enum BVGA_C fg, enum BVGA_C bg);
 void     bvga_init(void);
 void     bvga_set_colour(uint8_t colour);
 void     bvga_putstr(const char *str, uint8_t colour);
+void     bvga_put(char c, uint8_t colour);
 
 #endif
