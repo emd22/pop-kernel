@@ -2,7 +2,7 @@
 #define STRING_H
 
 #if !defined(NULL)
-    #define NULL ((void *)NULL)
+    #define NULL ((void *)0)
 #endif
 
 #include <stddef.h>

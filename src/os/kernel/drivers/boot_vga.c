@@ -1,4 +1,4 @@
-#include <kernel/boot_vga.h>
+#include <kernel/drivers/boot_vga.h>
 
 #include <string.h>
 #include <stdint.h>

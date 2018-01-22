@@ -4,7 +4,7 @@
 #include <kernel/boot_vga.h>
 
 #if !defined(NULL)
-    #define NULL ((void *)NULL)
+    #define NULL ((void *)0)
 #endif
 
 #define EOF (-1)
