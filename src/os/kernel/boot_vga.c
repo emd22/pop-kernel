@@ -16,6 +16,10 @@ uint8_t bvga_get_colour(enum BVGA_C fg, enum BVGA_C bg) {
     return fg | bg << 4;
 }
 
+uint8_t bvga_no_colour() {
+    return tinfo.colour;
+}
+
 uint16_t bvga_entry(uint8_t uc, uint8_t colour) {
 	return (uint16_t) uc | (uint16_t) colour << 8;
 }
@@ -24,15 +28,21 @@ void bvga_set_colour(uint8_t colour) {
     tinfo.colour = colour;
 }
 
-void inc_x() {
-    if (++(tinfo.col) == BVGA_WIDTH) {
-        tinfo.col = 0;
-        if (++(tinfo.row) == BVGA_HEIGHT) {
-            tinfo.row = 0;
-            //TODO: boot message scrolling
-        }
+void bvga_nl(void) {
+    tinfo.col = 0;
+    if (++(tinfo.row) == BVGA_HEIGHT) {
+        tinfo.row = 0;
+        //TODO: boot message scrolling
     }
 }
+
+void inc_x(void) {
+    if (++(tinfo.col) == BVGA_WIDTH) {
+        tinfo.col = 0;
+        bvga_nl();
+    }
+}
+
 
 void bvga_put(char c, uint8_t colour) {
     const size_t index = tinfo.row * BVGA_WIDTH + tinfo.col;

@@ -3,7 +3,12 @@
 
 #include <kernel/boot_vga.h>
 
-void kprint(const char *str);
+#if !defined(NULL)
+    #define NULL ((void *)NULL)
+#endif
 
+#define EOF (-1)
+
+int printf(const char *fmt, ...);
 
 #endif

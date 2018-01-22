@@ -1,4 +1,6 @@
 #include <kernel/boot_vga.h> 
+#include <stdio.h>
+#include <stdlib.h>
 
 #if defined(__linux__)
 #error "Error: Not compiled using cross-compiler."
@@ -11,5 +13,7 @@
 void kmain(void) {
 	bvga_init();
 
-	bvga_putstr("TestOS!", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
+	bvga_set_colour(bvga_get_colour(BVGA_LIGHT_GREEN, BVGA_GREEN));
+	printf("this is\na test");
+	bvga_set_colour(BVGA_DEF);
 }

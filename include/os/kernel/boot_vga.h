@@ -7,6 +7,9 @@
 #define BVGA_WIDTH 80
 #define BVGA_HEIGHT 25
 
+#define BVGA_DEF (bvga_get_colour(BVGA_LIGHT_GREY, BVGA_BLACK))
+#define BVGA_NONE (bvga_no_colour())
+
 enum BVGA_C {
 	BVGA_BLACK,
 	BVGA_BLUE,
@@ -26,9 +29,11 @@ enum BVGA_C {
 	BVGA_WHITE,
 };
 
+uint8_t  bvga_no_colour(void);
 uint16_t bvga_entry(uint8_t uc, uint8_t color);
 uint8_t  bvga_get_colour(enum BVGA_C fg, enum BVGA_C bg);
 void     bvga_init(void);
+void     bvga_nl(void);
 void     bvga_set_colour(uint8_t colour);
 void     bvga_putstr(const char *str, uint8_t colour);
 void     bvga_put(char c, uint8_t colour);
