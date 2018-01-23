@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #define BVGA_WIDTH 80
 #define BVGA_HEIGHT 25
@@ -37,5 +38,7 @@ void     bvga_nl(void);
 void     bvga_set_colour(uint8_t colour);
 void     bvga_putstr(const char *str, uint8_t colour);
 void     bvga_put(char c, uint8_t colour);
+bool     bvga_set_pos(int x, int y);
+void 	 bvga_mov_cur(int x_rel, int y_rel);
 
 #endif

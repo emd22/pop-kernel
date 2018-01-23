@@ -1,7 +1,7 @@
 #ifndef STDIO_H
 #define STDIO_H
 
-#include <kernel/boot_vga.h>
+#include <kernel/drivers/boot_vga.h>
 
 #if !defined(NULL)
     #define NULL ((void *)0)

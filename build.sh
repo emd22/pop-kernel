@@ -1,4 +1,4 @@
 cd build
-make
+make || exit 1
 cd ..
 ./genisoimg.sh

@@ -1,10 +1,13 @@
 #include <kernel/drivers/keyboard.h>
 #include <kernel/scancodes.h>
+#include <kernel/sysasm.h>
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-#define NULL 0
 #define KBD_PORT 0x64
 
 struct {
@@ -17,8 +20,8 @@ struct {
 
 void keyboard_init(void) {
     kinfo.key_cache = (uint8_t *)malloc(256);
-    kinfo.last_key  = NULL;
-    kinfo.key_loc   = NULL;
+    kinfo.last_key  = 0;
+    kinfo.key_loc   = 0;
     kinfo.enabled   = true;
     kinfo.shift     = false;
     
@@ -103,18 +106,18 @@ uint8_t scancode_char(int keycode) {
 char getkey(int flags) {
     //sorry andrew ;)
 
-    unsigned sc = NULL;
+    unsigned sc = 0;
 
     if (flags & KBD_NOBLOCK) {
-        if ((sc = get_scancode()) != NULL)
+        if ((sc = get_scancode()))
             goto gotchar;
-        return NULL;
+        return 0;
     }
-    else {
-        while ((sc = get_scancode()) != NULL);
+    else {   
+        while ((sc = get_scancode()) == 0);
         goto gotchar;
     }
 
-    gotchar:
-        return get_kbd(sc);
+gotchar:
+    return scancode_char(sc);
 }

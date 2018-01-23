@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include <kernel/boot_vga.h>
+#include <kernel/drivers/boot_vga.h>
 
 int normalize(double *val) {
     int exponent = 0;

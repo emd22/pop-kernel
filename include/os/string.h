@@ -10,5 +10,6 @@
 
 size_t strlen(const char *str);
 void *memset(void *ptr, int val, size_t num);
+void *memcpy(void *dst_, const void *src_, size_t length);
 
 #endif

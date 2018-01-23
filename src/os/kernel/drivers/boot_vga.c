@@ -1,7 +1,6 @@
 #include <kernel/drivers/boot_vga.h>
 
 #include <string.h>
-#include <stdint.h>
 
 #define BVGA_MEM_ADDR (uint16_t *)0xB8000
 
@@ -43,6 +42,25 @@ void inc_x(void) {
     }
 }
 
+bool bvga_set_pos(int x, int y) {
+    if ((x <= BVGA_WIDTH && x >= 0) &&
+        (y <= BVGA_HEIGHT && y >= 0)) {
+            tinfo.col = x;
+            tinfo.row = y;
+            return true;
+    }
+    return false;
+}
+
+void bvga_get_pos(int *pos) {
+    pos[0] = tinfo.col;
+    pos[1] = tinfo.row;
+}
+
+void bvga_mov_cur(int x_rel, int y_rel) {
+    tinfo.col += x_rel;
+    tinfo.row += y_rel;
+}
 
 void bvga_put(char c, uint8_t colour) {
     const size_t index = tinfo.row * BVGA_WIDTH + tinfo.col;

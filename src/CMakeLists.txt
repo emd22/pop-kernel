@@ -7,7 +7,7 @@ set(CMAKE_CROSSCOMPILING TRUE)
 # set(CMAKE_LINKER "../linker.ld")
 set(PROJECT_PATH "/home/ethan/Desktop/os2")
 
-set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -ffreestanding -nostdlib -nostartfiles")
+set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall")
 
 set(CMAKE_C_COMPILER ${PROJECT_PATH}/cross-compiler/bin/i686-elf-gcc)
 set(CMAKE_ASM_COMPILER ${PROJECT_PATH}/cross-compiler/bin/i686-elf-as)
