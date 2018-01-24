@@ -1,3 +1,9 @@
+/* 
+This file is the root of the kernel.
+Pop Kernel is released under the MIT license;
+See LICENSE for details.
+ */
+
 #if defined(__linux__)
 #error "Error: Not compiled using cross-compiler."
 #endif
@@ -15,4 +21,5 @@
 void kmain(void) {
 	bvga_init();
 	keyboard_init();
+
 }

@@ -78,10 +78,6 @@ void ftoa_fixed(char *buffer, double value) {
 }
 
 int printf(const char *fmt, ...) {
-    
-}
-
-int fmt_str(char *fmt, char *out, ...) {
     va_list args;
     va_start(args, fmt);
 
@@ -100,7 +96,7 @@ int fmt_str(char *fmt, char *out, ...) {
             switch (ch = *fmt++) {
                 case '%':
                     bvga_put('%', BVGA_NONE);
-                 return length;   length++;
+                    length++;
                     break;
                 case 'c':
                     tc = va_arg(args, int);

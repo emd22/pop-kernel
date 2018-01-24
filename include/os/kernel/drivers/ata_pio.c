@@ -31,4 +31,7 @@ void ata_pio_install(void) {
     if (drive_exists != 0) {
         primary_detected = true;
     }
+    else {
+        pr
+    }
 }
