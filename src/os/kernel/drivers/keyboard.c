@@ -104,20 +104,15 @@ uint8_t scancode_char(int keycode) {
 }
 
 char getkey(int flags) {
-    //sorry andrew ;)
-
     unsigned sc = 0;
 
     if (flags & KBD_NOBLOCK) {
-        if ((sc = get_scancode()))
-            goto gotchar;
-        return 0;
+        if (!(sc = get_scancode()))
+            return 0;
     }
     else {   
-        while ((sc = get_scancode()) == 0);
-        goto gotchar;
+        while (!(sc = get_scancode()));
     }
 
-gotchar:
     return scancode_char(sc);
 }

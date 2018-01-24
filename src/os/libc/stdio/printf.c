@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <kernel/drivers/boot_vga.h>
 
@@ -77,6 +78,10 @@ void ftoa_fixed(char *buffer, double value) {
 }
 
 int printf(const char *fmt, ...) {
+    
+}
+
+int fmt_str(char *fmt, char *out, ...) {
     va_list args;
     va_start(args, fmt);
 
@@ -90,12 +95,12 @@ int printf(const char *fmt, ...) {
     double td;
     char *ts;
 
-    while (ch = *fmt++) {
+    while ((ch = *fmt++)) {
         if (ch == '%') {
             switch (ch = *fmt++) {
                 case '%':
                     bvga_put('%', BVGA_NONE);
-                    length++;
+                 return length;   length++;
                     break;
                 case 'c':
                     tc = va_arg(args, int);
