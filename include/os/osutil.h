@@ -10,22 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define assert(cond, msg) assert__(cond ? 1 : 0, msg)
+#define assert(cond, msg, cb) assert__(cond ? 1 : 0, msg, cb)
 
-void panic(const char *msg, void (*sd_cb)(void)) {
-    printf("***KERNEL PANIC***:\n%s\nHALTING...\n", msg);
-    if (sd_cb != NULL)
-        sd_cb(); //shutdown callback(free objs, etc.)
-    for (;;);
-}
-
-void assert__(int res, const char *msg) {
-    if (res) return;
-    char full_msg[256];
-    bzero(full_msg, 256);
-    strcpy(full_msg, "Assertion failed with message: ");
-    strcat(full_msg, msg);
-    panic(full_msg, NULL);
-}
+void assert__(int res, const char *msg, void (*gr_cb)(void));
+void panic(const char *msg, void (*sd_cb)(void));
 
 #endif
