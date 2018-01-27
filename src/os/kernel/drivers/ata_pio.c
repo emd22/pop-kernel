@@ -4,17 +4,19 @@
 #include <stdlib.h>
 #include <osutil.h>
 
-#define PRIMARY_BUS 0x1F6
+#define BAR0 0x1F0
 
-#define IDENTIFY_PORT 0x1F7
-#define DATA_PORT     0x1F0
+#define PRIMARY_BUS BAR0+6
+
+#define COMMAND_PORT BAR0+7
+#define DATA_PORT    BAR0
 
 #define MASTER_DRIVE 0xA0
 
-#define SECTOR_COUNT 0x1F2
-#define LBA_LOW      0x1F3
-#define LBA_MID      0x1F4
-#define LBA_HIGH     0x1F5
+#define SECTOR_COUNT BAR0+2
+#define LBA_LOW      BAR0+3
+#define LBA_MID      BAR0+4
+#define LBA_HIGH     BAR0+5
 
 #define READ_SECTORS 0x20
 
@@ -38,9 +40,9 @@ void ata_pio_install(void) {
     outb(LBA_MID, OS_NULL);
     outb(LBA_HIGH, OS_NULL);
 
-    outb(IDENTIFY_PORT, 0xEC);
+    outb(COMMAND_PORT, 0xEC);
 
-    uint8_t drive_exists = inb(IDENTIFY_PORT);
+    uint8_t drive_exists = inb(COMMAND_PORT);
 
     if (drive_exists == 0){
         printf("Drive does not exist.\n");
@@ -66,12 +68,19 @@ void ata_pio_install(void) {
 }
 
 void wait_ready(void) {
-    while ((inb(IDENTIFY_PORT) & (0x80 | 0x40)) != 0x40);
+    while ((inb(COMMAND_PORT) & (0x80 | 0x40)) != 0x40);
 }
 
-void cache_flush() {
-    outb(IDENTIFY_PORT, CACHE_FLUSH);
+void cache_flush(void) {
+    outb(COMMAND_PORT, CACHE_FLUSH);
     wait_ready();
+}
+
+void wait_400ns(void) {
+    inb(COMMAND_PORT);
+    inb(COMMAND_PORT);
+    inb(COMMAND_PORT);
+    inb(COMMAND_PORT);
 }
 
 int ata_pio_read(size_t lba, uint8_t *buf) {
@@ -93,7 +102,7 @@ int ata_pio_read(size_t lba, uint8_t *buf) {
     outb(LBA_HIGH, (uint8_t)(lba >> 16));
 
     //send read sectors command
-    outb(IDENTIFY_PORT, READ_SECTORS);
+    outb(COMMAND_PORT, READ_SECTORS);
 
     int i;
     for (i = 0; i < 3000; i++); //wait for irq or poll
@@ -127,7 +136,7 @@ void ata_pio_write(size_t lba, uint8_t *buf, size_t d_len) {
     //Send the next 8 bits of the LBA to port 0x1F5:
     outb(LBA_HIGH, (uint8_t)(lba >> 16));
 
-    outb(IDENTIFY_PORT, 0x30); //initialize write command
+    outb(COMMAND_PORT, 0x30); //initialize write command
 
     int i;
     for (i = 0; i < d_len; i++) {
@@ -136,6 +145,8 @@ void ata_pio_write(size_t lba, uint8_t *buf, size_t d_len) {
         cache_flush();
     }
 
-    cache_flush();
     wait_ready();
+    wait_400ns();
+
+    ata_pio_read(lba, NULL);
 }

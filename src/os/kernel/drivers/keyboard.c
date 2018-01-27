@@ -110,7 +110,7 @@ char getkey(int flags) {
         if (!(sc = get_scancode()))
             return 0;
     }
-    else {   
+    else { 
         while (!(sc = get_scancode()));
     }
 

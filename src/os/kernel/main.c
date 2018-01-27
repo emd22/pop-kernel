@@ -8,6 +8,7 @@
 
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/idt.h>
+#include <kernel/drivers/boot_vga.h>
 #include <kernel/drivers/ata_pio.h>
 #include <osutil.h>
 #include <stdio.h>
@@ -15,26 +16,59 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+void input(char *buf) {
+    char ch = 0;
+    int index = 0;
+
+    char old_ch = 0;
+
+    while (true) {
+        ch = getkey(KBD_NOBLOCK);
+
+        if (ch == 0) continue;
+
+        if (ch == '\n') {
+            printf("\n");
+            break;
+        }
+        if (ch == KBDK_BACKSPACE) {
+            
+            bvga_mov_cur(-1, 0);
+            bvga_put_no_mv(' ', BVGA_DEF);
+            buf[index--] = 0;
+        }
+        else {
+            buf[index++] = ch;
+            printf("%c", ch);  
+        }
+        old_ch = ch;
+    }
+}
+
 void kmain(void) {
-	bvga_init();
-	keyboard_init();
-	idt_install();
-	ata_pio_install();
-	printf("Made it here\n");
+    bvga_init();
+    keyboard_init();
+    idt_install();
+    ata_pio_install();
 
-	uint8_t message[] = {'H', 'e', 'l', 'l', 'o', '!', '\0'};
+    char buf[64];
 
-	ata_pio_write(1000, message, 7);
+    input(buf);
 
-	uint8_t *buf = (uint8_t *)malloc(512);
+    printf("GOT: [%s]\n", buf);
+    // return;
 
-	ata_pio_read(1000, buf);
+    // ata_pio_write(1000, (uint8_t *)"Hello!", 7);
 
-	// printf("dat:%s\n", buf);
-	int i = 0;
-	while (i < 7) {
-		printf("[%c]\n", buf[i++]);
-	}
+    // uint8_t *buf = (uint8_t *)malloc(512);
 
-	free(buf);
+    // ata_pio_read(1000, buf);
+
+    // // printf("dat:%s\n", buf);
+    // int i = 0;
+    // while (i < 7) {
+    //     printf("[%c]\n", buf[i++]);
+    // }
+
+    // free(buf);
 }

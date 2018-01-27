@@ -52,6 +52,11 @@ bool bvga_set_pos(int x, int y) {
     return false;
 }
 
+void bvga_put_no_mv(char c, uint8_t colour) {
+    const size_t index = tinfo.row * BVGA_WIDTH + tinfo.col;
+    tinfo.buffer[index] = bvga_entry(c, colour);
+}
+
 void bvga_get_pos(int *pos) {
     pos[0] = tinfo.col;
     pos[1] = tinfo.row;
