@@ -11,6 +11,10 @@
 #define BVGA_DEF (bvga_get_colour(BVGA_LIGHT_GREY, BVGA_BLACK))
 #define BVGA_NONE (bvga_no_colour())
 
+#define BVGA_ERR (bvga_get_colour(BVGA_RED, BVGA_BLACK))
+
+#define BVGA_NOMOVE 0x01
+
 enum BVGA_C {
 	BVGA_BLACK,
 	BVGA_BLUE,
@@ -37,9 +41,10 @@ void     bvga_init(void);
 void     bvga_nl(void);
 void     bvga_set_colour(uint8_t colour);
 void     bvga_putstr(const char *str, uint8_t colour);
-void     bvga_put(char c, uint8_t colour);
+void     bvga_put(char c, uint8_t colour, int flags);
 bool     bvga_set_pos(int x, int y);
-void 	 bvga_put_no_mv(char c, uint8_t colour);
 void 	 bvga_mov_cur(int x_rel, int y_rel);
+void 	 bvga_cursorpos(int x, int y);
+void 	 bvga_clear(void);
 
 #endif

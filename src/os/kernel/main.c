@@ -7,65 +7,55 @@
 #endif
 
 #include <kernel/drivers/keyboard.h>
-#include <kernel/drivers/idt.h>
 #include <kernel/drivers/boot_vga.h>
-#include <kernel/drivers/ata_pio.h>
+#include <kernel/debug.h>
+#include <kernel/mem2d.h>
+#include <kernel/args.h>
 #include <osutil.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include <stdint.h>
 
-void input(char *buf) {
-    char ch = 0;
-    int index = 0;
+#define MAX_ARGS 32
+#define MAX_ARG_LEN 32
 
-    while (true) {
-        ch = getkey(KBD_NOBLOCK);
-
-        if (ch == 0) continue;
-
-        if (ch == '\n') {
-            printf("\n");
-            break;
-        }
-        if (ch == KBDK_BACKSPACE) {
-            
-            bvga_mov_cur(-1, 0);
-            bvga_put_no_mv(' ', BVGA_DEF);
-            buf[index--] = 0;
-        }
-        else {
-            buf[index++] = ch;
-            printf("%c", ch);  
-        }
-    }
+void invalid_command(char **args) {
+    bvga_set_colour(BVGA_ERR);
+    printf("Invalid command '%s'\n", args[0]);
+    bvga_set_colour(BVGA_DEF);
 }
 
 void kmain(void) {
     bvga_init();
     keyboard_init();
-    idt_install();
-    ata_pio_install();
 
     char buf[64];
 
-    input(buf);
+    char **args = alloc_2d(MAX_ARG_LEN, MAX_ARGS);
+    int arg_len = 0;
 
-    printf("GOT: [%s]\n", buf);
-    // return;
+    printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
 
-    // ata_pio_write(1000, (uint8_t *)"Hello!", 7);
+    for (;;) {
+        bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
+        bvga_putstr("Kernel", bvga_get_colour(BVGA_WHITE, BVGA_BLACK));
+        bvga_putstr("# ", bvga_get_colour(BVGA_LIGHT_GREEN, BVGA_BLACK));
+        
+        input(buf);
+        arg_len = split_to_args(buf, args);
 
-    // uint8_t *buf = (uint8_t *)malloc(512);
+        if (arg_len == 1 && !strcmp(args[0], "exit")) {
+            bvga_clear();
+            printf("it is now safe to shut down your computer.\n");
+            break;
+        }
+        else if (arg_len == 1 && !strcmp(args[0], "clear")) {
+            bvga_clear();
+            buf[0] = 0;
+        }
+        else {
+            invalid_command(args);
+        }
+    } 
 
-    // ata_pio_read(1000, buf);
-
-    // // printf("dat:%s\n", buf);
-    // int i = 0;
-    // while (i < 7) {
-    //     printf("[%c]\n", buf[i++]);
-    // }
-
-    // free(buf);
+    free_2d(MAX_ARGS, args);
 }

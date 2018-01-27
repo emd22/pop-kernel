@@ -95,12 +95,12 @@ int printf(const char *fmt, ...) {
         if (ch == '%') {
             switch (ch = *fmt++) {
                 case '%':
-                    bvga_put('%', BVGA_NONE);
+                    bvga_put('%', BVGA_NONE, 0);
                     length++;
                     break;
                 case 'c':
                     tc = va_arg(args, int);
-                    bvga_put(tc, BVGA_NONE);
+                    bvga_put(tc, BVGA_NONE, 0);
                     length++;
                     break;
                 case 's':
@@ -132,7 +132,7 @@ int printf(const char *fmt, ...) {
             bvga_nl();
         }
         else {
-            bvga_put(ch, BVGA_NONE);
+            bvga_put(ch, BVGA_NONE, 0);
             length++;
         }
     }

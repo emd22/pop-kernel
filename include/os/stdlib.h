@@ -13,5 +13,6 @@ void *realloc(void *blk, size_t size);
 void free(void *blk);
 
 char *itoa(int num, char *str, int base);
+int atoi(const char *str);
 
 #endif

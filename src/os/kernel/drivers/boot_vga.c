@@ -1,5 +1,5 @@
 #include <kernel/drivers/boot_vga.h>
-
+#include <kernel/sysasm.h>
 #include <string.h>
 
 #define BVGA_MEM_ADDR (uint16_t *)0xB8000
@@ -27,6 +27,19 @@ void bvga_set_colour(uint8_t colour) {
     tinfo.colour = colour;
 }
 
+void bvga_clear(void) {
+    tinfo.col = 0;
+    tinfo.row = 0;
+    bvga_cursorpos(0, 0);
+    int i;
+    for (i = 0; i < BVGA_WIDTH*BVGA_HEIGHT; i++) {
+        bvga_put(' ', BVGA_DEF, 0);
+    }
+    tinfo.col = 0;
+    tinfo.row = 0;
+    bvga_cursorpos(0, 0);
+}
+
 void bvga_nl(void) {
     tinfo.col = 0;
     if (++(tinfo.row) == BVGA_HEIGHT) {
@@ -52,11 +65,6 @@ bool bvga_set_pos(int x, int y) {
     return false;
 }
 
-void bvga_put_no_mv(char c, uint8_t colour) {
-    const size_t index = tinfo.row * BVGA_WIDTH + tinfo.col;
-    tinfo.buffer[index] = bvga_entry(c, colour);
-}
-
 void bvga_get_pos(int *pos) {
     pos[0] = tinfo.col;
     pos[1] = tinfo.row;
@@ -65,12 +73,17 @@ void bvga_get_pos(int *pos) {
 void bvga_mov_cur(int x_rel, int y_rel) {
     tinfo.col += x_rel;
     tinfo.row += y_rel;
+    bvga_cursorpos(tinfo.col, tinfo.row);
 }
 
-void bvga_put(char c, uint8_t colour) {
+void bvga_put(char c, uint8_t colour, int flags) {
     const size_t index = tinfo.row * BVGA_WIDTH + tinfo.col;
     tinfo.buffer[index] = bvga_entry(c, colour);
-    inc_x();
+
+    if (!(flags & BVGA_NOMOVE)) {
+        inc_x();
+    }
+    bvga_cursorpos(tinfo.col, tinfo.row);    
 }
 
 void bvga_putstr(const char *str, uint8_t colour) {
@@ -78,7 +91,11 @@ void bvga_putstr(const char *str, uint8_t colour) {
 
     int i;
     for (i = 0; i < strlen(str); i++) {
-        bvga_put(str[i], colour);
+        if (str[i] == '\n') {
+            bvga_nl();
+            continue;
+        }
+        bvga_put(str[i], colour, 0);
     }
 
     tinfo.colour = old_colour;
@@ -89,4 +106,15 @@ void bvga_init(void) {
     tinfo.col = 0;
     tinfo.row = 0;
     bvga_set_colour(bvga_get_colour(BVGA_LIGHT_GREY, BVGA_BLACK));
+}
+
+void bvga_cursorpos(int x, int y) {
+    unsigned short position = (y * BVGA_WIDTH) + x;
+
+    // cursor LOW port to vga INDEX register
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (unsigned char)(position & 0xFF));
+    // cursor HIGH port to vga INDEX register
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (unsigned char)((position >> 8) & 0xFF));
 }
