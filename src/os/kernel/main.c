@@ -20,8 +20,6 @@ void input(char *buf) {
     char ch = 0;
     int index = 0;
 
-    char old_ch = 0;
-
     while (true) {
         ch = getkey(KBD_NOBLOCK);
 
@@ -41,7 +39,6 @@ void input(char *buf) {
             buf[index++] = ch;
             printf("%c", ch);  
         }
-        old_ch = ch;
     }
 }
 
