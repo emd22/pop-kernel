@@ -189,3 +189,184 @@ make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
     Feature record: C_FEATURE:0c_restrict
     Feature record: C_FEATURE:0c_static_assert
     Feature record: C_FEATURE:0c_variadic_macros
+The system is: Linux - 4.13.0-25-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc 
+Build flags: -T;/home/ethan/Desktop/os2/linker.ld;-ffreestanding;-nostdlib;-nostartfiles;-Wall
+Id flags:  
+
+The output was:
+0
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/ethan/Desktop/os2/build/CMakeFiles/3.9.1/CompilerIdC/a.out"
+
+Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
+GNU assembler (GNU Binutils) 2.24
+Copyright 2013 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or later.
+This program has absolutely no warranty.
+This assembler was configured for a target of `i686-elf'.
+Determining if the C compiler works passed with the following output:
+Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_83e78/fast"
+make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_83e78.dir/build.make CMakeFiles/cmTC_83e78.dir/build
+make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_83e78.dir/testCCompiler.c.o
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_83e78.dir/testCCompiler.c.o   -c /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_83e78
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_83e78.dir/link.txt --verbose=1
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_83e78.dir/testCCompiler.c.o  -o cmTC_83e78 
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+make[2]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3b0e4/fast"
+make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_3b0e4.dir/build.make CMakeFiles/cmTC_3b0e4.dir/build
+make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_3b0e4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b0e4.dir/link.txt --verbose=1
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o  -o cmTC_3b0e4 
+Using built-in specs.
+COLLECT_GCC=/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc
+COLLECT_LTO_WRAPPER=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper
+Target: i686-elf
+Configured with: ../gcc-4.9.1/configure --target=i686-elf --prefix=/home/geist/svn/toolchains/i686-elf-4.9.1-Linux-x86_64 --enable-languages=c,c++ --disable-werror
+Thread model: single
+gcc version 4.9.1 (GCC) 
+COMPILER_PATH=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/
+LIBRARY_PATH=/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib/
+COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/os2/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_3b0e4' '-mtune=generic' '-march=pentiumpro'
+ /home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyghVst.res -o cmTC_3b0e4 -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/os2/linker.ld
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+make[2]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_3b0e4/fast"]
+  ignore line: [make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_3b0e4.dir/build.make CMakeFiles/cmTC_3b0e4.dir/build]
+  ignore line: [make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_3b0e4]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3b0e4.dir/link.txt --verbose=1]
+  ignore line: [/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o  -o cmTC_3b0e4 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper]
+  ignore line: [Target: i686-elf]
+  ignore line: [Configured with: ../gcc-4.9.1/configure --target=i686-elf --prefix=/home/geist/svn/toolchains/i686-elf-4.9.1-Linux-x86_64 --enable-languages=c,c++ --disable-werror]
+  ignore line: [Thread model: single]
+  ignore line: [gcc version 4.9.1 (GCC) ]
+  ignore line: [COMPILER_PATH=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/]
+  ignore line: [LIBRARY_PATH=/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/:/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/os2/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_3b0e4' '-mtune=generic' '-march=pentiumpro']
+  link line: [ /home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyghVst.res -o cmTC_3b0e4 -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/os2/linker.ld]
+    arg [/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/home/ethan/Desktop/os2/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccyghVst.res] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_3b0e4] ==> ignore
+    arg [-L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1] ==> dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1]
+    arg [-L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc] ==> dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc]
+    arg [-L/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib] ==> dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib]
+    arg [CMakeFiles/cmTC_3b0e4.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-T] ==> ignore
+    arg [/home/ethan/Desktop/os2/linker.ld] ==> ignore
+  collapse library dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1] ==> [/home/ethan/Desktop/os2/cross-compiler/lib/gcc/i686-elf/4.9.1]
+  collapse library dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc] ==> [/home/ethan/Desktop/os2/cross-compiler/lib/gcc]
+  collapse library dir [/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib] ==> [/home/ethan/Desktop/os2/cross-compiler/i686-elf/lib]
+  implicit libs: []
+  implicit dirs: [/home/ethan/Desktop/os2/cross-compiler/lib/gcc/i686-elf/4.9.1;/home/ethan/Desktop/os2/cross-compiler/lib/gcc;/home/ethan/Desktop/os2/cross-compiler/i686-elf/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1a826/fast"
+make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_1a826.dir/build.make CMakeFiles/cmTC_1a826.dir/build
+make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1a826.dir/feature_tests.c.o
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c11 -o CMakeFiles/cmTC_1a826.dir/feature_tests.c.o   -c /home/ethan/Desktop/os2/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_1a826
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1a826.dir/link.txt --verbose=1
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_1a826.dir/feature_tests.c.o  -o cmTC_1a826 
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+make[2]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4708e/fast"
+make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_4708e.dir/build.make CMakeFiles/cmTC_4708e.dir/build
+make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4708e.dir/feature_tests.c.o
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c99 -o CMakeFiles/cmTC_4708e.dir/feature_tests.c.o   -c /home/ethan/Desktop/os2/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_4708e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4708e.dir/link.txt --verbose=1
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_4708e.dir/feature_tests.c.o  -o cmTC_4708e 
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+make[2]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c4335/fast"
+make[1]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c4335.dir/build.make CMakeFiles/cmTC_c4335.dir/build
+make[2]: Entering directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c4335.dir/feature_tests.c.o
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c90 -o CMakeFiles/cmTC_c4335.dir/feature_tests.c.o   -c /home/ethan/Desktop/os2/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_c4335
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c4335.dir/link.txt --verbose=1
+/home/ethan/Desktop/os2/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/os2/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_c4335.dir/feature_tests.c.o  -o cmTC_c4335 
+/home/ethan/Desktop/os2/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+make[2]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/home/ethan/Desktop/os2/build/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros

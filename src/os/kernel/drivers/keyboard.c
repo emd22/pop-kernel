@@ -114,5 +114,12 @@ char getkey(int flags) {
         while (!(sc = get_scancode()));
     }
 
+    if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {
+        kinfo.shift = true;
+    }
+    else {
+        kinfo.shift = false;
+    }
+
     return scancode_char(sc);
 }

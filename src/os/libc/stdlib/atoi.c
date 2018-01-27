@@ -1,5 +1,9 @@
 #include <stdlib.h>
 
+int isspace(const char p) {
+    return (p == ' ' || p == '\t') ? 1 : 0;
+}
+
 int atoi(const char *str) {
     register int result = 0;
     register unsigned int digit;
@@ -9,21 +13,21 @@ int atoi(const char *str) {
      * Skip any leading blanks.
      */
 
-    while (isspace(*string))
-	    string += 1;
+    while (isspace(*str))
+	    str += 1;
 
-    if (*string == '-') {
+    if (*str == '-') {
         sign = 1;
-        string += 1;
+        str += 1;
     } else {
         sign = 0;
-        if (*string == '+') {
-            string += 1;
+        if (*str == '+') {
+            str += 1;
         }
     }
 
-    for (; ; string += 1) {
-        digit = *string - '0';
+    for (; ; str += 1) {
+        digit = *str - '0';
         if (digit > 9) {
             break;
         }

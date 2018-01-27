@@ -32,7 +32,7 @@ void bvga_clear(void) {
     tinfo.row = 0;
     bvga_cursorpos(0, 0);
     int i;
-    for (i = 0; i < BVGA_WIDTH*BVGA_HEIGHT; i++) {
+    for (i = 0; i < (BVGA_WIDTH*BVGA_HEIGHT)-1; i++) {
         bvga_put(' ', BVGA_DEF, 0);
     }
     tinfo.col = 0;
@@ -44,6 +44,7 @@ void bvga_nl(void) {
     tinfo.col = 0;
     if (++(tinfo.row) == BVGA_HEIGHT) {
         tinfo.row = 0;
+        bvga_clear();
         //TODO: boot message scrolling
     }
 }

@@ -23,3 +23,11 @@ inline uint16_t inw(uint16_t port) {
 inline void outw(uint16_t port, uint16_t val) {
     asm volatile("outw %0, %1" : : "a"(val), "Nd"(port));
 }
+
+inline void outsm(unsigned short port, unsigned char *data, unsigned long size) {
+    asm volatile ("rep outsw" : "+S" (data), "+c" (size) : "d" (port) : "memory");
+}
+
+inline void insm(unsigned short port, unsigned char *data, unsigned long size) {
+    asm volatile ("rep insw" : "+D" (data), "+c" (size) : "d" (port) : "memory");
+}

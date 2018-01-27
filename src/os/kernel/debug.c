@@ -30,3 +30,8 @@ void input(char *buf) {
         }
     }
 }
+
+void debug_err(const char *msg) {
+    //TODO: timestamp? + other info
+    bvga_putstr(msg, BVGA_ERR);
+}

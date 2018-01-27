@@ -8,7 +8,7 @@
 #define EMPTY_PARTITION 0x01
 #define FEATURE_NOT_EXIST 0x02
 
-#define GET_PART_ENTRY(n) (0x1BE+(n*16))
+#define FAT32_SYSID 0x0C
 
 typedef enum {
     NONE,
@@ -26,5 +26,18 @@ typedef struct {
     size_t lba_sector_count;
     size_t lba_end_sector;
 } partition_t;
+
+typedef struct {
+    partition_t partitions[4];
+    uint8_t     signature[2];
+} mbr_t;
+
+void mbr_init(void);
+bool retrieve_partitions(void);
+mbr_t *get_mbr();
+void mbr_write_part(unsigned loc, uint32_t sp, uint32_t ep, uint8_t sys_id);
+void format_mbr(void);
+int get_part_entry(int n);
+void mbr_purge();
 
 #endif

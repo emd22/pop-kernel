@@ -30,6 +30,10 @@ struct {
     unsigned sec_count;
 } info;
 
+void wait_ready(void) {
+    while ((inb(COMMAND_PORT) & (0x80 | 0x40)) != 0x40);
+}
+
 void ata_pio_install(void) {
     //select drive MASTER on primary bus
     outb(PRIMARY_BUS, MASTER_DRIVE);
@@ -49,6 +53,8 @@ void ata_pio_install(void) {
         return;
     }
 
+    wait_ready();
+
     uint8_t drive_pos = 0;
 
     drive_pos = inb(LBA_MID);
@@ -56,6 +62,8 @@ void ata_pio_install(void) {
 
     //TODO: remove assert, make it use ramdisk or something
     assert(drive_pos == 0, "Disk is not PATA compatible.", NULL);
+
+    wait_ready();
 
     int i;
 
@@ -65,10 +73,6 @@ void ata_pio_install(void) {
     info.sec_count = info.disk_info[60];
     info.sec_count = info.sec_count << 16;
     info.sec_count += info.disk_info[61];
-}
-
-void wait_ready(void) {
-    while ((inb(COMMAND_PORT) & (0x80 | 0x40)) != 0x40);
 }
 
 void cache_flush(void) {
@@ -109,20 +113,21 @@ int ata_pio_read(size_t lba, uint8_t *buf) {
 
     wait_ready();
 
-    while (bytes_read < 256) {
-        word = 0;
-        word = inw(0x1F0);
+    // while (bytes_read < 256) {
+    //     word = inw(0x1F0);
 
-        buf[bytes_read * 2] = word & 0xFF;
-        buf[(bytes_read * 2) + 1] = word >> 8;
+    //     buf[bytes_read * 2] = word & 0xFF;
+    //     buf[(bytes_read * 2) + 1] = word >> 8;
 
-        bytes_read++;
-    }
+    //     bytes_read++;
+    // }
+    insm(BAR0, buf, 256);
+    
 
     return bytes_read;
 }
 
-void ata_pio_write(size_t lba, uint8_t *buf, size_t d_len) {
+void ata_pio_write(size_t lba, const uint8_t *buf, size_t d_len) {
     int n_sectors = d_len/512;
     
     if (n_sectors == 0) 
@@ -138,12 +143,15 @@ void ata_pio_write(size_t lba, uint8_t *buf, size_t d_len) {
 
     outb(COMMAND_PORT, 0x30); //initialize write command
 
-    int i;
-    for (i = 0; i < d_len; i++) {
-        while ((inb(0x1F7) & (0x80 | 0x40)) != 0x40); //wait for DRIVE READY and BUSY bit to clear
-        outb(0x1F0, buf[i]); //write to io port
-        cache_flush();
-    }
+    // int i;
+    // for (i = 0; i < d_len; i++) {
+    //     wait_ready();
+    //     wait_400ns();
+    //     outb(BAR0, buf[i]); //write to io port
+    //     cache_flush();
+    // }
+
+    outsm(BAR0, buf, 256);
 
     wait_ready();
     wait_400ns();
