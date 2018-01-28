@@ -6,7 +6,7 @@
 
 #define BAR0 0x1F0
 
-#define PRIMARY_BUS BAR0+6
+#define PRIMARY_BUS  BAR0+6
 
 #define COMMAND_PORT BAR0+7
 #define DATA_PORT    BAR0
@@ -87,7 +87,17 @@ void wait_400ns(void) {
     inb(COMMAND_PORT);
 }
 
-int ata_pio_read(size_t lba, uint8_t *buf) {
+void clean_up(void) {
+    outb(0x1F6, 0);
+    outb(SECTOR_COUNT, 0);
+    outb(LBA_LOW, 0);
+    outb(LBA_MID, 0);
+    outb(LBA_HIGH, 0);
+    outb(COMMAND_PORT, 0);
+    outb(BAR0, 0);    
+}
+
+int ata_pio_read(uint16_t lba, uint8_t *buf) {
     wait_ready();
 
     size_t bytes_read = 0;
@@ -95,7 +105,9 @@ int ata_pio_read(size_t lba, uint8_t *buf) {
     uint16_t slavebit = 0;
 
     //select master or slave
-    outb(0x1F6, MASTER | (slavebit << 4) | ((lba >> 24) & SLAVE));
+    uint8_t ms_slv = MASTER | (slavebit << 4) | ((lba >> 24) & SLAVE);
+    printf("ms_slv: %x\n", ms_slv);
+    outb(0x1F6, ms_slv);
     outb(SECTOR_COUNT, 1); //ask for one sector
 
     //Send first 8 bits of the LBA to LBA_LOW
@@ -109,25 +121,25 @@ int ata_pio_read(size_t lba, uint8_t *buf) {
     outb(COMMAND_PORT, READ_SECTORS);
 
     int i;
-    for (i = 0; i < 3000; i++); //wait for irq or poll
+    for (i = 0; i < 10000; i++); //wait for irq or poll
 
     wait_ready();
 
-    // while (bytes_read < 256) {
-    //     word = inw(0x1F0);
+    while (bytes_read < 256) {
+        word = inw(0x1F0);
 
-    //     buf[bytes_read * 2] = word & 0xFF;
-    //     buf[(bytes_read * 2) + 1] = word >> 8;
+        buf[bytes_read * 2] = word & 0xFF;
+        buf[(bytes_read * 2) + 1] = word >> 8;
 
-    //     bytes_read++;
-    // }
-    insm(BAR0, buf, 256);
+        bytes_read++;
+    }
+    // insm(BAR0, buf, 256);
     
-
+    // clean_up();
     return bytes_read;
 }
 
-void ata_pio_write(size_t lba, const uint8_t *buf, size_t d_len) {
+void ata_pio_write(uint16_t lba, const uint8_t *buf, size_t d_len) {
     int n_sectors = d_len/512;
     
     if (n_sectors == 0) 
@@ -143,18 +155,19 @@ void ata_pio_write(size_t lba, const uint8_t *buf, size_t d_len) {
 
     outb(COMMAND_PORT, 0x30); //initialize write command
 
-    // int i;
-    // for (i = 0; i < d_len; i++) {
-    //     wait_ready();
-    //     wait_400ns();
-    //     outb(BAR0, buf[i]); //write to io port
-    //     cache_flush();
-    // }
+    int i;
+    for (i = 0; i < d_len; i++) {
+        wait_400ns();
+        outb(BAR0, buf[i]); //write to io port
+        cache_flush();
+        wait_ready();
+    }
 
-    outsm(BAR0, buf, 256);
+    // outsm(BAR0, buf, 256);
 
     wait_ready();
     wait_400ns();
 
-    ata_pio_read(lba, NULL);
+    // ata_pio_read(lba, NULL);
+    // clean_up();
 }

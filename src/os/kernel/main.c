@@ -33,9 +33,9 @@ void kmain(void) {
     ata_pio_install();
     mbr_init();
 
-    bool has_mbr = false;
+    // bool has_mbr = false;
 
-    has_mbr = retrieve_partitions();
+    /*has_mbr = */retrieve_partitions();
 
     char buf[64];
 
@@ -52,15 +52,15 @@ void kmain(void) {
     // wait_400ns();
     // wait_400ns();
     // wait_400ns();
-    // wait_400ns();
-    ata_pio_write(10001, (uint8_t *)"BBBBB", 6);
+    uint8_t w1[] = {'T', 'e', 's', '!', '\0'};
+    uint8_t w2[] = {'1', '2'};
 
-    ata_pio_read(10001, dat);
+    ata_pio_write(10000, w1, 4);    
+    ata_pio_write(10000, w2, 2);
 
-    int i;
-    for (i = 0; i < 100; i++) {
-        printf("[%d]", dat[i]);
-    }
+    ata_pio_read(10000, dat);
+
+    printf("inf: %s\n", dat);
 
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
