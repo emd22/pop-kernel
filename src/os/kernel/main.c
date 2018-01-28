@@ -44,33 +44,6 @@ void kmain(void) {
 
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
 
-    uint8_t dat[512];
-    // ata_pio_write(10000, (uint8_t *)"wowzas", 7);
-    // wait_400ns();
-    // wait_400ns();
-    // wait_400ns();
-    // wait_400ns();
-    // wait_400ns();
-    // wait_400ns();
-    uint8_t w1[] = {'T', 'e', 's', 'T', '!', '\0'};
-    uint8_t w2[] = {'1', '2'};
-
-    // ata_pio_write(10000, w1, 4);    
-    // ata_pio_write(10000, w2, 2);
-
-    ata_pio_rw(10000, w2, WRITE, 2);
-    ata_pio_rw(10000, w1, WRITE, 6);
-
-    // ata_pio_read(10000, dat);
-    ata_pio_rw(10000, dat, READ, 1);
-
-    // printf("inf: %s\n", dat);
-
-    int i;
-    for (i = 0; i < 6; i++) {
-        printf("[%c]", dat[i]);
-    }
-
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
         bvga_putstr("Kernel", bvga_get_colour(BVGA_WHITE, BVGA_BLACK));

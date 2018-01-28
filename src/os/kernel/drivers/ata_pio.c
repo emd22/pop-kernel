@@ -99,48 +99,6 @@ void clean_up(void) {
     outb(BAR0, 0);    
 }
 
-int ata_pio_read(uint16_t lba, uint8_t *buf) {
-    wait_ready();
-
-    size_t bytes_read = 0;
-    uint16_t word;
-    uint16_t slavebit = 0;
-
-    //select master or slave
-    uint8_t ms_slv = MASTER | (slavebit << 4) | ((lba >> 24) & SLAVE);
-    printf("ms_slv: %x\n", ms_slv);
-    outb(0x1F6, ms_slv);
-    outb(SECTOR_COUNT, 1); //ask for one sector
-
-    //Send first 8 bits of the LBA to LBA_LOW
-    outb(LBA_LOW, (uint8_t)lba);
-    //Send the next 8 bits of the LBA to LBA_MID
-    outb(LBA_MID, (uint8_t)(lba >> 8));
-    //Send the next 8 bits of the LBA to LBA_HIGH
-    outb(LBA_HIGH, (uint8_t)(lba >> 16));
-
-    //send read sectors command
-    outb(COMMAND_PORT, READ);
-
-    int i;
-    for (i = 0; i < 10000; i++); //wait for irq or poll
-
-    wait_ready();
-
-    while (bytes_read < 256) {
-        word = inw(0x1F0);
-
-        buf[bytes_read * 2] = word & 0xFF;
-        buf[(bytes_read * 2) + 1] = word >> 8;
-
-        bytes_read++;
-    }
-    // insm(BAR0, buf, 256);
-    
-    // clean_up();
-    return bytes_read;
-}
-
 void ata_pio_rw(unsigned lba, void *buf, unsigned rw, unsigned sl_dl) {
     //sl_dl -> sector_length for reading, data length(bytes) for writing.
     while ((inb(STATUS_PORT) & 0xC0) != 0x40);
@@ -164,40 +122,14 @@ void ata_pio_rw(unsigned lba, void *buf, unsigned rw, unsigned sl_dl) {
     else if (rw == WRITE) {
         outsl(DATA_PORT, buf, sl_dl << 7);
     }
-    cache_flush();
-        // printf("got here\n");
 
+    cache_flush();
 }
 
-void ata_pio_write(uint16_t lba, const uint8_t *buf, size_t d_len) {
-    int n_sectors = d_len/512;
-    
-    if (n_sectors == 0) 
-        n_sectors = 1;
+void ata_pio_read(uint16_t lba, void *buf, int sc) {
+    ata_pio_rw(lba, buf, READ, sc);
+}
 
-    outb(SECTOR_COUNT, (uint8_t)n_sectors); //set number of sectors
-    //Send the low 8 bits of the LBA to port 0x1F3:
-    outb(LBA_LOW, (uint8_t)lba);
-    //Send the next 8 bits of the LBA to port 0x1F4:
-    outb(LBA_MID, (uint8_t)(lba >> 8));
-    //Send the next 8 bits of the LBA to port 0x1F5:
-    outb(LBA_HIGH, (uint8_t)(lba >> 16));
-
-    outb(COMMAND_PORT, 0x30); //initialize write command
-
-    int i;
-    for (i = 0; i < d_len; i++) {
-        wait_400ns();
-        outb(BAR0, buf[i]); //write to io port
-        cache_flush();
-        wait_ready();
-    }
-
-    // outsm(BAR0, buf, 256);
-
-    wait_ready();
-    wait_400ns();
-
-    // ata_pio_read(lba, NULL);
-    // clean_up();
+void ata_pio_write(uint16_t lba, const uint8_t *buf, size_t dl) {
+    ata_pio_rw(lba, (void *)buf, WRITE, dl);
 }

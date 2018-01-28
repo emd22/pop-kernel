@@ -101,6 +101,7 @@ void format_mbr(void) {
 
     printf("Formatting MBR...\n");
     ata_pio_write(0, template_mbr, 512);
+    
     int i;
     for (i = 0; i < 4; i++) {
         mbr_write_part(get_part_entry(i), 0, 0, 0);
@@ -129,7 +130,7 @@ void mbr_write_part(unsigned loc, uint32_t sp, uint32_t ep, uint8_t sys_id) {
 bool retrieve_partitions(void) {
     uint8_t *mbr_dat = (uint8_t *)malloc(512);
 
-    ata_pio_read(0, mbr_dat);
+    ata_pio_read(0, mbr_dat, 1);
 
     if (mbr_dat[510] != 0x55 || mbr_dat[511] != 0xAA) {
         debug_err("Drive does not have MBR installed.\n");
