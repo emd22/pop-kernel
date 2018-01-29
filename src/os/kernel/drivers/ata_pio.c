@@ -99,7 +99,7 @@ void clean_up(void) {
     outb(BAR0, 0);    
 }
 
-void ata_pio_rw(unsigned lba, void *buf, unsigned rw, unsigned sl_dl) {
+void ata_pio_rw(unsigned lba, uint16_t bp, void *buf, unsigned rw, unsigned sl_dl) {
     //sl_dl -> sector_length for reading, data length(bytes) for writing.
     while ((inb(STATUS_PORT) & 0xC0) != 0x40);
     // while ((inb(COMMAND_PORT) & (0x80 | 0x40)) != 0x40);
@@ -117,10 +117,10 @@ void ata_pio_rw(unsigned lba, void *buf, unsigned rw, unsigned sl_dl) {
     // while (!(inb(STATUS_PORT) & 0x80));
 
     if (rw == READ) {
-        insl(DATA_PORT, buf, sl_dl << 7);
+        insb(DATA_PORT, buf, sl_dl*512);
     } 
     else if (rw == WRITE) {
-        outsl(DATA_PORT, buf, sl_dl << 7);
+        outsb(DATA_PORT, buf, sl_dl);
     }
 
     cache_flush();

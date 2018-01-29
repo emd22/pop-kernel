@@ -24,18 +24,18 @@ inline void outw(uint16_t port, uint16_t val) {
     asm volatile("outw %0, %1" : : "a"(val), "Nd"(port));
 }
 
-// inline void outsm(unsigned short port, unsigned char *data, unsigned long size) {
-//     asm volatile ("rep outsw" : "+S" (data), "+c" (size) : "d" (port) : "memory");
+// inline void insl(uint16_t port, uint8_t *buffer, size_t count) {
+//     asm volatile("cld; rep; insl" :: "d"(port), "D"(buffer), "c"(count));
 // }
 
-// inline void insm(unsigned short port, unsigned char *data, unsigned long size) {
-//     asm volatile ("rep insw" : "+D" (data), "+c" (size) : "d" (port) : "memory");
+// inline void outsl(uint16_t port, uint8_t *buffer, size_t count) {
+//     asm volatile("cld; rep; outsl" :: "d"(port), "S"(buffer), "c"(count));
 // }
 
-inline void insl(uint16_t port, uint8_t *buffer, size_t count) {
-    asm volatile("cld; rep; insl" :: "d"(port), "D"(buffer), "c"(count));
+inline void outsb(uint16_t port, uint8_t *buffer, size_t count) {
+    asm volatile("cld; rep; outsb" :: "d"(port), "0"(buffer), "1"(count));
 }
 
-inline void outsl(uint16_t port, uint8_t *buffer, size_t count) {
-    asm volatile("cld; rep; outsl" :: "d"(port), "S"(buffer), "c"(count));
+inline void insb(uint16_t port, uint8_t *buffer, size_t count) {
+    asm volatile("cld; rep; insb" :: "d"(port), "0"(buffer), "1"(count));    
 }
