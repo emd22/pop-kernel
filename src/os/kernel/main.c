@@ -32,10 +32,8 @@ void kmain(void) {
     keyboard_init();
     ata_pio_install();
     mbr_init();
-
-    // bool has_mbr = false;
-
-    /*has_mbr = */retrieve_partitions();
+    
+    retrieve_partitions();
 
     char buf[64];
 

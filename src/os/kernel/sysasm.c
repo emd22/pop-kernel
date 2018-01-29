@@ -32,10 +32,10 @@ inline void outw(uint16_t port, uint16_t val) {
 //     asm volatile("cld; rep; outsl" :: "d"(port), "S"(buffer), "c"(count));
 // }
 
-inline void outsb(uint16_t port, uint8_t *buffer, size_t count) {
-    asm volatile("cld; rep; outsb" :: "d"(port), "0"(buffer), "1"(count));
-}
+// inline void outsb(uint16_t port, uint8_t *buffer, size_t count) {
+//     asm volatile("cld; rep; outsb" :: "d"(port), "0"(buffer), "1"(count));
+// }
 
-inline void insb(uint16_t port, uint8_t *buffer, size_t count) {
-    asm volatile("cld; rep; insb" :: "d"(port), "0"(buffer), "1"(count));    
-}
+// inline void insb(uint16_t port, uint8_t *buffer, size_t count) {
+//     asm volatile("cld; rep; insb" :: "d"(port), "0"(buffer), "1"(count));    
+// }
