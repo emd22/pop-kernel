@@ -135,14 +135,14 @@ void ata_pio_write(unsigned addr, const uint8_t *buf) {
 
     uint8_t tmp;
     int i;
-    printf("WROTE: ");
 
     for (i = 0; i < 256; i++) {
         tmp = buf[8+i*2] | (buf[8+i*2+1] << 8);
         outb(BAR0, tmp);
         cache_flush();
+        wait_400ns();
     }
-    printf("\n");
+    // ata_pio_read(addr, NULL);
 }
 
 void ata_pio_read(unsigned addr, uint8_t *buf) {
@@ -154,8 +154,10 @@ void ata_pio_read(unsigned addr, uint8_t *buf) {
 
     for (i = 0; i < 256; i++) {
         tmp = inw(BAR0);
+        // if (buf != NULL) {
         buf[i*2] = (uint8_t)tmp;
         buf[i*2+1] = (uint8_t)(tmp >> 8);
+        // }
         // printf("buf[%d] -> %c\n", i*2, buf[i*2]);
     }
 }
