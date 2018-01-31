@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CROSSCOMPILING TRUE)
 # set(CMAKE_C_LINK_EXECUTABLE "../linker.ld")
 # set(CMAKE_LINKER "../linker.ld")
-set(PROJECT_PATH "/home/ethan/Desktop/os2")
+set(PROJECT_PATH "/home/ethan/Desktop/pop-kernel")
 
 set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall")
 

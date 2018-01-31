@@ -38,6 +38,9 @@ void kmain(void) {
 
     HBA_PORT hba_port;
 
+    if (!(abar->ghc & BIT31))
+        abar->ghc |= BIT31;
+
     // port_rebase(&hba_port, 0);
     probe_port((HBA_MEM *)(0xFFFFFFFF00000000+(uintptr_t)bar5));
     // retrieve_partitions();
