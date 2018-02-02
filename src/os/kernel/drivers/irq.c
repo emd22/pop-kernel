@@ -1,5 +1,5 @@
 #include <kernel/drivers/irq.h>
-#include <kernel/sysasm.h>
+#include <kernel/x86.h>
 #include <stddef.h>
 #include <stdio.h>
 

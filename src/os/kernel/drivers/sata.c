@@ -24,112 +24,75 @@
 #define HBA_PxCMD_FR 0x4000
 #define HBA_PxCMD_CR 0x8000
 
-void sata_init(void) {
-    FIS_REG_H2D fis;
-    bzero(&fis, sizeof(FIS_REG_H2D));
+#define PORT_TO_CTRL(port, reg) (0x100+((port*0x80)+reg))
 
-    fis.fis_type = FIS_TYPE_REG_H2D;
-    fis.command  = FIS_CMD_IDENTIFY;
-    fis.device   = 0; //master
-    fis.c        = 1; //write command register
-}
+// void sata_init_(FIS_REG_H2D *fis) {
+//     memset(fis, 0, sizeof(*fis));
+// }
 
-static int check_type(HBA_PORT *port) {
-    uint32_t ssts = port->ssts;
+void sata_prep_rw(ahci_fis_t *fis, sata_op_t *op, uint8_t is_write) {
+    /*Logical block address; normally 512 bytes long.*/
+    size_t lba = op->lba;
+    uint8_t cmd = 0;
 
-    uint8_t ipm = (ssts >> 8) & 0x0F;
-    uint8_t det = ssts & 0x0F;
+    memset(fis, 0, sizeof(*fis));
 
-    if (det != HBA_PORT_DET_PRESENT)
-        return AHCI_DEV_NULL;
-    if (ipm != HBA_PORT_IPM_ACTIVE)
-        return AHCI_DEV_NULL;
-
-    switch (port->sig) {
-        case SATA_SIG_ATAPI:
-            return AHCI_DEV_SATAPI;
-        case SATA_SIG_SEMB:
-            return AHCI_DEV_SEMB;
-        case SATA_SIG_PM:
-            return AHCI_DEV_PM;
-        default:
-            return AHCI_DEV_SATA;
+    if (op->scount >= (1 << 8) || lba+op->scount >= (1 << 28)) {
+        lba &= 0xFFFFFF;
+        cmd = (is_write ? ATA_WRITE_DMA_EXT :
+                          ATA_READ_DMA_EXT);
     }
-}
-
-void probe_port(HBA_MEM *abar) {
-    uint32_t pi = abar->pi;
-    int i = 0;
-
-    while (i < 32) {
-        if (pi & 1) {
-            int dt = check_type(&abar->ports[i]);
-            if (dt == AHCI_DEV_SATA)
-                printf("SATA drive found at port %d\n", i);
-            else if (dt == AHCI_DEV_SATAPI)
-                printf("SATAPI drive found at port %d\n", i);
-            else if (dt == AHCI_DEV_SEMB)
-                printf("SEMB drive found at port %d\n", i);
-            else if (dt == AHCI_DEV_PM)
-                printf("PM drive found at port %d\n", i);
-            else
-                printf("No drive found at port %d\n", i);
-        }
-        pi >>= 1;
-        i++;
-    }
-}
-
-void start_cmd(HBA_PORT *port) {
-    while (port->cmd & HBA_PxCMD_CR);
-
-    //set FRE(bit ) and ST(bit0)
-    port->cmd |= HBA_PxCMD_FRE;
-    port->cmd |= HBA_PxCMD_ST;
-}
-
-void stop_cmd(HBA_PORT *port) {
-    port->cmd &= ~HBA_PxCMD_ST;
-
-    while (1) {
-        if (port->cmd & HBA_PxCMD_FR)
-            continue;
-        if (port->cmd & HBA_PxCMD_CR)
-            continue;
-        break;
+    else {
+        cmd = (is_write ? ATA_WRITE_DMA :
+                          ATA_READ_DMA);
     }
 
-    //clear FRE
-    port->cmd &= ~HBA_PxCMD_FRE;
+    fis->lba_low  = (uint8_t)lba;
+    fis->lba_mid  = (uint8_t)(lba >> 8);
+    fis->lba_high = (uint8_t)(lba >> 16);
+    fis->feat     = 1; //dma
+    fis->scount   = op->scount;
+    fis->cmd      = cmd;
+    fis->dev      = ((lba >> 24) & 0x40) | ATA_CB_DH_LBA;
 }
 
-void port_rebase(HBA_PORT *port, int portno) {
-    //stop command engine
-    stop_cmd(port);
+void sata_prep_atapi(sata_fis_t *fis, uint16_t bsize) {
+    memset_fl(fis, 0, sizeof(*fis));
+    fis->lba_mid  = bsize;
+    fis->lba_high = bsize >> 8;
+    fis->feat     = 1; //atapi dma
+    fis->cmd      = ATA_PACKET;
+}
 
-    // Command list offset: 1K*portno
-    // Command list entry size = 32
-    // Command list entry maxim count = 32
-    // Command list maxim size = 32*32 = 1K per port
-    port->clb = AHCI_BASE + (portno << 10);
-    port->clbu = 0;
-    bzero((void *)(port->clb), 1024);
+uint32_t port_readl(void *base, uint32_t port, uint32_t reg) {
+    return readl(base+PORT_TO_CTRL(port, reg));
+}
 
-    port->fb = AHCI_BASE + (32 << 10) + (portno << 8);
-    port->fbu = 0;
-    bzero((void *)(port->fb), 256);
+void port_writel(void *base, uint32_t port, uint32_t reg, uint32_t val) {
+    writel(base+PORT_TO_CTRL(port, reg), val);
+}
 
-    HBA_CMD_HEADER *cmd_header = (HBA_CMD_HEADER *)(port->clb);
+int ahci_command(ahci_port_t *port, void *buf, unsigned size, int flags) {
+    ahci_ctrl_t *ctrl = port->ctrl;
+    ahci_cmd_t  *cmd  = port->cmd;
+    ahci_list_t *list = port->list;
 
-    int i;
-    for (i = 0; i < 32; i++) {
-        cmd_header[i].prdtl = 8; //8 prdt entries per command table
-                                 //256 bytes per command table, 64+16+48+16*8
-        //command table offset: 40K + 8K*portno + cmdheader_index*256
-        cmd_header[i].ctba = AHCI_BASE + (40 << 10) + (portno << 13) + (i << 8);
-        cmd_header[i].ctbau = 0;
+    cmd->fis.reg = 0x27;
+    cmd->fis.pmp_type = 1 << 7;
 
-        bzero((void *)cmd_header[i].ctba, 256);
-    }
-    start_cmd(port);
+    cmd->prdt.base = (uint32_t)buf;
+    cmd->prdt.baseu = 0;
+    cmd->prdt.flags = size-1;
+
+    uint32_t l_flags;
+    l_flags = ((1 << 16) |
+               (flags & AHCI_WRITE ? (1 << 6) : 0) |
+               (flags & AHCI_ATAPI ? (1 << 5) : 0) | 5);
+
+    list->flags  = l_flags;
+    list->bytes  = 0;
+    list->base   = (uint32_t)cmd;
+    list->baseu  = 0;
+
+    uint32_t bits = port_readl(ctrl->io_base, port->pnr);
 }

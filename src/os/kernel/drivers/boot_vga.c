@@ -1,5 +1,5 @@
 #include <kernel/drivers/boot_vga.h>
-#include <kernel/sysasm.h>
+#include <kernel/x86.h>
 #include <string.h>
 
 #define BVGA_MEM_ADDR (uint16_t *)0xB8000

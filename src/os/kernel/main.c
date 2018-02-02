@@ -36,13 +36,10 @@ void kmain(void) {
     mbr_init();
     sata_init();
 
-    HBA_PORT hba_port;
-
-    if (!(abar->ghc & BIT31))
-        abar->ghc |= BIT31;
+    // HBA_PORT hba_port;
 
     // port_rebase(&hba_port, 0);
-    probe_port((HBA_MEM *)(0xFFFFFFFF00000000+(uintptr_t)bar5));
+    // probe_port((HBA_MEM *)(0xFFFFFFFF00000000+(uintptr_t)bar5));
     // retrieve_partitions();
 
     // uint8_t buf1[512];

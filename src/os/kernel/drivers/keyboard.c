@@ -1,6 +1,6 @@
 #include <kernel/drivers/keyboard.h>
 #include <kernel/scancodes.h>
-#include <kernel/sysasm.h>
+#include <kernel/x86.h>
 
 #include <stdint.h>
 #include <stdbool.h>

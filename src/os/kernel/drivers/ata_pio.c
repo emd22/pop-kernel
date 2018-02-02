@@ -1,5 +1,5 @@
 #include <kernel/drivers/ata_pio.h>
-#include <kernel/sysasm.h>
+#include <kernel/x86.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <osutil.h>
