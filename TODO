@@ -1,7 +1,14 @@
-[X] - ATA PIO
-[ ] - USB driver
-[ ] - Lua support
-[ ] - FAT32
-[ ] - MBR w/r
-[ ] - networking
-[ ] - VESA/VBE driver
+todo list done in order.
+
+[X] - done
+[*] - working on it
+[~] - partial implementation
+[ ] - not done
+
+1. [*] - SATA driver
+2. [~] - MBR w/r
+3. [ ] - USB driver
+4. [ ] - FAT32
+5. [ ] - Lua support
+6. [ ] - VESA/VBE driver
+7. [ ] - networking
