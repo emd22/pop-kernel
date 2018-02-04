@@ -1,5 +1,6 @@
 #include <kernel/drivers/sata.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define FIS_CMD_IDENTIFY 0xEC
 
@@ -24,10 +25,18 @@
 #define HBA_PxCMD_FR 0x4000
 #define HBA_PxCMD_CR 0x8000
 
+#define AHCI_PHYS_BASE 0x800000
+
+#define MEM_KERN_BASE 0xFFFFFFFF80000000
+
+#define AHCI_DEV_BUSY 0x80
+#define AHCI_DEV_DRQ  0x08
+
 HBA_MEM *abar;
 
 void ahci_init() {
-    abar = NULL;
+    uint64_t paddr = 0xFEBF0000;
+    uint64_t vaddr = 0;
 
     //...
 }
@@ -92,115 +101,106 @@ int check_type(HBA_PORT *port) {
             return AHCI_DEV_SATA;
     }
 
-    return 0;
+    return AHCI_DEV_NULL;
 }
 
-// void sata_init(void) {
-//     FIS_REG_H2D fis;
-//     bzero(&fis, sizeof(FIS_REG_H2D));
 
-//     fis.fis_type = FIS_TYPE_REG_H2D;
-//     fis.command  = FIS_CMD_IDENTIFY;
-//     fis.device   = 0; //master
-//     fis.c        = 1; //write command register
-// }
+void start_cmd(HBA_PORT *port) {
+    while (port->cmd & HBA_PxCMD_CR);
 
-// static int check_type(HBA_PORT *port) {
-//     uint32_t ssts = port->ssts;
+    //set FRE(bit4) and ST(bit0)
+    port->cmd |= HBA_PxCMD_FRE;
+    port->cmd |= HBA_PxCMD_ST;
+}
 
-//     uint8_t ipm = (ssts >> 8) & 0x0F;
-//     uint8_t det = ssts & 0x0F;
+void stop_cmd(HBA_PORT *port) {
+    port->cmd &= ~HBA_PxCMD_ST;
+    port->cmd &= ~HBA_PxCMD_FRE;
 
-//     if (det != HBA_PORT_DET_PRESENT)
-//         return AHCI_DEV_NULL;
-//     if (ipm != HBA_PORT_IPM_ACTIVE)
-//         return AHCI_DEV_NULL;
+    while (1) {
+        if (port->cmd & HBA_PxCMD_FR)
+            continue;
+        if (port->cmd & HBA_PxCMD_CR)
+            continue;
+        break;
+    }
 
-//     switch (port->sig) {
-//         case SATA_SIG_ATAPI:
-//             return AHCI_DEV_SATAPI;
-//         case SATA_SIG_SEMB:
-//             return AHCI_DEV_SEMB;
-//         case SATA_SIG_PM:
-//             return AHCI_DEV_PM;
-//         default:
-//             return AHCI_DEV_SATA;
-//     }
-// }
+    //clear FRE
+    port->cmd &= ~HBA_PxCMD_FRE;
+}
 
-// void probe_port(HBA_MEM *abar) {
-//     uint32_t pi = abar->pi;
-//     int i = 0;
+void port_rebase(HBA_PORT *port, int port_no) {
+    int i;
+    uint64_t clb_addr, fbu_addr, ctb_addr;
+    stop_cmd(port);
 
-//     while (i < 32) {
-//         if (pi & 1) {
-//             int dt = check_type(&abar->ports[i]);
-//             if (dt == AHCI_DEV_SATA)
-//                 printf("SATA drive found at port %d\n", i);
-//             else if (dt == AHCI_DEV_SATAPI)
-//                 printf("SATAPI drive found at port %d\n", i);
-//             else if (dt == AHCI_DEV_SEMB)
-//                 printf("SEMB drive found at port %d\n", i);
-//             else if (dt == AHCI_DEV_PM)
-//                 printf("PM drive found at port %d\n", i);
-//             else
-//                 printf("No drive found at port %d\n", i);
-//         }
-//         pi >>= 1;
-//         i++;
-//     }
-// }
+    port->clb  = (((uint64_t)AHCI_PHYS_BASE & 0xFFFFFFFF));
+    port->clbu = 0;
+    port->fb   = (((uint64_t)AHCI_PHYS_BASE + (uint64_t) ((32 << 10))) & 0xFFFFFFFF);
+    port->fbu  = ((((uint64_t)AHCI_PHYS_BASE + (uint64_t) ((32 << 10))) >> 32) & 0xFFFFFFFF);
 
-// void start_cmd(HBA_PORT *port) {
-//     while (port->cmd & HBA_PxCMD_CR);
+    port->serr = 1;
+    port->is   = 0;
+    port->ie   = 1;
 
-//     //set FRE(bit ) and ST(bit0)
-//     port->cmd |= HBA_PxCMD_FRE;
-//     port->cmd |= HBA_PxCMD_ST;
-// }
+    clb_addr = 0;
+    clb_addr = (((clb_addr | port->clbu) << 32) | port->clb);
+    clb_addr = clb_addr + MEM_KERN_BASE;
+    memset((void *)clb_addr, 0, 1024);
 
-// void stop_cmd(HBA_PORT *port) {
-//     port->cmd &= ~HBA_PxCMD_ST;
+    fbu_addr = 0;
+    fbu_addr = (((fbu_addr | port->fbu) << 32) | port->fb);
+    fbu_addr = fbu_addr + MEM_KERN_BASE;
+    memset((void *)fbu_addr, 0, 256);
 
-//     while (1) {
-//         if (port->cmd & HBA_PxCMD_FR)
-//             continue;
-//         if (port->cmd & HBA_PxCMD_CR)
-//             continue;
-//         break;
-//     }
+    clb_addr = 0;
+    clb_addr = (((clb_addr | port->clbu) << 32) | port->clb);
+    clb_addr = (clb_addr + MEM_KERN_BASE);
 
-//     //clear FRE
-//     port->cmd &= ~HBA_PxCMD_FRE;
-// }
+    HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER *) clb_addr;
+    for (i = 0; i < 32; i++) {
+        cmdheader[i].prdtl = 8; // 8 prdt entries per command table
+        // 256 bytes per command table, 64+16+48+16*8
+        // Command table offset: 40K + 8K*portno + cmdheader_index*256
+        cmdheader[i].ctba  = (((uint64_t)AHCI_PHYS_BASE + (uint64_t) ((40 << 10)) + (uint64_t)((i << 8))) & 0xFFFFFFFFF);
+        cmdheader[i].ctbau = ((((uint64_t)AHCI_PHYS_BASE + (uint64_t) ((40 << 10)) + (uint64_t)((i << 8))) >> 32)& 0xFFFFFFFF);
 
-// void port_rebase(HBA_PORT *port, int portno) {
-//     //stop command engine
-//     stop_cmd(port);
+        ctb_addr = 0;
+        ctb_addr = (((ctb_addr | cmdheader[i].ctbau) << 32) | cmdheader[i].ctba);
+        ctb_addr =  ctb_addr + MEM_KERN_BASE;
 
-//     // Command list offset: 1K*portno
-//     // Command list entry size = 32
-//     // Command list entry maxim count = 32
-//     // Command list maxim size = 32*32 = 1K per port
-//     port->clb = AHCI_BASE + (portno << 10);
-//     port->clbu = 0;
-//     bzero((void *)(port->clb), 1024);
+        memset((void *)ctb_addr, 0, 256);
+    }
 
-//     port->fb = AHCI_BASE + (32 << 10) + (portno << 8);
-//     port->fbu = 0;
-//     bzero((void *)(port->fb), 256);
+    start_cmd(port);
 
-//     HBA_CMD_HEADER *cmd_header = (HBA_CMD_HEADER *)(port->clb);
+    port->is = 0;   
+    port->ie = 0xFFFFFFFF;
+}
 
-//     int i;
-//     for (i = 0; i < 32; i++) {
-//         cmd_header[i].prdtl = 8; //8 prdt entries per command table
-//                                  //256 bytes per command table, 64+16+48+16*8
-//         //command table offset: 40K + 8K*portno + cmdheader_index*256
-//         cmd_header[i].ctba = AHCI_BASE + (40 << 10) + (portno << 13) + (i << 8);
-//         cmd_header[i].ctbau = 0;
+bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf) {
+    /*Clear pending interrupt bits*/
+    port->is = (uint32_t)-1;
 
-//         bzero((void *)cmd_header[i].ctba, 256);
-//     }
-//     start_cmd(port);
-// }
+    int spin_cnt = 0;
+    int slot = find_cmdslot(port);
+
+    if (slot == -1)
+        return false;
+    
+    HBA_CMD_HEADER *cmd_header;
+    cmd_header = (HBA_CMD_HEADER *)port->clb;
+
+    cmd_header += slot;
+    cmd_header->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);
+    cmd_header->w = 0;
+    cmd_header->prdtl = (uint16_t)((scount-1) >> 4)+1;
+
+    HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL *)(cmd_header->ctba);
+    memset(cmd_tbl, 0, sizeof(HBA_CMD_TBL)+(cmd_header->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
+
+    int i;
+    for (i = 0; i < cmd_header->prdtl-1; i++) {
+        cmd_tbl->prdt_entry[i].dba = (uint32_t)buf;
+    }
+}
