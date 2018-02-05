@@ -33,30 +33,21 @@ Some AHCI/SATA code taken from osdev.org.
 #define AHCI_PHYS_BASE 0x800000
 #define AHCI_VIRT_BASE 0xFFFFFFFF00800000
 
-#define MEM_KERN_BASE 0xFFFFFFFF80000000
-
 #define AHCI_DEV_BUSY 0x80
 #define AHCI_DEV_DRQ  0x08
 
 HBA_MEM *abar;
 
-void ahci_alloc_pages(uint32_t npages) {
-    uint64_t vaddr, paddr;
-    
-    vaddr = AHCI_VIRT_BASE;
-    paddr = AHCI_PHYS_BASE;
-
-    int i;
-    for (i = 0; i < npages; ++i) {
-        
-    }
-}
-
 void ahci_init(void) {
     uint64_t paddr = 0xFEBF0000;
     uint64_t vaddr = 0;
 
+    uint64_t *pahci = (uint64_t *)
     
+}
+
+void ahci_destroy(void) {
+
 }
 
 void probe_port(HBA_MEM *abar_) {
