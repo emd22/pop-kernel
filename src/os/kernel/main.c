@@ -36,6 +36,10 @@ void kmain(void) {
     mbr_init();
     sata_init();
 
+    HBA_PORT port;
+
+    sata_write();
+
     // HBA_PORT hba_port;
 
     // port_rebase(&hba_port, 0);

@@ -2,6 +2,15 @@
 #define SATA_H
 
 #include <stdint.h>
+#include <stdbool.h>
+
+#define ATA_CMD_READ_DMA_EXT 0x25
+#define ATA_CMD_WRITE_DMA_EXT 0x35
+
+#define ATA_DEV_BUSY 0x80
+#define ATA_DEV_DRQ  0x08
+
+#define HBA_PxIS_TFES (1 << 30)
 
 //enums + structs taken from osdev.org.
 //TODO: remove unused code.
@@ -285,5 +294,7 @@ typedef struct tagHBA_CMD_TBL {
 void sata_init(void);
 void probe_port(HBA_MEM *abar);
 void port_rebase(HBA_PORT *port, int portno);
+bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf);
+bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t *buf);
 
 #endif
