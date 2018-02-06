@@ -24,13 +24,24 @@ inline void outw(uint16_t port, uint16_t val) {
     asm volatile("outw %0, %1" : : "a"(val), "Nd"(port));
 }
 
-inline uint32_t readl(const void *addr) {
-    uint32_t val = *(volatile const uint32_t *)addr;
-    barrier();
-    return val;
+inline void outl(uint16_t port, unsigned data) {
+    asm volatile("outl %0, %1" : : "a" (data), "d" (port));
 }
 
-inline void outl(const void *addr, uint32_t val) {
-    barrier();
-    *(volatile uint32_t *)addr = val;
+inline unsigned inl(uint16_t port) {
+    unsigned data;
+
+    asm volatile("inl %1, %0" : "=a" (data) : "d" (port));
+    return data;
 }
+
+// inline uint32_t readl(const void *addr) {
+//     uint32_t val = *(volatile const uint32_t *)addr;
+//     barrier();
+//     return val;
+// }
+
+// inline void outl(const void *addr, uint32_t val) {
+//     barrier();
+//     *(volatile uint32_t *)addr = val;
+// }

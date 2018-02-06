@@ -12,6 +12,8 @@
 
 #define HBA_PxIS_TFES (1 << 30)
 
+#define MEM_KERN_BASE 0xFFFFFFFF80000000
+
 //enums + structs taken from osdev.org.
 //TODO: remove unused code.
 

@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#define MEM_KERN_BASE 0xFFFFFFFF80000000
 
 struct _mem_page {
     struct _mem_page *page_next;

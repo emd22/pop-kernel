@@ -36,18 +36,52 @@ Some AHCI/SATA code taken from osdev.org.
 #define AHCI_DEV_BUSY 0x80
 #define AHCI_DEV_DRQ  0x08
 
+#define BAR0 0x10
+
 HBA_MEM *abar;
+
+typedef struct {
+    uint16_t vendorid;
+    uint8_t bus;
+    uint8_t dev;
+    uint8_t func;
+    uint8_t class;
+    uint8_t subclass;
+} pci_dat_t;
+
+typedef struct {
+    uint16_t vendorid;
+    uint8_t bus;
+    uint8_t dev;
+    uint8_t func;
+    uint8_t class;
+    uint8_t subclass;
+} pci_function_t;
+
+unsigned pcireadl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset)
+{
+    unsigned long addr;
+
+    addr = (1 << 31) | (bus << 16) | (dev << 11) | (func << 8) | (offset & 0xFC);
+
+    outl(addr, 0xCF8);
+    return inl(0xCFC);
+}
+
+unsigned get_pci_bar(pci_function_t *func, uint8_t bar) {
+    return pci_readl(func->bus, func->dev, func->func, BAR0+4*bar);
+}
+
+HBA_MEM *get_abar(pci_dat_t *pci_dat) {
+    return (HBA_MEM *)(unsigned long)(pcibar(pci_dat, 5) & 0xFFFFFFF0);
+}
 
 void ahci_init(void) {
     uint64_t paddr = 0xFEBF0000;
     uint64_t vaddr = 0;
 
-    uint64_t *pahci = (uint64_t *)
+    HBA_MEM *abar;
     
-}
-
-void ahci_destroy(void) {
-
 }
 
 void probe_port(HBA_MEM *abar_) {
