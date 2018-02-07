@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <kernel/drivers/pci.h>
+
 #define ATA_CMD_READ_DMA_EXT 0x25
 #define ATA_CMD_WRITE_DMA_EXT 0x35
 
@@ -293,10 +295,11 @@ typedef struct tagHBA_CMD_TBL {
     HBA_PRDT_ENTRY    prdt_entry[1];    // Physical region descriptor table entries, 0 ~ 65535
 } HBA_CMD_TBL;
 
-void sata_init(void);
+void ahci_init(void);
 void probe_port(HBA_MEM *abar);
 void port_rebase(HBA_PORT *port, int portno);
 bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf);
-bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t *buf);
+bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf);
+HBA_MEM *get_abar(pci_function_t *func);
 
 #endif

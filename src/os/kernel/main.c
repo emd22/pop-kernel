@@ -27,18 +27,16 @@ int check_command(char **args, const char *command) {
     return !strcmp(args[0], command);
 }
 
-uint64_t bar5;
-
 void kmain(void) {
     bvga_init();
     keyboard_init();
     // ata_pio_install();
     mbr_init();
-    sata_init();
+    ahci_init();
 
     HBA_PORT port;
 
-    sata_write();
+    // sata_write();
 
     // HBA_PORT hba_port;
 

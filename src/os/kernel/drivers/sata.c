@@ -38,87 +38,41 @@ Some AHCI/SATA code taken from osdev.org.
 
 #define BAR0 0x10
 
-HBA_MEM *abar;
+struct {
+    bool found;
+    HBA_MEM *abar;
+} ahci;
 
-typedef struct {
-    uint16_t vendorid;
-    uint8_t bus;
-    uint8_t dev;
-    uint8_t func;
-    uint8_t class;
-    uint8_t subclass;
-} pci_dat_t;
+struct {
+    pci_function_t pci;
+    HBA_MEM *base;
+    int n_ports;
+    int n_slots;
+    int dma64;
+} hba;
 
-typedef struct {
-    uint16_t vendorid;
-    uint8_t bus;
-    uint8_t dev;
-    uint8_t func;
-    uint8_t class;
-    uint8_t subclass;
-} pci_function_t;
+void ahci_init(void) {
+    ahci.found = false;
+    //...
+}
 
-unsigned pcireadl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset)
-{
-    unsigned long addr;
-
-    addr = (1 << 31) | (bus << 16) | (dev << 11) | (func << 8) | (offset & 0xFC);
-
-    outl(addr, 0xCF8);
-    return inl(0xCFC);
+bool find_ahci(pci_function_t *func) {
+    if (func->class_ == PCI_C_STORAGE && func->subclass == PCI_SC_AHCI) {
+        ahci.found = true;
+        hba.pci = *func;
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 unsigned get_pci_bar(pci_function_t *func, uint8_t bar) {
-    return pci_readl(func->bus, func->dev, func->func, BAR0+4*bar);
+    return pcireadl(func->bus, func->dev, func->func, BAR0+4*bar);
 }
 
-HBA_MEM *get_abar(pci_dat_t *pci_dat) {
-    return (HBA_MEM *)(unsigned long)(pcibar(pci_dat, 5) & 0xFFFFFFF0);
-}
-
-void ahci_init(void) {
-    uint64_t paddr = 0xFEBF0000;
-    uint64_t vaddr = 0;
-
-    HBA_MEM *abar;
-    
-}
-
-void probe_port(HBA_MEM *abar_) {
-    //Search disk in implemented ports
-    uint32_t pi = abar_->pi;
-    int i = 0;
-    while (i < 32) {
-        if (pi & 1) {
-            int dt = check_type((HBA_PORT *)&abar_->ports[i]);
-
-            if (dt == AHCI_DEV_SATA) {
-                printf("SATA drive found at port %d\n", i);
-                abar = abar_;
-                port_rebase(abar_->ports, i);
-                //read(&abar_temp->ports[0], 0, 0, 2, (uint64_t)pages_for_ahci_start + (20*4096)/8);
-                //print("\nafter read %d",((HBA_PORT *)&abar_temp->ports[i])->ssts);
-                return;
-            }
-        }
-        pi >>= 1;
-        i++;
-    }
-}
-
-int find_cmdslot(HBA_PORT *port) {
-    uint32_t slots = (port->sact | port->ci);
-    unsigned slots_len = (abar->cap & 0x0F00) >> 8;
-
-    int i;
-    for (i = 0; i < slots_len; i++) {
-        if (!(slots & 1))
-            return i;
-        slots >>= 1;
-    }
-
-    printf("AHCI: Cannot find command list entry. [%d]\n", i);
-    return -1;
+HBA_MEM *get_abar(pci_function_t *func) {
+    return (HBA_MEM *)(unsigned long)(get_pci_bar(func, 5) & 0xFFFFFFF0);
 }
 
 int check_type(HBA_PORT *port) {
@@ -147,6 +101,42 @@ int check_type(HBA_PORT *port) {
     return AHCI_DEV_NULL;
 }
 
+void probe_port(HBA_MEM *abar_) {
+    //Search disk in implemented ports
+    uint32_t pi = abar_->pi;
+    int i = 0;
+    while (i < 32) {
+        if (pi & 1) {
+            int dt = check_type((HBA_PORT *)&abar_->ports[i]);
+
+            if (dt == AHCI_DEV_SATA) {
+                printf("SATA drive found at port %d\n", i);
+                ahci.abar = abar_;
+                port_rebase(abar_->ports, i);
+                //read(&abar_temp->ports[0], 0, 0, 2, (uint64_t)pages_for_ahci_start + (20*4096)/8);
+                //print("\nafter read %d",((HBA_PORT *)&abar_temp->ports[i])->ssts);
+                return;
+            }
+        }
+        pi >>= 1;
+        i++;
+    }
+}
+
+int find_cmdslot(HBA_PORT *port) {
+    uint32_t slots = (port->sact | port->ci);
+    unsigned slots_len = (ahci.abar->cap & 0x0F00) >> 8;
+
+    int i;
+    for (i = 0; i < slots_len; i++) {
+        if (!(slots & 1))
+            return i;
+        slots >>= 1;
+    }
+
+    printf("AHCI: Cannot find command list entry. [%d]\n", i);
+    return -1;
+}
 
 void start_cmd(HBA_PORT *port) {
     while (port->cmd & HBA_PxCMD_CR);
@@ -201,6 +191,7 @@ void port_rebase(HBA_PORT *port, int port_no) {
     clb_addr = (clb_addr + MEM_KERN_BASE);
 
     HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER *)clb_addr;
+
     for (i = 0; i < 32; i++) {
         cmdheader[i].prdtl = 8; // 8 prdt entries per command table
         // 256 bytes per command table, 64+16+48+16*8
@@ -225,7 +216,7 @@ bool wait_busy(HBA_PORT *port, int *spin) {
     while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && (*spin) < 1000000) {
         (*spin)++;
     }
-    if (spin >= 1000000) {
+    if (*spin >= 1000000) {
         printf("[AHCI]: err: port hung\n");
         return false;
     }
@@ -299,7 +290,7 @@ bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount
     port->ci = 1 << slot; //issue command
 
     while (true) { //wait for completion
-        if (port->ci & (1 << slot) == 0)
+        if (!(port->ci & (1 << slot)))
             break;
         if (port->is & HBA_PxIS_TFES) {
             printf("[AHCI]: err: disk read error\n");
@@ -316,7 +307,7 @@ bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount
     return true;
 }
 
-bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t *buf) {
+bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf) {
     port->is = 0xFFFF; //clear pending interrupt bits
 
     int slot = find_cmdslot(port);
@@ -333,20 +324,20 @@ bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scoun
     cmd_header->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);
     cmd_header->w = 1; //write to device
     cmd_header->c = 1;
+    cmd_header->p = 1;
 
     cmd_header->prdtl = 1; //prdt entries count
 
     uint64_t ctb = 0;
     ctb = (((ctb | cmd_header->ctbau) << 32) | cmd_header->ctba);
 
-    HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL *)(MEM_KERN_BASE+ctb);
-    memset((uint64_t *)(MEM_KERN_BASE + ctb), 0, sizeof(HBA_CMD_TBL));
-
+    HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL *)(MEM_KERN_BASE + ctb);
+    memset((void *)cmd_tbl, 0, sizeof(HBA_CMD_TBL));
 
     HBA_PRDT_ENTRY *prdt = &(cmd_tbl->prdt_entry[0]);
 
     prdt->dba = (uint32_t)(buf & 0xFFFFFFFF);
-    prdt->dbau = (uint32_t)((buf >> 32) & 0xFFFFFFFF);
+    prdt->dbau = (uint32_t)((buf << 32) & 0xFFFFFFFF);
     prdt->dbc = 4096-1; //512 bytes per sector
     prdt->i = 0;
 
