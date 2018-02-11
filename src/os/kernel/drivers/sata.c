@@ -77,6 +77,10 @@ void ahci_init(void) {
     //...
 }
 
+bool found_ahci() {
+    return ahci.found;
+}
+
 bool find_ahci(pci_function_t *func) {
     if (func->class_ == PCI_C_STORAGE && func->subclass == PCI_SC_AHCI) {
         ahci.found = true;
@@ -125,7 +129,7 @@ void portstop(HBA_PORT *port) {
 }
 
 void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *fisbase) {
-    uintptr_t cll, fisbasel, ctlistl;
+    volatile uintptr_t cll, fisbasel, ctlistl;
     int i;
 
     checkalign(cl, 1*1024, "portinit - cl align");
@@ -140,6 +144,8 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
     // assert(hba.dma64 && ctlistl >= 4*GB, "[AHCI]: portinit - ctlist", NULL);
 
     portstop(port);
+
+    printf("CLL = %d\n", cll);
 
     port->clb = (unsigned)cll;
     if (hba.dma64)
@@ -352,7 +358,7 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
 	int spin = 0; // Spin lock timeout counter
 	int slot = find_cmdslot(port);
 	if (slot == -1)
-		return false;
+		return false;        
  
 	HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER *)port->clb;
 	cmdheader += slot;
@@ -375,6 +381,9 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
 		buf += 4*1024;	// 4K words
 		count -= 16;	// 16 sectors
 	}
+
+    while (1);
+
 	// Last entry
 	cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
 	cmdtbl->prdt_entry[i].dbc = (count<<9)-1;	// 512 bytes per sector
@@ -400,14 +409,14 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
 	cmdfis->counth = (count >> 8) & 0xFF;
  
 	// The below loop waits until the port is no longer busy before issuing a new command
-	while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
+	while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ))/*  && spin < 1000000 */)
 	{
 		spin++;
 	}
-	if (spin == 1000000)
+	/* if (spin == 1000000)
 	{
 		return AHCI_PORT_HUNG;
-	}
+	} */
  
 	port->ci = 1<<slot;	// Issue command
  
@@ -428,6 +437,7 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
 	{
 		return AHCI_READ_ERR;
 	}
+
  
 	return true;
 }

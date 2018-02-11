@@ -35,12 +35,19 @@ void kmain(void) {
     mbr_init();
     ahci_init();
 
-    ahci_detect();
+    bool ahci_exists = false;
+
+    ahci_exists = ahci_detect();
 
     HBA_PORT *port = get_port();
 
     uint8_t buf[512];
     bzero(buf, 512);
+
+    printf("weiner\n");
+
+    printf("FAHCI: %d\n", ahci_exists);
+
 
     // uint8_t out[] = {'T', 'E', 'S', 'T', '\0'};
 
@@ -56,7 +63,12 @@ void kmain(void) {
 
     chk_err(<function>, params...);
     */
-    chk_err(read, port, 0, 0, 1, buf);
+    printf("READING FROM PORT %d\n", port);
+
+    if (!ahci_exists) {
+        while (1);
+    }
+    chk_err(read, port, 0, 0, 1, (uint16_t *)buf);
 
     // sata_write();
 

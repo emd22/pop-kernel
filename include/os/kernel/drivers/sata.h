@@ -308,5 +308,6 @@ HBA_PORT *get_port(void);
 // void ahci_write(uint8_t *addr, size_t lba, uint16_t scount);
 
 bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf);
+bool found_ahci(void);
 
 #endif
