@@ -27,5 +27,6 @@ typedef struct {
 unsigned pcireadl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
 uint16_t pcireadw(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
 uint8_t pcireadb(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
+void pci_each(int (*f)(pci_function_t *));
 
 #endif

@@ -13,6 +13,7 @@
 #include <kernel/debug.h>
 #include <kernel/mem2d.h>
 #include <kernel/args.h>
+#include <kernel/err.h>
 #include <osutil.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -34,7 +35,28 @@ void kmain(void) {
     mbr_init();
     ahci_init();
 
-    HBA_PORT port;
+    ahci_detect();
+
+    HBA_PORT *port = get_port();
+
+    uint8_t buf[512];
+    bzero(buf, 512);
+
+    // uint8_t out[] = {'T', 'E', 'S', 'T', '\0'};
+
+    // memcpy(buf, out, 5);
+
+    // ahci_write(buf, 1000, 1);
+
+    // bzero(buf, 512);
+
+    /* 
+    chk_err runs this function(made as macro so it could return any type + have any param types) 
+    and checks the return type. it will kernel panic if error is found.
+
+    chk_err(<function>, params...);
+    */
+    chk_err(read, port, 0, 0, 1, buf);
 
     // sata_write();
 

@@ -2,6 +2,7 @@
 #define SATA_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 #include <kernel/drivers/pci.h>
@@ -21,9 +22,9 @@
 
 typedef volatile struct tagHBA_PORT {
     uint32_t clb;       // 0x00, command list base address, 1K-byte aligned
-    uint32_t clbu;      // 0x04, command list base address upper 32 bits
+    unsigned clbu;      // 0x04, command list base address upper 32 bits
     uint32_t fb;        // 0x08, FIS base address, 256-byte aligned
-    uint32_t fbu;       // 0x0C, FIS base address upper 32 bits
+    unsigned fbu;       // 0x0C, FIS base address upper 32 bits
     uint32_t is;        // 0x10, interrupt status
     uint32_t ie;        // 0x14, interrupt enable
     uint32_t cmd;       // 0x18, command and status
@@ -296,10 +297,16 @@ typedef struct tagHBA_CMD_TBL {
 } HBA_CMD_TBL;
 
 void ahci_init(void);
-void probe_port(HBA_MEM *abar);
-void port_rebase(HBA_PORT *port, int portno);
-bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf);
-bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf);
-HBA_MEM *get_abar(pci_function_t *func);
+// void probe_port(HBA_MEM *abar);
+// void port_rebase(HBA_PORT *port, int portno);
+// bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf);
+// bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf);
+bool ahci_detect(void);
+HBA_PORT *get_port(void);
+
+// void ahci_read(uint8_t *addr, size_t lba, uint16_t scount);
+// void ahci_write(uint8_t *addr, size_t lba, uint16_t scount);
+
+bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf);
 
 #endif
