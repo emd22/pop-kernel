@@ -1,4 +1,5 @@
 #include <kernel/drivers/pci.h>
+#include <sys/objclr.h>
 #include <stdlib.h>
 #include <string.h>
 
