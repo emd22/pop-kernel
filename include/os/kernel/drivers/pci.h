@@ -2,31 +2,22 @@
 #define PCI_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
-    uint16_t vendorid;
     uint8_t bus;
-    uint8_t dev;
-    uint8_t func;
-    uint8_t class_;
+    uint8_t slot;
+    uint8_t function;
+
+    uint16_t vendor;
+
+    uint8_t _class;
     uint8_t subclass;
-} pci_dat_t;
-
-typedef struct {
-    uint16_t vendorid;
-    uint8_t bus;
-    uint8_t dev;
-    uint8_t func;
-    uint8_t class_;
-    uint8_t subclass;
-} pci_function_t;
-
-#define PCI_C_STORAGE 0x10
-#define PCI_SC_AHCI 0x60
-
-unsigned pcireadl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
-uint16_t pcireadw(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
-uint8_t pcireadb(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
-void pci_each(int (*f)(pci_function_t *));
+    uint8_t prog_if;
+    uint8_t rev_id;
+    uint8_t head_type;
+    uint8_t n_functions;
+    bool multi_func;
+} pci_header_t;
 
 #endif

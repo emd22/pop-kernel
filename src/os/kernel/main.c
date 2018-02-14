@@ -44,10 +44,7 @@ void kmain(void) {
     uint8_t buf[512];
     bzero(buf, 512);
 
-    printf("weiner\n");
-
     printf("FAHCI: %d\n", ahci_exists);
-
 
     // uint8_t out[] = {'T', 'E', 'S', 'T', '\0'};
 

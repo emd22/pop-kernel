@@ -21,7 +21,7 @@
 //TODO: remove unused code.
 
 typedef volatile struct tagHBA_PORT {
-    uint32_t clb;       // 0x00, command list base address, 1K-byte aligned
+    unsigned clb;       // 0x00, command list base address, 1K-byte aligned
     unsigned clbu;      // 0x04, command list base address upper 32 bits
     uint32_t fb;        // 0x08, FIS base address, 256-byte aligned
     unsigned fbu;       // 0x0C, FIS base address upper 32 bits
