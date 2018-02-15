@@ -5,6 +5,11 @@
 
 #define PCI_AMT 12
 
+#define BUS_AMT 256
+#define SLOT_AMT 32
+
+#define NEXT -1
+
 struct {
     pci_header_t *hdrs;
     unsigned index;
@@ -12,6 +17,7 @@ struct {
 
 void pci_init(void) {
     hdrs.hdrs = (pci_header_t *)malloc(sizeof(pci_header_t)*PCI_AMT);
+    hdrs.index = 0;
     
     //set all values of headers to zero
     int i;
@@ -81,10 +87,38 @@ void create_dev_header(uint8_t bus, uint8_t slot, uint8_t func) {
     head->vend_id = entry00 & 0xFFFF;
 
     uint32_t entry08 = pci_config_readw(bus, slot, func, 0x08);
-    head->class_ = (entry08 & 0xFF000000) >> 24;
+    head->class_ = (entry08 & 0xFF000000)256 >> 24;
     head->subclass = (entry08 & 0xFF0000) >> 16;
     head->prog_if = (entry08 & 0xFF00) >> 8;
     head->rev_id = (entry08 & 0xFF);
+}
+
+void set_hdr(int index, uint8_t bus, uint8_t slot, uint8_t func) {
+    pci_header_t *hdr = &hdrs.hdrs[index == -1 ? index : hdrs.index];
+}
+
+bool chk_multi_func(uint8_t bus, uint8_t slot) {
+    uint8_t head_type = (pci_config_readw(bus, slot, 0, 0x0C) & 0xFF0000) >> 16;
+    return (head_type & 0x80);
+}
+
+void scan_brute_force(void) {
+    int bus, slot, func;
+
+    for (bus = 0; bus < BUS_AMT; bus++) {
+        for (slot = 0; slot < SLOT_AMT; slot++) {
+            if (dev_is_valid(bus, slot, 0)) {
+                if (chk_multi_func(bus, slot)) {
+                    for (func = 0; func < 8; func++) {
+                        if (dev_is_valid(bus, slot, func))
+                            create_dev_header(bus, slot, func);
+                    }
+                }
+                else
+                    hdrs.hdrs[hdrs.index++];
+            }
+        }
+    }
 }
 
 void check_dev(uint8_t bus, uint8_t dev) {
