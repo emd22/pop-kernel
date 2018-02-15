@@ -3,15 +3,15 @@
 #include <string.h>
 #include <stdio.h>
 
-#define	HEAP_SIZE 1000000u
-#define	MALLOC_MAGIC 0x6D92	/* must be < 0x8000 */
+#define    HEAP_SIZE 1000000u
+#define    MALLOC_MAGIC 0x6D92    /* must be < 0x8000 */
 
 typedef struct _malloc {
     size_t size; /* 2 bytes 4 bytes */
     struct _malloc *next; /* 2 bytes 4 bytes */
     unsigned magic : 15; /* 2 bytes total 4 bytes total */
     unsigned used : 1;
-} malloc_t;	 /* total 6 bytes 12 bytes */
+} malloc_t;     /* total 6 bytes 12 bytes */
 
 static char *g_heap_bot, *g_kbrk, *g_heap_top;
 

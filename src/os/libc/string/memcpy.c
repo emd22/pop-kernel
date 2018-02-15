@@ -17,17 +17,17 @@ void *memcpy(void *dst_, const void *src_, size_t length) {
     }
 
     /*
-	 * Macros: loop-t-times; and loop-t-times, t>0
-	 */
-    #define	TLOOP(s) if (t) TLOOP1(s)
-    #define	TLOOP1(s) do { s; } while (--t)
-	
+     * Macros: loop-t-times; and loop-t-times, t>0
+     */
+    #define    TLOOP(s) if (t) TLOOP1(s)
+    #define    TLOOP1(s) do { s; } while (--t)
+    
 
     if ((size_t)dst < (size_t)src) {
         /*
          * Copy forward.
          */
-        t = (size_t)src;	/* only need low bits */
+        t = (size_t)src;    /* only need low bits */
         if ((t | (size_t)dst) & wmask) {
             /*
              * Try to align operands.  This cannot be done

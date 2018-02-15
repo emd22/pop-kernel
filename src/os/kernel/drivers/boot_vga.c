@@ -20,7 +20,7 @@ uint8_t bvga_no_colour() {
 }
 
 uint16_t bvga_entry(uint8_t uc, uint8_t colour) {
-	return (uint16_t) uc | (uint16_t) colour << 8;
+    return (uint16_t) uc | (uint16_t) colour << 8;
 }
 
 void bvga_set_colour(uint8_t colour) {

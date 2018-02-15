@@ -8,12 +8,12 @@
 void reverse(char *str, int length) {
     int start = 0;
     int end = length-1;
-	char tmp;
+    char tmp;
 
     while (start < end) {
-		tmp = *(str+start);
-		*(str+start) = *(str+end);
-		*(str+end) = tmp;
+        tmp = *(str+start);
+        *(str+start) = *(str+end);
+        *(str+end) = tmp;
         start++;
         end--;
     }

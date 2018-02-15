@@ -31,10 +31,10 @@ extern void idt_load(uintptr_t); // defined in idt_load.s
 #endif
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags) {
-    idt.entries[num].base_low =	(base & 0xFFFF);
+    idt.entries[num].base_low =    (base & 0xFFFF);
     idt.entries[num].base_high = (base >> 16) & 0xFFFF;
     idt.entries[num].sel = sel;
-    idt.entries[num].zero =	0;
+    idt.entries[num].zero =    0;
     idt.entries[num].flags = flags | 0x60;
 }
 

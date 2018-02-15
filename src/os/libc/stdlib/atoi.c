@@ -14,7 +14,7 @@ int atoi(const char *str) {
      */
 
     while (isspace(*str))
-	    str += 1;
+        str += 1;
 
     if (*str == '-') {
         sign = 1;
@@ -35,7 +35,7 @@ int atoi(const char *str) {
     }
 
     if (sign) {
-	    return -result;
+        return -result;
     }
     return result;
 }

@@ -9,7 +9,8 @@ typedef struct {
     uint8_t slot;
     uint8_t function;
 
-    uint16_t vendor;
+    uint16_t vend_id;
+    uint16_t dev_id;
 
     uint8_t _class;
     uint8_t subclass;
