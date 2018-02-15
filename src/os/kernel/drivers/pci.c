@@ -81,10 +81,10 @@ void create_dev_header(uint8_t bus, uint8_t slot, uint8_t func) {
     head->vend_id = entry00 & 0xFFFF;
 
     uint32_t entry08 = pci_config_readw(bus, slot, func, 0x08);
-    head->_class = (entry08 & 0xFF000000) >> 24;
-    head->subclassCode = (entry08 & 0xFF0000) >> 16;
-    head->progIf = (entry08 & 0xFF00) >> 8;
-    head->revisionId = (entry08 & 0xFF);
+    head->class_ = (entry08 & 0xFF000000) >> 24;
+    head->subclass = (entry08 & 0xFF0000) >> 16;
+    head->prog_if = (entry08 & 0xFF00) >> 8;
+    head->rev_id = (entry08 & 0xFF);
 }
 
 void check_dev(uint8_t bus, uint8_t dev) {
