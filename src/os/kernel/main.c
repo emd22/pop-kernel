@@ -8,6 +8,7 @@
 
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/boot_vga.h>
+#include <kernel/drivers/pci.h>
 #include <kernel/drivers/sata.h>
 #include <kernel/drivers/mbr.h>
 #include <kernel/debug.h>
@@ -31,20 +32,21 @@ int check_command(char **args, const char *command) {
 void kmain(void) {
     bvga_init();
     keyboard_init();
+    pci_init();
     // ata_pio_install();
+    // ahci_init();
     mbr_init();
-    ahci_init();
 
-    bool ahci_exists = false;
+    // bool ahci_exists = false;
 
-    ahci_exists = ahci_detect();
+    // ahci_exists = ahci_detect();
 
-    HBA_PORT *port = get_port();
+    // HBA_PORT *port = get_port();
 
-    uint8_t buf[512];
-    bzero(buf, 512);
+    // uint8_t buf[512];
+    // bzero(buf, 512);
 
-    printf("FAHCI: %d\n", ahci_exists);
+    // printf("FAHCI: %d\n", ahci_exists);
 
     // uint8_t out[] = {'T', 'E', 'S', 'T', '\0'};
 
@@ -60,12 +62,12 @@ void kmain(void) {
 
     chk_err(<function>, params...);
     */
-    printf("READING FROM PORT %d\n", port);
+    // printf("READING FROM PORT %d\n", port);
 
-    if (!ahci_exists) {
-        while (1);
-    }
-    chk_err(read, port, 0, 0, 1, (uint16_t *)buf);
+    // if (!ahci_exists) {
+    //     while (1);
+    // }
+    // chk_err(read, port, 0, 0, 1, (uint16_t *)buf);
 
     // sata_write();
 

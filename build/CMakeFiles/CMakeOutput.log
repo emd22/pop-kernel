@@ -1,8 +1,8 @@
-The system is: Linux - 4.13.0-32-generic - x86_64
+The system is: Linux - 4.4.0-53-generic - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc 
 Build flags: -T;/home/ethan/Desktop/pop-kernel/linker.ld;-ffreestanding;-nostdlib;-nostartfiles;-Wall
-Id flags:  
+Id flags: 
 
 The output was:
 0
@@ -11,7 +11,28 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/home/ethan/Desktop/pop-kernel/build/CMakeFiles/3.9.1/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/home/ethan/Desktop/pop-kernel/build/CMakeFiles/3.5.1/CompilerIdC/a.out"
+
+Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
+GNU assembler (GNU Binutils) 2.24
+Copyright 2013 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or later.
+This program has absolutely no warranty.
+This assembler was configured for a target of `i686-elf'.
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc 
+Build flags: -T;/home/ethan/Desktop/pop-kernel/linker.ld;-ffreestanding;-nostdlib;-nostartfiles;-Wall
+Id flags: 
+
+The output was:
+0
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/ethan/Desktop/pop-kernel/build/CMakeFiles/3.5.1/CompilerIdC/a.out"
 
 Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
 GNU assembler (GNU Binutils) 2.24
@@ -23,14 +44,14 @@ This assembler was configured for a target of `i686-elf'.
 Determining if the C compiler works passed with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_6829c/fast"
-/usr/bin/make -f CMakeFiles/cmTC_6829c.dir/build.make CMakeFiles/cmTC_6829c.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_55b9a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_55b9a.dir/build.make CMakeFiles/cmTC_55b9a.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_6829c.dir/testCCompiler.c.o
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_6829c.dir/testCCompiler.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_6829c
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6829c.dir/link.txt --verbose=1
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_6829c.dir/testCCompiler.c.o  -o cmTC_6829c 
+Building C object CMakeFiles/cmTC_55b9a.dir/testCCompiler.c.o
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_55b9a.dir/testCCompiler.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_55b9a
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_55b9a.dir/link.txt --verbose=1
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_55b9a.dir/testCCompiler.c.o  -o cmTC_55b9a 
 /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
@@ -38,14 +59,14 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e262d/fast"
-/usr/bin/make -f CMakeFiles/cmTC_e262d.dir/build.make CMakeFiles/cmTC_e262d.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_286b8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_286b8.dir/build.make CMakeFiles/cmTC_286b8.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_e262d
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e262d.dir/link.txt --verbose=1
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o  -o cmTC_e262d 
+Building C object CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_286b8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_286b8.dir/link.txt --verbose=1
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o  -o cmTC_286b8  
 Using built-in specs.
 COLLECT_GCC=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc
 COLLECT_LTO_WRAPPER=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper
@@ -55,24 +76,24 @@ Thread model: single
 gcc version 4.9.1 (GCC) 
 COMPILER_PATH=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/
 LIBRARY_PATH=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib/
-COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/pop-kernel/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_e262d' '-mtune=generic' '-march=pentiumpro'
- /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cc9bkKFQ.res -o cmTC_e262d -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/pop-kernel/linker.ld
+COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/pop-kernel/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_286b8' '-mtune=generic' '-march=pentiumpro'
+ /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cckUYTAx.res -o cmTC_286b8 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/pop-kernel/linker.ld
 /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
-  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_e262d/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_e262d.dir/build.make CMakeFiles/cmTC_e262d.dir/build]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_286b8/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_286b8.dir/build.make CMakeFiles/cmTC_286b8.dir/build]
   ignore line: [make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_e262d]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e262d.dir/link.txt --verbose=1]
-  ignore line: [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o  -o cmTC_e262d ]
+  ignore line: [Building C object CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -o CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_286b8]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_286b8.dir/link.txt --verbose=1]
+  ignore line: [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -v CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o  -o cmTC_286b8  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc]
   ignore line: [COLLECT_LTO_WRAPPER=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper]
@@ -82,19 +103,19 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 4.9.1 (GCC) ]
   ignore line: [COMPILER_PATH=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/]
   ignore line: [LIBRARY_PATH=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/:/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/pop-kernel/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_e262d' '-mtune=generic' '-march=pentiumpro']
-  link line: [ /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cc9bkKFQ.res -o cmTC_e262d -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/pop-kernel/linker.ld]
+  ignore line: [COLLECT_GCC_OPTIONS='-T' '/home/ethan/Desktop/pop-kernel/linker.ld' '-ffreestanding' '-nostdlib' '-nostartfiles' '-Wall' '-v' '-o' 'cmTC_286b8' '-mtune=generic' '-march=pentiumpro']
+  link line: [ /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2 -plugin /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so -plugin-opt=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper -plugin-opt=-fresolution=/tmp/cckUYTAx.res -o cmTC_286b8 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1 -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc -L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o -T /home/ethan/Desktop/pop-kernel/linker.ld]
     arg [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../libexec/gcc/i686-elf/4.9.1/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/cc9bkKFQ.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cckUYTAx.res] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_e262d] ==> ignore
+    arg [cmTC_286b8] ==> ignore
     arg [-L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1] ==> dir [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1]
     arg [-L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc] ==> dir [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc]
     arg [-L/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib] ==> dir [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/lib]
-    arg [CMakeFiles/cmTC_e262d.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_286b8.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-T] ==> ignore
     arg [/home/ethan/Desktop/pop-kernel/linker.ld] ==> ignore
   collapse library dir [/home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1] ==> [/home/ethan/Desktop/pop-kernel/cross-compiler/lib/gcc/i686-elf/4.9.1]
@@ -110,14 +131,14 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_37bb9/fast"
-/usr/bin/make -f CMakeFiles/cmTC_37bb9.dir/build.make CMakeFiles/cmTC_37bb9.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_cdbd9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_cdbd9.dir/build.make CMakeFiles/cmTC_cdbd9.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_37bb9.dir/feature_tests.c.o
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c11 -o CMakeFiles/cmTC_37bb9.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_37bb9
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_37bb9.dir/link.txt --verbose=1
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_37bb9.dir/feature_tests.c.o  -o cmTC_37bb9 
+Building C object CMakeFiles/cmTC_cdbd9.dir/feature_tests.c.o
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c11 -o CMakeFiles/cmTC_cdbd9.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_cdbd9
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cdbd9.dir/link.txt --verbose=1
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_cdbd9.dir/feature_tests.c.o  -o cmTC_cdbd9 
 /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
@@ -131,14 +152,14 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_fc69f/fast"
-/usr/bin/make -f CMakeFiles/cmTC_fc69f.dir/build.make CMakeFiles/cmTC_fc69f.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_ef88e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ef88e.dir/build.make CMakeFiles/cmTC_ef88e.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_fc69f.dir/feature_tests.c.o
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c99 -o CMakeFiles/cmTC_fc69f.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_fc69f
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fc69f.dir/link.txt --verbose=1
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_fc69f.dir/feature_tests.c.o  -o cmTC_fc69f 
+Building C object CMakeFiles/cmTC_ef88e.dir/feature_tests.c.o
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c99 -o CMakeFiles/cmTC_ef88e.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_ef88e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ef88e.dir/link.txt --verbose=1
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_ef88e.dir/feature_tests.c.o  -o cmTC_ef88e 
 /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
@@ -152,14 +173,14 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_67f16/fast"
-/usr/bin/make -f CMakeFiles/cmTC_67f16.dir/build.make CMakeFiles/cmTC_67f16.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_1f2d6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1f2d6.dir/build.make CMakeFiles/cmTC_1f2d6.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_67f16.dir/feature_tests.c.o
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc   -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c90 -o CMakeFiles/cmTC_67f16.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_67f16
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67f16.dir/link.txt --verbose=1
-/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_67f16.dir/feature_tests.c.o  -o cmTC_67f16 
+Building C object CMakeFiles/cmTC_1f2d6.dir/feature_tests.c.o
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc    -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall    -std=c90 -o CMakeFiles/cmTC_1f2d6.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_1f2d6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1f2d6.dir/link.txt --verbose=1
+/home/ethan/Desktop/pop-kernel/cross-compiler/bin/i686-elf-gcc  -T /home/ethan/Desktop/pop-kernel/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall     CMakeFiles/cmTC_1f2d6.dir/feature_tests.c.o  -o cmTC_1f2d6 
 /home/ethan/Desktop/pop-kernel/cross-compiler/bin/../lib/gcc/i686-elf/4.9.1/../../../../i686-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 0000000000100000
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
