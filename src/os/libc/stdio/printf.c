@@ -131,6 +131,11 @@ int printf(const char *fmt, ...) {
         else if (ch == '\n') {
             bvga_nl();
         }
+        else if (ch == '\r') {
+            int tpos[2];
+            bvga_get_pos(tpos);
+            bvga_set_pos(0, tpos[1]);
+        }
         else {
             bvga_put(ch, BVGA_NONE, 0);
             length++;

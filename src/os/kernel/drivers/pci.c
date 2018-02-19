@@ -132,11 +132,11 @@ void check_dev(uint8_t bus, uint8_t dev) {
         //multi function device, check remaining functions
         for (func = 1; func < 8; func++) {
             if (head->vend_id != 0xFFFF) {
-                hdrs.index++;
                 check_function(bus, dev, func);
             }
         }
     }
+    // printf("CHK: %d, %d\n", bus, dev);
 }
 
 void scan_brute_force(void) {
@@ -146,6 +146,7 @@ void scan_brute_force(void) {
         for (dev = 0; dev < 32; dev++) {
             check_dev((uint8_t)bus, (uint8_t)dev);
         }
+        // printf("PCI_BRUTE: %d\n", bus);
     }
 }
 

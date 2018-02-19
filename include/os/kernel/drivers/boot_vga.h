@@ -43,8 +43,9 @@ void     bvga_set_colour(uint8_t colour);
 void     bvga_putstr(const char *str, uint8_t colour);
 void     bvga_put(char c, uint8_t colour, int flags);
 bool     bvga_set_pos(int x, int y);
-void      bvga_mov_cur(int x_rel, int y_rel);
-void      bvga_cursorpos(int x, int y);
-void      bvga_clear(void);
+void     bvga_get_pos(int *pos);
+void     bvga_mov_cur(int x_rel, int y_rel);
+void     bvga_cursorpos(int x, int y);
+void     bvga_clear(void);
 
 #endif
