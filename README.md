@@ -5,6 +5,7 @@ Pop kernel is a x86 kernel written almost completely in C. Some of the current f
 - WIP AHCI driver
 - WIP PCI driver
 - WIP SATA driver
+
 The main goal for Pop Kernel is to be fast and able to run on low-end computers. The kernel will be built using "modules" of lua files. Many drivers will be downloadable and would be run as a process. For example, the UI would be some lua files which could be edited/worked on while the operating system is running. This would be done by having a reserved ram disk that will hold all system files. if the operating system finds the refresh command, it will test to see if the modules are runnable. I chose to use lua because of its speed, portability and size.
 
 ## Getting started
