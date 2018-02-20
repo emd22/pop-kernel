@@ -23,14 +23,6 @@ void pci_init(void) {
     int i;
     for (i = 0; i < PCI_AMT; i++)
         memset(&hdrs.hdrs[i], 0, sizeof(pci_header_t));
-
-    scan_brute_force();
-
-    printf("FOUND %d PCI DEVICES!\n", hdrs.index);
-
-    for (i = 0; i < hdrs.index; i++) {
-        printf("dev #%d vid -> %x\n", i, hdrs.hdrs[i].vend_id);
-    }
 }
 
 // inline void sysoutl(uint16_t port, uint32_t val) {
@@ -224,7 +216,7 @@ bool is_multi_func(uint8_t bus, uint8_t slot) {
     return (head & 0x80);
 }
 
-void scan_brute_force() {
+void scan_brute_force(int (*cb)(pci_header_t *)) {
     int bus, slot, func;
 
     for (bus = 0; bus < 256; bus++) {
@@ -238,6 +230,7 @@ void scan_brute_force() {
                 }
                 else
                     create_dev_header(bus, slot, 0);
+                cb(&hdrs.hdrs[hdrs.index]);
             }
         }
     }
