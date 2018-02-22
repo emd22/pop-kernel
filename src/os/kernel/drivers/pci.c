@@ -164,6 +164,14 @@ void pci_init(void) {
 
 
 
+unsigned readl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
+    size_t addr;
+
+    addr = (1 << 31) | (bus << 16) | (dev << 11) | (func << 8) | (offset & 0xFC);
+
+    outl(0xCF8, addr);
+    return inl(0xCFC);
+}
 
 uint32_t readi(uint16_t port) {
     uint32_t val;

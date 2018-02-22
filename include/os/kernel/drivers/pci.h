@@ -22,6 +22,7 @@ typedef struct {
 } pci_header_t;
 
 void pci_init(void);
+unsigned readl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset);
 uint16_t pci_config_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 uint16_t pci_check_vendor(uint8_t bus, uint8_t slot);
 bool dev_is_valid(uint8_t bus, uint8_t slot, uint8_t func);

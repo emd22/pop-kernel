@@ -10,7 +10,7 @@
 Some AHCI/SATA code taken from osdev.org.
 */
 
-#define FIS_CMD_IDENTIFY 0xEC
+// #define FIS_CMD_IDENTIFY 0xEC
 
 #define PCI_C_STORAGE 0x01
 #define PCI_SC_AHCI 0x06
@@ -29,18 +29,18 @@ Some AHCI/SATA code taken from osdev.org.
 #define HBA_PORT_IPM_ACTIVE  1
 #define HBA_PORT_DET_PRESENT 3
 
-#define AHCI_BASE 0x400000 //4M
+// #define AHCI_BASE 0x400000 //4M
 
-#define HBA_Px 0x0001
-#define HBA_PxCMD_FRE 0x0010
+// #define HBA_Px 0x0001
+// #define HBA_PxCMD_FRE 0x0010
 #define HBA_PxCMD_FR 0x4000
 #define HBA_PxCMD_CR 0x8000
 
 #define AHCI_PHYS_BASE 0x800000
-#define AHCI_VIRT_BASE 0xFFFFFFFF00800000
+// #define AHCI_VIRT_BASE 0xFFFFFFFF00800000
 
-#define AHCI_DEV_BUSY 0x80
-#define AHCI_DEV_DRQ  0x08
+// #define AHCI_DEV_BUSY 0x80
+// #define AHCI_DEV_DRQ  0x08
 
 #define BAR0 0x10
 
@@ -81,35 +81,20 @@ void ahci_init(void) {
     //...
 }
 
-bool found_ahci() {
-    return ahci.found;
-}
-
 bool find_ahci(pci_header_t *func) {
     if (func->class_ == PCI_C_STORAGE && func->subclass == PCI_SC_AHCI) {
         ahci.found = true;
         hba.pci = *func;
-        return false;
-    }
-    else {
         return true;
     }
-}
-
-int pop_count(size_t x) {
-    int count;
-    for (count = 0; x; count++) {
-        x &= x - 1; // clear least significant non-zero bit
+    else {
+        return false;
     }
-    return count;
-}
-
-unsigned get_pci_bar(pci_header_t *func, uint8_t bar) {
-    return pcireadl(func->bus, func->dev_id, func->function, BAR0+4*bar);
 }
 
 HBA_MEM *get_abar(pci_header_t *func) {
-    return (HBA_MEM *)(unsigned long)(get_pci_bar(func, 5) & 0xFFFFFFF0);
+    unsigned pci_bar = readl(func->bus, func->dev_id, func->function, BAR0+20);
+    return (HBA_MEM *)(unsigned long)(pci_bar & 0xFFFFFFF0);
 }
 
 void checkalign(void *a, int alignment, char *msg) {
@@ -143,10 +128,6 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
     fisbasel = (uintptr_t)fisbase;
     ctlistl = (uintptr_t)ctlist;
 
-    // assert(hba.dma64 && cll >= 4*GB, "[AHCI]: portinit - cl", NULL);
-    // assert(hba.dma64 && fisbasel >= 4*GB, "[AHCI]: portinit - fisbase", NULL);
-    // assert(hba.dma64 && ctlistl >= 4*GB, "[AHCI]: portinit - ctlist", NULL);
-
     portstop(port);
 
     printf("CLL = %d\n", cll);
@@ -167,23 +148,6 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
     }
 
     portstart(port);
-}
-
-bool ahci_detect(void) {
-    HBA_MEM *base;
-
-    pci_each(find_ahci);
-
-    if (ahci.found) {
-        base = hba.base = get_abar(&hba.pci);
-        hba.n_ports = pop_count(base->pi);
-        hba.n_slots = ((base->cap >> 8) & 0x1F) + 1;
-        hba.dma64  = base->cap & (1 << 31);
-
-        portinit(&base->ports[0], cmdlist, cmdtbls, &fisstorage);
-    }
-
-    return ahci.found;
 }
 
 int check_type(HBA_PORT *port) {
@@ -212,9 +176,13 @@ int check_type(HBA_PORT *port) {
     return AHCI_DEV_NULL;
 }
 
-// HBA_CMD_TBL *getcmdtbl(HBA_CMD_HEADER *cmdhdr) {
-//     return (HBA_CMD_TBL *)(((size_t)cmdhdr->ctbau << 32) + cmdhdr->ctba);
-// }
+HBA_CMD_HEADER *get_cmdlist(HBA_PORT *port) {
+    return (HBA_CMD_HEADER *)(((size_t)port->clbu << 32) + port->clb);
+}
+
+HBA_CMD_TBL *get_cmdtbl(HBA_CMD_HEADER *cmdhdr) {
+    return (HBA_CMD_TBL *)(((size_t)cmdhdr->ctbau << 32) + cmdhdr->ctba);
+}
 
 int find_cmdslot(HBA_PORT *port) {
     uint32_t slots = (port->sact | port->ci);
@@ -341,121 +309,126 @@ HBA_PORT *get_port(void) {
     return &hba.base->ports[0];
 }
 
-// HBA_CMD_HEADER *getcmdlist(HBA_PORT *port) {
-//     return (HBA_CMD_HEADER *)(((size_t)port->clbu << 32) + port->clb);
-// }
+void mkprd(HBA_PRDT_ENTRY *prd, uintptr_t addr, unsigned bytes) {
+    assert(bytes <= 4*MB, "[AHCI]: mkprd", NULL);
 
-// void mkprd(HBA_PRDT_ENTRY *prd, uintptr_t addr, unsigned bytes) {
-//     assert(bytes <= 4*MB, "[AHCI]: mkprd", NULL);
-
-//     prd->dba = (unsigned)addr;
-//     if (hba.dma64) {
-//         prd->dbau = (unsigned)(addr >> 32);
-//     }
-
-//     prd->dbc = bytes - 1; // zero indexed
-//     prd->i = 1;
-// }
-
-bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf) {
-    port->is = (uint32_t) -1;        // Clear pending interrupt bits
-    int spin = 0; // Spin lock timeout counter
-    int slot = find_cmdslot(port);
-    if (slot == -1)
-        return false;        
- 
-    HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER *)port->clb;
-    cmdheader += slot;
-    cmdheader->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);    // Command FIS size
-    cmdheader->w = 0;        // Read from device
-    cmdheader->prdtl = (uint16_t)((count-1) >> 4)+1;    // PRDT entries count
- 
-    HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL *)(cmdheader->ctba);
-    memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) +
-         (cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
- 
-    int i;
-
-    // 8K bytes (16 sectors) per PRDT
-    for (i = 0; i < cmdheader->prdtl-1; i++)
-    {
-        cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
-        cmdtbl->prdt_entry[i].dbc = 8*1024-1;    // 8K bytes (this value should always be set to 1 less than the actual value)
-        cmdtbl->prdt_entry[i].i = 1;
-        buf += 4*1024;    // 4K words
-        count -= 16;    // 16 sectors
+    prd->dba = (unsigned)addr;
+    if (hba.dma64) {
+        prd->dbau = (unsigned)(addr >> 32);
     }
 
-    while (1);
+    prd->dbc = bytes - 1; // zero indexed
+    prd->i = 1;
+}
 
-    // Last entry
-    cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
-    cmdtbl->prdt_entry[i].dbc = (count<<9)-1;    // 512 bytes per sector
-    cmdtbl->prdt_entry[i].i = 1;
- 
-    // Setup command
-    FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)(&cmdtbl->cfis);
- 
+const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
+    int slot, i;
+    uint16_t sectleft;
+    uintptr_t addr;
+    HBA_PORT *port;
+    HBA_CMD_HEADER *cmdhdr;
+    HBA_CMD_TBL *cmdtbl;
+
+    addr = (uintptr_t)buf;
+
+    checkalign(addr, 2, "ahciread - addr align");
+
+    port = &hba.base->ports[0];
+
+    port->is = 0xFFFFFFFF;      // clear interrupt flags
+
+    slot = find_cmdslot(port);
+    cmdhdr = get_cmdlist(&(port)[slot]);
+    cmdtbl = get_cmdtbl(cmdhdr);
+
+    cmdhdr->cfl = sizeof(FIS_REG_H2D)/sizeof(unsigned);
+    cmdhdr->w = write;
+    cmdhdr->prdtl = (scount*512 + PRDSIZE - 1) / PRDSIZE; // round up to the nearest 4MB
+
+    if (cmdhdr->prdtl > 8)
+        return "AHCI reading - prdtl error";
+
+    // WARING! ahciread relies on sizeof(CommandTable). If we ever
+    // dynamically allocate Command Tables, we must change ahciread!
+    bzero(cmdtbl, sizeof(HBA_CMD_TBL));
+
+    sectleft = scount;
+    for (i = 0; i < cmdhdr->prdtl-1; i++) {
+        cmdtbl->prdt_entry[i].dba = (uint32_t)buf;
+        cmdtbl->prdt_entry[i].dbc = 8*1024 -1;	// 8K bytes
+        cmdtbl->prdt_entry[i].i = 0;
+        addr += 4*MB; //4K words
+        sectleft -= 4*MB/512;
+    }
+    
+    mkprd(&cmdtbl->prdt_entry[i], addr, sectleft * 512);
+
+    FIS_REG_H2D *cmdfis = (FIS_REG_H2D *)(&cmdtbl->cfis);
+
     cmdfis->fis_type = FIS_TYPE_REG_H2D;
-    cmdfis->c = 1;    // Command
-    cmdfis->command = ATA_CMD_READ_DMA_EXT;
- 
-    cmdfis->lba0 = (uint8_t)startl;
-    cmdfis->lba1 = (uint8_t)(startl>>8);
-    cmdfis->lba2 = (uint8_t)(startl>>16);
-    cmdfis->device = 1<<6;    // LBA mode
- 
-    cmdfis->lba3 = (uint8_t)(startl>>24);
-    cmdfis->lba4 = (uint8_t)starth;
-    cmdfis->lba5 = (uint8_t)(starth>>8);
- 
-    cmdfis->countl = count & 0xFF;
-    cmdfis->counth = (count >> 8) & 0xFF;
- 
-    // The below loop waits until the port is no longer busy before issuing a new command
-    while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ))/*  && spin < 1000000 */)
-    {
-        spin++;
-    }
-    /* if (spin == 1000000)
-    {
-        return AHCI_PORT_HUNG;
-    } */
- 
-    port->ci = 1<<slot;    // Issue command
- 
-    // Wait for completion
-    while (true)
-    {
-        // In some longer duration reads, it may be helpful to spin on the DPS bit 
-        // in the PxIS port field as well (1 << 5)
-        if ((port->ci & (1<<slot)) == 0) 
+    cmdfis->c = 1;
+    cmdfis->command = write ? ATA_CMD_WRITE_DMA_EXT : ATA_CMD_READ_DMA_EXT;
+
+    cmdfis->lba0 = (uint8_t)lba;
+    cmdfis->lba1 = (uint8_t)(lba >> 8);
+    cmdfis->lba2 = (uint8_t)(lba >> 16);
+    cmdfis->device = (1 << 6);
+
+    cmdfis->lba3 = (uint8_t)(lba >> 24);
+    cmdfis->lba4 = (uint8_t)(lba >> 32);
+    cmdfis->lba5 = (uint8_t)(lba >> 40);
+
+    cmdfis->countl = (uint8_t)(scount);
+    cmdfis->counth = (uint8_t)(scount >> 8);
+
+    while (port->tfd & ((1 << 7) | (1 << 3)));
+
+    port->ci = 1 << slot; // issue the command!
+
+    // wait for the command to finish
+    for (;;) {
+        // break on complete
+        if ((port->ci & (1 << slot)) == 0)
             break;
-        if (port->is & HBA_PxIS_TFES) { //task file error
-            return AHCI_READ_ERR;
-        }
-    }
- 
-    // Check again
-    if (port->is & HBA_PxIS_TFES)
-    {
-        return AHCI_READ_ERR;
+
+        // error bit set in ata status register
+        if (port->is & PORT_IS_TFES)
+            return write ? "AHCI write - error 1" : "AHCI read - error 1";
     }
 
- 
-    return true;
+    // check again. no idea if this is necessary, but it's in an osdev example (of dubious quality)
+    if (port->is & PORT_IS_TFES)
+        return write ? "AHCI write - error 2" : "AHCI read - error 2";
+
+    return NULL;
 }
 
-int find_ahci(pci_header_t *head) {
-    if (head->class_ == PCI_C_STORAGE && head->subclass == PCI_SC_AHCI) {
-        ahci.found = true;
-        hba.pci = *head;
-        return 1;
-    }
-    return 0;
+const char *read(size_t lba, uint16_t scount, uint8_t *buf) {
+    return rw(lba, scount, buf, false);
 }
 
-int ahci_detect() {
+const char *write(size_t lba, uint16_t scount, uint8_t *buf) {
+    return rw(lba, scount, buf, true);
+}
+
+int pop_count(size_t x) {
+    int count;
+    for (count = 0;;count++) {
+        x &= x-1;
+    }
+    return count;
+}
+
+bool ahci_detect() {
     HBA_MEM *base;
     scan_brute_force(find_ahci);
+
+    if (ahci.found) {
+        base = hba.base = get_abar(&hba.pci);
+        hba.n_ports = pop_count(base->pi);
+        hba.n_slots = ((base->cap >> 8) & 0x1F)+1;
+        hba.dma64 = base->cap & (1 << 31)/* 64 bit addressing */;
+        portinit(&base->ports[0], cmdlist, cmdtbls, &fisstorage);
+    }
+    return ahci.found;
 }
