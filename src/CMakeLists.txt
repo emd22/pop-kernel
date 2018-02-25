@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+project(os C ASM)
 
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -12,7 +13,6 @@ set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -ffreestanding -nostdlib -nostar
 set(CMAKE_C_COMPILER ${PROJECT_PATH}/cross-compiler/bin/i686-elf-gcc)
 set(CMAKE_ASM_COMPILER ${PROJECT_PATH}/cross-compiler/bin/i686-elf-as)
 
-project(os C ASM)
 
 set(BUILD_NAME os)
 

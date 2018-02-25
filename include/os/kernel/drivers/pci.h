@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define PCI_SUCCESS 1
+#define PCI_FAIL 0
+
 typedef struct {
     uint8_t bus;
     uint8_t slot;

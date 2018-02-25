@@ -86,13 +86,13 @@ void kmain(void) {
     assert(ahci_exists, "AHCI not found.", NULL);
 
     uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
-    strcpy((char *)buf_, "Chicken Strips");
-    write(0, 1, buf_);
-    printf("\nWRITING COMPLETED\n");
-
     bzero(buf_, 512);
-    read(0, 1, buf_);
-    read(0, 1, buf_);
+    strcpy((char *)buf_, "bork!");
+    write(10, 1, buf_);
+    printf("\nWRITING COMPLETED\n");
+    
+    bzero(buf_, 512);
+    read(10, 1, buf_);
     bvga_clear();
 
     int i;

@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <kernel/x86.h>
 
-#define PCI_AMT 12
+#define PCI_AMT 8192
 
 #define BUS_AMT 256
 #define SLOT_AMT 32
@@ -161,9 +162,6 @@ void pci_init(void) {
 // }
 
 
-
-
-
 unsigned readl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
     size_t addr;
 
@@ -171,6 +169,24 @@ unsigned readl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
 
     outl(0xCF8, addr);
     return inl(0xCFC);
+}
+
+uint16_t readw(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
+    unsigned data;
+
+    data = pcireadl(bus, dev, func, offset);
+
+    return offset % 4 == 0 ? data : data >> 16;
+}
+
+
+uint8_t readb(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
+    unsigned data;
+    int shift = 8 * (offset % 4);
+
+    data = readl(bus, slot, func, offset);
+
+    return data >> shift;
 }
 
 uint32_t readi(uint16_t port) {
@@ -222,6 +238,33 @@ bool dev_valid(uint8_t bus, uint8_t slot, uint8_t func) {
 bool is_multi_func(uint8_t bus, uint8_t slot) {
     uint8_t head = (read_config(bus, slot, 0, 0x0C) & 0xFF0000) >> 16;
     return (head & 0x80);
+}
+
+int check_dev(uint8_t bus, uint8_t slot, int (*cb)(pci_header_t *)) {
+    uint16_t vend_id;
+    pci_header_t head;
+
+    vend_id = readw(bus, slot, 0, 0);
+
+    if (vend_id == 0xFFFF)
+        return PCI_FAIL;
+
+    head.vend_id = vend_id;
+    head.bus = bus;
+    head.slot = slot;
+    head.function = 0;
+    head.class_ = readb(bus, slot, 0, 10);
+    head.subclass = readb(bus, slot, 0, 11);
+
+    if (cb(&head) == 0)
+        return PCI_SUCCESS;
+
+    if (vend_id & (1 << 7)) { //multi function device
+        int i;
+        for (i = 1; i < 8; i++) {
+            vend_id = readw();
+        }
+    }
 }
 
 void scan_brute_force(int (*cb)(pci_header_t *)) {
