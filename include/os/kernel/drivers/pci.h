@@ -34,5 +34,6 @@ void set_hdr(int index, uint8_t bus, uint8_t slot, uint8_t func);
 bool chk_multi_func(uint8_t bus, uint8_t slot);
 void scan_brute_force(int (*cb)(pci_header_t *));
 pci_header_t *find_dev(uint8_t bus, uint8_t slot, uint8_t func);
+unsigned pci_bar(pci_header_t *func, uint8_t bar);
 
 #endif

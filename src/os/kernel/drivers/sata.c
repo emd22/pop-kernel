@@ -82,9 +82,11 @@ void ahci_init(void) {
 }
 
 bool find_ahci(pci_header_t *func) {
+    printf("test, class = %d, subclass = %d.\n", func->class_, func->subclass);
     if (func->class_ == PCI_C_STORAGE && func->subclass == PCI_SC_AHCI) {
         ahci.found = true;
         hba.pci = *func;
+        printf("found ahci, all good\n");
         return true;
     }
     else {
@@ -93,8 +95,7 @@ bool find_ahci(pci_header_t *func) {
 }
 
 HBA_MEM *get_abar(pci_header_t *func) {
-    unsigned pci_bar = readl(func->bus, func->dev_id, func->function, BAR0+20);
-    return (HBA_MEM *)(unsigned long)(pci_bar & 0xFFFFFFF0);
+    return (HBA_MEM *)(unsigned long)(pci_bar(func, 5) & 0xFFFFFFF0);
 }
 
 void checkalign(void *a, int alignment, char *msg) {
@@ -348,8 +349,6 @@ const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
     if (cmdhdr->prdtl > 8)
         return "AHCI reading - prdtl error";
 
-    // WARING! ahciread relies on sizeof(CommandTable). If we ever
-    // dynamically allocate Command Tables, we must change ahciread!
     bzero(cmdtbl, sizeof(HBA_CMD_TBL));
 
     sectleft = scount;
@@ -413,7 +412,7 @@ const char *write(size_t lba, uint16_t scount, uint8_t *buf) {
 
 int pop_count(size_t x) {
     int count;
-    for (count = 0;;count++) {
+    for (count = 0; count < x; count++) {
         x &= x-1;
     }
     return count;
@@ -425,10 +424,12 @@ bool ahci_detect() {
 
     if (ahci.found) {
         base = hba.base = get_abar(&hba.pci);
-        hba.n_ports = pop_count(base->pi);
+        // hba.n_ports = pop_count(base->pi);
+
         hba.n_slots = ((base->cap >> 8) & 0x1F)+1;
         hba.dma64 = base->cap & (1 << 31)/* 64 bit addressing */;
         portinit(&base->ports[0], cmdlist, cmdtbls, &fisstorage);
+        printf("calzone\n");
     }
     return ahci.found;
 }

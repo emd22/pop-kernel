@@ -174,7 +174,7 @@ unsigned readl(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
 uint16_t readw(uint8_t bus, uint8_t dev, uint8_t func, uint8_t offset) {
     unsigned data;
 
-    data = pcireadl(bus, dev, func, offset);
+    data = readl(bus, dev, func, offset);
 
     return offset % 4 == 0 ? data : data >> 16;
 }
@@ -256,33 +256,59 @@ int check_dev(uint8_t bus, uint8_t slot, int (*cb)(pci_header_t *)) {
     head.class_ = readb(bus, slot, 0, 10);
     head.subclass = readb(bus, slot, 0, 11);
 
-    if (cb(&head) == 0)
+    if (cb(&head) == PCI_SUCCESS)
         return PCI_SUCCESS;
 
     if (vend_id & (1 << 7)) { //multi function device
         int i;
         for (i = 1; i < 8; i++) {
-            vend_id = readw();
+            vend_id = readw(bus, slot, i, 0);
+            if (vend_id == 0xFFFF)
+                continue;
+            head.vend_id = vend_id;
+            head.function = i;
+            head.class_ = readb(bus, slot, i, 10);
+            head.subclass = readb(bus, slot, i, 11);
+
+            if (cb(&head) == PCI_SUCCESS)
+                return PCI_SUCCESS;
         }
     }
+    return PCI_FAIL;
 }
 
 void scan_brute_force(int (*cb)(pci_header_t *)) {
-    int bus, slot, func;
+    int bus, slot, val;
+    for (bus = 0; bus < BUS_AMT; bus++) {
+        for (slot = 0; slot < SLOT_AMT; slot++) {
+            val = check_dev(bus, slot, cb);
 
-    for (bus = 0; bus < 256; bus++) {
-        for (slot = 0; slot < 32; slot++) {
-            if (dev_valid(bus, slot, 0)) {
-                if (is_multi_func(bus, slot)) {
-                    for (func = 0; func < 8; func++) {
-                        if (dev_valid(bus, slot, func))
-                            create_dev_header(bus, slot, func);
-                    }
-                }
-                else
-                    create_dev_header(bus, slot, 0);
-                cb(&hdrs.hdrs[hdrs.index]);
-            }
+            if (val == PCI_SUCCESS)
+                return;
         }
     }
 }
+
+unsigned pci_bar(pci_header_t *func, uint8_t bar) {
+    return readl(func->bus, func->slot, func->function, 0x10+4*bar);
+}
+
+// void scan_brute_force(int (*cb)(pci_header_t *)) {
+//     int bus, slot, func;
+
+//     for (bus = 0; bus < 256; bus++) {
+//         for (slot = 0; slot < 32; slot++) {
+//             if (dev_valid(bus, slot, 0)) {
+//                 if (is_multi_func(bus, slot)) {
+//                     for (func = 0; func < 8; func++) {
+//                         if (dev_valid(bus, slot, func))
+//                             create_dev_header(bus, slot, func);
+//                     }
+//                 }
+//                 else
+//                     create_dev_header(bus, slot, 0);
+//                 cb(&hdrs.hdrs[hdrs.index]);
+//             }
+//         }
+//     }
+// }
