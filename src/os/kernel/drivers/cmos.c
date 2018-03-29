@@ -96,3 +96,13 @@ cmos_td_t rtc_gettime() {
 
     return cur;
 }
+
+cmos_td_t cmos_add_time_s(cmos_td_t *c_td, int secs) {
+    cmos_td_t new_td;
+    new_td = *c_td;
+
+    new_td.minute += (int)(secs/60);
+    new_td.second += secs % 60;
+
+    return new_td;
+}

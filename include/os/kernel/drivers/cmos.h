@@ -18,5 +18,6 @@ typedef struct {
 typedef long cmos_ts_t;
 
 cmos_td_t rtc_gettime();
+cmos_td_t cmos_add_time_s(cmos_td_t *c_td, int secs);
 
 #endif
