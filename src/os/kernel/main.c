@@ -11,6 +11,9 @@
 #include <kernel/drivers/pci.h>
 #include <kernel/drivers/sata.h>
 #include <kernel/drivers/mbr.h>
+#include <kernel/drivers/cmos.h>
+#include <kernel/drivers/irq.h>
+#include <kernel/drivers/idt.h>
 #include <kernel/debug.h>
 #include <kernel/mem2d.h>
 #include <kernel/args.h>
@@ -20,6 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+
+#include <kernel/timeout.h>
 
 bool ahci_exists;
 
@@ -74,38 +79,53 @@ int check_command(char **args, const char *command) {
 //         return;
 // }
 
+int tcheck(void) {
+    return 0;
+}
+
+void tfailure(void) {
+    printf("waffles\n");
+    panic("waffles", NULL);
+}
+
 void kmain(void) {
+    idt_install();
+    // irq_install();
+
     bvga_init();
     keyboard_init();
     pci_init();
     ahci_init();
     mbr_init();
 
-    ahci_exists = ahci_detect();
+    timeout_start(10);
+    timeout_wait(tcheck, tfailure);
 
-    printf("weenie\n");
+    // ahci_exists = ahci_detect();
 
-    assert(ahci_exists, "AHCI not found.", NULL);
+    // printf("weenie\n");
 
-    uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
-    // bzero(buf_, 512);
-    // strcpy((char *)buf_, "bork!");
-    // write(10, 1, buf_);
-    // printf("\nWRITING COMPLETED\n");
+    // assert(ahci_exists, "AHCI not found.", NULL);
+
+    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
+    // // bzero(buf_, 512);
+    // // strcpy((char *)buf_, "bork!");
+    // // write(10, 1, buf_);
+    // // printf("\nWRITING COMPLETED\n");
     
-    bzero(buf_, 512);
-    read(10000, 1, buf_);
-    bvga_clear();
+    // bzero(buf_, 512);
+    // read(10000, 1, buf_);
+    // bvga_clear();
 
-    int i;
-    for (i = 0; i < 512; i++) {
-        if (buf_[i] != 0) {
-            printf("[%d]", buf_[i]);
-        }
-    }
-    printf("\nREADING COMPLETED\n");
+    // int i;
+    // for (i = 0; i < 512; i++) {
+    //     if (buf_[i] != 0) {
+    //         printf("[%d]", buf_[i]);
+    //     }
+    // }
+    // printf("\nREADING COMPLETED\n");
 
-    free(buf_);
+    // free(buf_);
 
     /* 
     chk_err runs this function(made as macro so it could return any type + have any param types) 
