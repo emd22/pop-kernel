@@ -303,8 +303,8 @@ void ahci_init(void);
 // bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf);
 bool ahci_detect(void);
 HBA_PORT *get_port(void);
-const char *read(size_t lba, uint16_t scount, uint8_t *buf);
-const char *write(size_t lba, uint16_t scount, uint8_t *buf);
+const char *read(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf);
+const char *write(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf);
 bool found_ahci(void);
 
 #endif

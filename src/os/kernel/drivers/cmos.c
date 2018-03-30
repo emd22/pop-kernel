@@ -4,40 +4,6 @@
 
 static int creg = 0x00; //century register
 
-
-// void cmos_read(uint8_t *buf) {
-//     int tval, index;
-
-//     for (index = 0; index < 128; index++) {
-//         _asm {
-//             cli //disable interrupts
-//             mov al, index
-//             out 0x70, al
-//             in al, 0x71
-//             sti
-//             mov tval, al
-//         }
-//         buf[index] = tval;
-//     }
-// }
-
-// void cmos_write(uint8_t *buf) {
-//     int tval, index;
-
-//     for (index = 0; index < 128; index++) {
-//         tval = buf[index];
-
-//         _asm {
-//             cli
-//             mov al, index
-//             out 0x70, al
-//             mov al, tval
-//             out 0x71, al
-//             sti
-//         }
-//     }
-// }
-
 int check_updating() {
     outb(0x70, 0x0A);
     return (inb(0x71) & 0x80);
@@ -48,7 +14,7 @@ uint8_t get_reg(int reg) {
     return inb(0x71);
 }
 
-cmos_td_t rtc_gettime() {
+cmos_td_t cmos_rtc_gettime() {
     while (check_updating());
     cmos_td_t last;
     cmos_td_t cur;
@@ -95,14 +61,4 @@ cmos_td_t rtc_gettime() {
     }
 
     return cur;
-}
-
-cmos_td_t cmos_add_time_s(cmos_td_t *c_td, int secs) {
-    cmos_td_t new_td;
-    new_td = *c_td;
-
-    new_td.minute += (int)(secs/60);
-    new_td.second += secs % 60;
-
-    return new_td;
 }

@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define CMOS_SMALL_TS(c_td) ((c_td.hour*10000)+(c_td.minute*100)+c_td.second)
-
 typedef struct {
     uint8_t century;
     uint8_t second;
@@ -17,7 +15,7 @@ typedef struct {
 
 typedef long cmos_ts_t;
 
-cmos_td_t rtc_gettime();
-cmos_td_t cmos_add_time_s(cmos_td_t *c_td, int secs);
+cmos_td_t cmos_rtc_gettime();
+void cmos_time_normalize(cmos_td_t *ttime);
 
 #endif

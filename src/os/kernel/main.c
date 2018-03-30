@@ -11,11 +11,11 @@
 #include <kernel/drivers/pci.h>
 #include <kernel/drivers/sata.h>
 #include <kernel/drivers/mbr.h>
-#include <kernel/drivers/cmos.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
+#include <kernel/memory/mem2d.h>
+#include <kernel/time.h>
 #include <kernel/debug.h>
-#include <kernel/mem2d.h>
 #include <kernel/args.h>
 #include <kernel/err.h>
 #include <stdlib.h>
@@ -98,34 +98,34 @@ void kmain(void) {
     ahci_init();
     mbr_init();
 
-    timeout_start(10);
-    timeout_wait(tcheck, tfailure);
+    ahci_exists = ahci_detect();
 
-    // ahci_exists = ahci_detect();
+    printf("weenie\n");
 
-    // printf("weenie\n");
+    assert(ahci_exists, "AHCI not found.", NULL);
 
-    // assert(ahci_exists, "AHCI not found.", NULL);
-
-    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
-    // // bzero(buf_, 512);
-    // // strcpy((char *)buf_, "bork!");
-    // // write(10, 1, buf_);
-    // // printf("\nWRITING COMPLETED\n");
-    
+    uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     // bzero(buf_, 512);
-    // read(10000, 1, buf_);
-    // bvga_clear();
+    // strcpy((char *)buf_, "bork!");
+    // write(10, 1, buf_);
+    // printf("\nWRITING COMPLETED\n");
+    
+    bzero(buf_, 512);
+    const char *error;
+    if ((error = read(0, 0, 1, buf_)) != NULL) {
+        printf("AHCI ERROR: %s\n", error);
+    }
+    bvga_clear();
 
-    // int i;
-    // for (i = 0; i < 512; i++) {
-    //     if (buf_[i] != 0) {
-    //         printf("[%d]", buf_[i]);
-    //     }
-    // }
-    // printf("\nREADING COMPLETED\n");
+    int i;
+    for (i = 0; i < 512; i++) {
+        if (buf_[i] != 0) {
+            printf("[%d]", buf_[i]);
+        }
+    }
+    printf("\nREADING COMPLETED\n");
 
-    // free(buf_);
+    free(buf_);
 
     /* 
     chk_err runs this function(made as macro so it could return any type + have any param types) 
@@ -162,6 +162,9 @@ void kmain(void) {
     int arg_len = 0;
 
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
+
+    cmos_td_t td = cmos_rtc_gettime();
+    printf("### %s %s, '%d ###\n", time_get_month(td.month), time_day_full(td.day), td.year);
 
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));

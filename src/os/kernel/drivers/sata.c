@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <osutil.h>
 
+#include <kernel/timeout.h>
 #include <kernel/err.h>
 
 /*
@@ -105,7 +106,12 @@ void checkalign(void *a, int alignment, char *msg) {
 }
 
 void portstart(HBA_PORT *port) {
-    while (port->cmd & PORT_CMD_CR);
+    timeout_start(5);
+    while (port->cmd & PORT_CMD_CR) {
+        if (timeout_tick()) {
+            panic("Timeout exceeded in portstart()", NULL);
+        }
+    }
 
     port->cmd |= PORT_CMD_FRE;
     port->cmd |= PORT_CMD_ST;
@@ -115,7 +121,13 @@ void portstop(HBA_PORT *port) {
     port->cmd &= ~PORT_CMD_ST;
     port->cmd &= ~PORT_CMD_FRE;
 
-    while (port->cmd & (PORT_CMD_FR | PORT_CMD_CR));
+    timeout_start(5);
+
+    while (port->cmd & (PORT_CMD_FR | PORT_CMD_CR)) {
+        if (timeout_tick()) {
+            panic("Timeout exceeded in portstop()", NULL);
+        }
+    }
 }
 
 void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *fisbase) {
@@ -201,7 +213,12 @@ int find_cmdslot(HBA_PORT *port) {
 }
 
 void start_cmd(HBA_PORT *port) {
-    while (port->cmd & HBA_PxCMD_CR);
+    timeout_start(5);
+    while (port->cmd & HBA_PxCMD_CR) {
+        if (timeout_tick()) {
+            panic("Timeout exceeded in start_cmd()", NULL);
+        }
+    }
 
     //set FRE(bit4) and ST(bit0)
     port->cmd |= PORT_CMD_FRE;
@@ -211,7 +228,7 @@ void start_cmd(HBA_PORT *port) {
 void stop_cmd(HBA_PORT *port) {
     port->cmd &= ~PORT_CMD_ST;
     port->cmd &= ~PORT_CMD_FRE;
-
+    
     while (true) {
         if (port->cmd & PORT_CMD_FR)
             continue;
@@ -322,9 +339,8 @@ void mkprd(HBA_PRDT_ENTRY *prd, uintptr_t addr, unsigned bytes) {
     prd->i = 1;
 }
 
-const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
+const char *rw(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf, bool write) {
     int slot, i;
-    uint16_t sectleft;
     uintptr_t addr;
     HBA_PORT *port;
     HBA_CMD_HEADER *cmdhdr;
@@ -344,23 +360,27 @@ const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
 
     cmdhdr->cfl = sizeof(FIS_REG_H2D)/sizeof(unsigned);
     cmdhdr->w = write;
-    cmdhdr->prdtl = (scount*512 + PRDSIZE - 1) / PRDSIZE; // round up to the nearest 4MB
+    cmdhdr->prdtl = (uint16_t)((scount-1) >> 4)+1; // round up to the nearest 4MB
 
     if (cmdhdr->prdtl > 8)
         return "AHCI reading - prdtl error";
 
     bzero(cmdtbl, sizeof(HBA_CMD_TBL));
 
-    sectleft = scount;
     for (i = 0; i < cmdhdr->prdtl-1; i++) {
+        printf("prding\n");
         cmdtbl->prdt_entry[i].dba = (uint32_t)buf;
         cmdtbl->prdt_entry[i].dbc = 8*1024 -1;	// 8K bytes
         cmdtbl->prdt_entry[i].i = 0;
         addr += 4*MB; //4K words
-        sectleft -= 4*MB/512;
+        scount -= 16;
     }
+
+    cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
+    cmdtbl->prdt_entry[i].dbc = (scount << 9)-1;	// 512 bytes per sector
+    cmdtbl->prdt_entry[i].i = 1;
     
-    mkprd(&cmdtbl->prdt_entry[i], addr, sectleft * 512);
+    // mkprd(&cmdtbl->prdt_entry[i], addr, sectleft * 512);
 
     FIS_REG_H2D *cmdfis = (FIS_REG_H2D *)(&cmdtbl->cfis);
 
@@ -368,17 +388,17 @@ const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
     cmdfis->c = 1;
     cmdfis->command = write ? ATA_CMD_WRITE_DMA_EXT : ATA_CMD_READ_DMA_EXT;
 
-    cmdfis->lba0 = (uint8_t)lba;
-    cmdfis->lba1 = (uint8_t)(lba >> 8);
-    cmdfis->lba2 = (uint8_t)(lba >> 16);
-    cmdfis->device = (1 << 6);
+    cmdfis->lba0 = (uint8_t)startl;
+    cmdfis->lba1 = (uint8_t)(startl>>8);
+    cmdfis->lba2 = (uint8_t)(startl>>16);
+    cmdfis->device = 1 << 6; // LBA mode
+ 
+    cmdfis->lba3 = (uint8_t)(startl>>24);
+    cmdfis->lba4 = (uint8_t)starth;
+    cmdfis->lba5 = (uint8_t)(starth>>8);
 
-    cmdfis->lba3 = (uint8_t)(lba >> 24);
-    cmdfis->lba4 = (uint8_t)(lba >> 32);
-    cmdfis->lba5 = (uint8_t)(lba >> 40);
-
-    cmdfis->countl = (uint8_t)(scount);
-    cmdfis->counth = (uint8_t)(scount >> 8);
+    cmdfis->countl = (uint8_t)(scount) & 0xFF;
+    cmdfis->counth = (uint8_t)(scount >> 8) & 0xFF;
 
     while (port->tfd & ((1 << 7) | (1 << 3)));
 
@@ -402,12 +422,12 @@ const char *rw(size_t lba, uint16_t scount, uint8_t *buf, bool write) {
     return NULL;
 }
 
-const char *read(size_t lba, uint16_t scount, uint8_t *buf) {
-    return rw(lba, scount, buf, false);
+const char *read(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf) {
+    return rw(startl, starth, scount, buf, false);
 }
 
-const char *write(size_t lba, uint16_t scount, uint8_t *buf) {
-    return rw(lba, scount, buf, true);
+const char *write(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf) {
+    return rw(startl, starth, scount, buf, true);
 }
 
 int pop_count(size_t x) {
