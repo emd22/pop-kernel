@@ -9,7 +9,7 @@ struct {
     uint32_t *page_prev;
 } page_inf;
 
-void paging_map_virt_phys(uint32_t virt, uint32_t phys) {
+void paging_map(uint32_t virt, uint32_t phys) {
     uint16_t id = virt >> 22;
     int i;
     for (i = 0; i < 1024; i++) {
@@ -23,6 +23,7 @@ void paging_map_virt_phys(uint32_t virt, uint32_t phys) {
 
 void paging_init() {
     memset(&page_inf, 0, sizeof(page_inf));
+    printf("HOI\n");
 
     page_inf.pdir = (uint32_t *)0x400000;
     page_inf.pdir_loc = (uint32_t)page_inf.pdir;
@@ -30,11 +31,11 @@ void paging_init() {
 
     memset(page_inf.pdir, 0 | 2, 1024);
 
-    paging_map_virt_phys(0, 0);
-    paging_map_virt_phys(0x400000, 0x400000);
+    paging_map(0, 0);
+    paging_map(0x400000, 0x400000);
 
     asm volatile("mov %%eax, %%cr3": :"a"(page_inf.pdir_loc));	
     asm volatile("mov %cr0, %eax");
-    asm volatile("orl $0x80000000, %eax");
+    asm volatile("or %eax, 0x80000001");
     asm volatile("mov %eax, %cr0");
 }

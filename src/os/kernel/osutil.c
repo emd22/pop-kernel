@@ -4,7 +4,12 @@ void panic(const char *msg, void (*sd_cb)(void)) {
     printf("***KERNEL PANIC***:\n%s\nHALTING...\n", msg);
     if (sd_cb != NULL)
         sd_cb(); //shutdown callback(free objs, etc.)
-    for (;;);
+
+    _asm {
+        cli
+        1: hlt
+        jmp 1b
+    };
 }
 
 void assert__(int res, const char *msg, void (*gr_cb)(void)) {

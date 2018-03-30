@@ -14,6 +14,7 @@
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
 #include <kernel/memory/mem2d.h>
+#include <kernel/memory/memory.h>
 #include <kernel/time.h>
 #include <kernel/debug.h>
 #include <kernel/args.h>
@@ -89,6 +90,7 @@ void tfailure(void) {
 }
 
 void kmain(void) {
+
     idt_install();
     // irq_install();
 
@@ -97,6 +99,7 @@ void kmain(void) {
     pci_init();
     ahci_init();
     mbr_init();
+    paging_init();
 
     ahci_exists = ahci_detect();
 
