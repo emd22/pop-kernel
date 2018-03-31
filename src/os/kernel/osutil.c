@@ -5,11 +5,7 @@ void panic(const char *msg, void (*sd_cb)(void)) {
     if (sd_cb != NULL)
         sd_cb(); //shutdown callback(free objs, etc.)
 
-    _asm {
-        cli
-        1: hlt
-        jmp 1b
-    };
+    for (;;);
 }
 
 void assert__(int res, const char *msg, void (*gr_cb)(void)) {

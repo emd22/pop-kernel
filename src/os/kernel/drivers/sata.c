@@ -32,11 +32,6 @@ Some AHCI/SATA code taken from osdev.org.
 
 // #define AHCI_BASE 0x400000 //4M
 
-// #define HBA_Px 0x0001
-// #define HBA_PxCMD_FRE 0x0010
-#define HBA_PxCMD_FR 0x4000
-#define HBA_PxCMD_CR 0x8000
-
 #define AHCI_PHYS_BASE 0x800000
 // #define AHCI_VIRT_BASE 0xFFFFFFFF00800000
 
@@ -105,11 +100,11 @@ void checkalign(void *a, int alignment, char *msg) {
     assert(!(aa & (alignment-1)), msg, NULL);
 }
 
-void portstart(HBA_PORT *port) {
+void start_cmd(HBA_PORT *port) {
     timeout_start(5);
     while (port->cmd & PORT_CMD_CR) {
         if (timeout_tick()) {
-            panic("Timeout exceeded in portstart()", NULL);
+            panic("Timeout exceeded in start_cmd()", NULL);
         }
     }
 
@@ -117,17 +112,19 @@ void portstart(HBA_PORT *port) {
     port->cmd |= PORT_CMD_ST;
 }
 
-void portstop(HBA_PORT *port) {
+void stop_cmd(HBA_PORT *port) {
     port->cmd &= ~PORT_CMD_ST;
     port->cmd &= ~PORT_CMD_FRE;
-
-    timeout_start(5);
-
-    while (port->cmd & (PORT_CMD_FR | PORT_CMD_CR)) {
-        if (timeout_tick()) {
-            panic("Timeout exceeded in portstop()", NULL);
-        }
+    
+    while (true) {
+        if (port->cmd & PORT_CMD_FR)
+            continue;
+        if (port->cmd & PORT_CMD_CR)
+            continue;
+        break;
     }
+
+    port->cmd &= ~PORT_CMD_FRE;
 }
 
 void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *fisbase) {
@@ -141,7 +138,7 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
     fisbasel = (uintptr_t)fisbase;
     ctlistl = (uintptr_t)ctlist;
 
-    portstop(port);
+    stop_cmd(port);
 
     printf("CLL = %d\n", cll);
 
@@ -160,7 +157,7 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
             cl[i].ctbau = (unsigned)(ctlistl >> 32);
     }
 
-    portstart(port);
+    start_cmd(port);
 }
 
 int check_type(HBA_PORT *port) {
@@ -210,35 +207,6 @@ int find_cmdslot(HBA_PORT *port) {
 
     printf("AHCI: Cannot find command list entry. [%d]\n", i);
     return -1;
-}
-
-void start_cmd(HBA_PORT *port) {
-    timeout_start(5);
-    while (port->cmd & HBA_PxCMD_CR) {
-        if (timeout_tick()) {
-            panic("Timeout exceeded in start_cmd()", NULL);
-        }
-    }
-
-    //set FRE(bit4) and ST(bit0)
-    port->cmd |= PORT_CMD_FRE;
-    port->cmd |= PORT_CMD_ST;
-}
-
-void stop_cmd(HBA_PORT *port) {
-    port->cmd &= ~PORT_CMD_ST;
-    port->cmd &= ~PORT_CMD_FRE;
-    
-    while (true) {
-        if (port->cmd & PORT_CMD_FR)
-            continue;
-        if (port->cmd & PORT_CMD_CR)
-            continue;
-        break;
-    }
-
-    //clear FRE
-    port->cmd &= ~PORT_CMD_FRE;
 }
 
 void port_rebase(HBA_PORT *port, int port_no) {
