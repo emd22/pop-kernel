@@ -36,7 +36,7 @@ void mbr_init(void);
 bool retrieve_partitions(void);
 mbr_t *get_mbr();
 void mbr_write_part(unsigned loc, uint32_t sp, uint32_t ep, uint8_t sys_id);
-void format_mbr(void);
+bool format_mbr(void);
 int get_part_entry(int n);
 void mbr_purge();
 

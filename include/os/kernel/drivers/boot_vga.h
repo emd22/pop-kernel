@@ -14,6 +14,7 @@
 #define BVGA_ERR (bvga_get_colour(BVGA_RED, BVGA_BLACK))
 
 #define BVGA_NOMOVE 0x01
+#define BVGA_HOMECURSOR 0x02
 
 enum BVGA_C {
     BVGA_BLACK,

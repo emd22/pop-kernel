@@ -14,20 +14,23 @@
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
 #include <kernel/memory/mem2d.h>
+#include <kernel/memory/mm.h>
 #include <kernel/memory/memory.h>
 #include <kernel/time.h>
 #include <kernel/debug.h>
 #include <kernel/args.h>
 #include <kernel/err.h>
-#include <stdlib.h>
+#include <kernel/drivers/gdt.h>
 #include <osutil.h>
+
+#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 
-#include <kernel/timeout.h>
 
 bool ahci_exists;
+uint32_t kernel_end;
+uint32_t kernel_base;
 
 void invalid_command(char **args) {
     bvga_set_colour(BVGA_ERR);
@@ -39,86 +42,36 @@ int check_command(char **args, const char *command) {
     return !strcmp(args[0], command);
 }
 
-// void sata_command(char **args, int arg_len) {
-//     if (arg_len < 2) {
-//         printf("Not enough arguments. %d/2\n", arg_len);
-//         goto fail;
-//     }
-
-//     if (!strcmp(args[1], "start")) {
-//         ahci_exists = ahci_detect();
-//         return;
-//     }
-//     else if (!strcmp(args[1], "read")) {
-//         if (!ahci_exists) return;
-//         uint8_t *buf = (uint8_t *)malloc(sizeof(uint8_t)*512);
-//         HBA_PORT *port = get_port();
-//         read(0, 1, buf);
-//         bvga_clear();
-
-//         int i;
-//         for (i = 0; i < 512; i++) {
-//             printf("%c,", buf[i]);
-//         }
-//         printf("\nREADING COMPLETED\n");
-//     }
-//     else if (!strcmp(args[1], "write")) {
-//         if (!ahci_exists) return;
-        
-//         uint8_t *buf = (uint8_t *)malloc(sizeof(uint8_t)*512);
-//         strcpy(buf, "Chicken Strips");
-//         HBA_PORT *port = get_port();
-//         write(0, 1, buf);
-//         printf("\nWRITING COMPLETED\n");
-//     }
-//     else {
-//         goto fail;
-//     }
-
-//     fail:
-//         printf("Usage: sata <start|read|write>\n");
-//         return;
-// }
-
-int tcheck(void) {
-    return 0;
-}
-
-void tfailure(void) {
-    printf("waffles\n");
-    panic("waffles", NULL);
-}
-
 void kmain(void) {
-
+    printf("Kbase: 0x%x, Kend: 0x%x\n", &kernel_base, &kernel_end);
+    mm_init(&kernel_end);
+    paging_init();
+    
+    gdt_install();
     idt_install();
-    // irq_install();
+    irq_install();
 
     bvga_init();
     keyboard_init();
     pci_init();
     ahci_init();
     mbr_init();
-    paging_init();
+
+    void *abar = malloc(4096);
+
+    probe_port(abar);
 
     ahci_exists = ahci_detect();
-
-    printf("weenie\n");
 
     assert(ahci_exists, "AHCI not found.", NULL);
 
     uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
-    // bzero(buf_, 512);
-    // strcpy((char *)buf_, "bork!");
-    // write(10, 1, buf_);
-    // printf("\nWRITING COMPLETED\n");
     
     bzero(buf_, 512);
     const char *error;
     if ((error = read(0, 0, 1, buf_)) != NULL) {
         printf("AHCI ERROR: %s\n", error);
     }
-    bvga_clear();
 
     int i;
     for (i = 0; i < 512; i++) {
@@ -130,44 +83,12 @@ void kmain(void) {
 
     free(buf_);
 
-    /* 
-    chk_err runs this function(made as macro so it could return any type + have any param types) 
-    and checks the return type. it will kernel panic if error is found.
-
-    chk_err(<function>, params...);
-    */
-    // printf("READING FROM PORT %d\n", port);
-
-    // if (!ahci_exists) {
-    //     while (1);
-    // }
-    // chk_err(read, port, 0, 0, 1, (uint16_t *)buf);
-
-    // sata_write();
-
-    // HBA_PORT hba_port;
-
-    // port_rebase(&hba_port, 0);
-    // probe_port((HBA_MEM *)(0xFFFFFFFF00000000+(uintptr_t)bar5));
-    // retrieve_partitions();
-
-    // uint8_t buf1[512];
-
-    // ata_pio_read(10000, buf1);
-    // int i;
-    // for (i = 0; i < 8; i++) {
-    //     printf("d:%c\n", buf1[i]);
-    // }
-
     char buf[64];
 
     char **args = alloc_2d(MAX_ARG_LEN, MAX_ARGS);
     int arg_len = 0;
 
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
-
-    cmos_td_t td = cmos_rtc_gettime();
-    printf("### %s %s, '%d ###\n", time_get_month(td.month), time_day_full(td.day), td.year);
 
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
@@ -193,11 +114,13 @@ void kmain(void) {
             mbr_purge();
         }
         else if (check_command(args, "mbrfmt")) {
-            format_mbr();
-            mbr_write_part(get_part_entry(0), 1000, 5000, FAT32_SYSID); //4kb
+            if (format_mbr())
+                mbr_write_part(get_part_entry(0), 1000, 5000, FAT32_SYSID); //4kb
         }
-        else if (check_command(args, "sata")) {
-            // sata_command(args, arg_len);
+        else if (check_command(args, "td")) {
+            cmos_td_t c_td = cmos_rtc_gettime();
+            printf("Date: %s %s, '%d\n", time_get_month(c_td.month), time_day_full(c_td.day), c_td.year);
+            printf("Time: %s\n", time_str(&c_td, TIME_HOUR | TIME_MINUTE));
         }
         else {
             invalid_command(args);

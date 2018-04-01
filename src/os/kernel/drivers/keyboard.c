@@ -104,7 +104,7 @@ uint8_t scancode_char(int keycode) {
 }
 
 char getkey(int flags) {
-    unsigned sc = 0;
+    int sc = 0, sc_released;
 
     if (flags & KBD_NOBLOCK) {
         if (!(sc = get_scancode()))
@@ -114,12 +114,15 @@ char getkey(int flags) {
         while (!(sc = get_scancode()));
     }
 
+    sc_released = sc-0x80;
+
     if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {
         kinfo.shift = true;
     }
     else {
+        char ch = scancode_char(sc);
         kinfo.shift = false;
+        return ch;
     }
-
-    return scancode_char(sc);
+    return 0;
 }

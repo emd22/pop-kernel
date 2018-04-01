@@ -8,5 +8,6 @@ For first time building:
 6. cd out of build dir, run genisoimg.sh(./genisoimg.sh)
 7. open VM of choice, using iso generated.
 
-Later building:
-run ./build.sh
+If you are using virtualbox with extension pack, you can use
+./build.sh to build, or ./full_build.sh to compile cmake files
+as well.

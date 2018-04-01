@@ -90,14 +90,14 @@ bool parse_partition(int part, uint8_t *mbr_dat, unsigned location) {
     }
 }
 
-void format_mbr(void) {
+bool format_mbr(void) {
     char confirmation[16];
 
     printf("Enter 'format' to format MBR: ");
     input(confirmation);
     printf("\n");
 
-    if (strcmp(confirmation, "format")) return;
+    if (strcmp(confirmation, "format")) return false;
 
     printf("Formatting MBR...\n");
     ata_pio_write(0, template_mbr);
@@ -107,7 +107,7 @@ void format_mbr(void) {
         mbr_write_part(get_part_entry(i), 0, 0, 0);
     }
     printf("MBR formatted.\n");
-
+    return true;
 }
 
 void mbr_purge() {

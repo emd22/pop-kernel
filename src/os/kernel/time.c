@@ -32,11 +32,13 @@ const char *time_day_full(int day) {
     
     const char *end;
 
-    if (day == 1)
+    char dend = msg[strlen(msg)-1];
+
+    if (dend == '1')
         end = "st";
-    else if (day == 2)
+    else if (dend == '2')
         end = "nd";
-    else if (day == 3)
+    else if (dend == '3')
         end = "rd";
     else
         end = "th";
@@ -52,5 +54,40 @@ const char *time_get_month(int month) {
         "July", "August", "September", "October", "November", "December"
     };
 
-    return months[month];
+    return months[month-1];
+}
+
+const char *time_zero(int tm) {
+    static char buf[4];
+    if (tm < 10) {
+        buf[0] = '0';
+        /* strcat(buf,  */dec_to_str(tm, buf);/* ); */
+    }
+    else {
+        strcpy(buf, dec_to_str(tm, buf));
+    }
+    return buf;
+}
+
+const char *time_str(cmos_td_t *td, int flags) {
+    static char buf[32];
+
+    if (flags & TIME_HOUR || flags & TIME_ALL)
+        strcpy(buf, time_zero(td->hour));
+
+    if ((flags & TIME_HOUR && flags & TIME_MINUTE) || flags & TIME_ALL)
+        strcat(buf, ":");
+
+    if (flags & TIME_MINUTE || flags & TIME_ALL)
+        strcat(buf, time_zero(td->minute));
+
+    if ((flags & TIME_MINUTE && flags & TIME_SECOND) || flags & TIME_ALL)
+        strcat(buf, ":");
+    
+    if (flags & TIME_SECOND || flags & TIME_ALL)
+        strcat(buf, time_zero(td->second));
+
+    strcat(buf, "\0");
+    
+    return buf;
 }

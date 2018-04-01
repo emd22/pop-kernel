@@ -1,6 +1,7 @@
 #ifndef STDIO_H
 #define STDIO_H
 
+#include <kernel/memory/mm.h>
 #include <kernel/drivers/boot_vga.h>
 
 #ifndef NULL

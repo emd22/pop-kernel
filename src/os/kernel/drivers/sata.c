@@ -69,6 +69,57 @@ struct {
     int dma64;
 } hba;
 
+int check_type(HBA_PORT *port) {
+    uint32_t ssts = port->ssts;
+
+    uint8_t ipm = (ssts >> 8) & 0x0F;
+    uint8_t det = ssts & 0x0F;
+
+    printf("ipm %d det %d sig %d\n", ipm, det, port->sig); 
+    if (det != HBA_PORT_DET_PRESENT)    // Check drive status
+        return AHCI_DEV_NULL;
+    if (ipm != HBA_PORT_IPM_ACTIVE)
+        return AHCI_DEV_NULL;
+ 
+    switch (port->sig) {
+        case SATA_SIG_ATAPI:
+            return AHCI_DEV_SATAPI;
+        case SATA_SIG_SEMB:
+            return AHCI_DEV_SEMB;
+        case SATA_SIG_PM:
+            return AHCI_DEV_PM;
+        default:
+            return AHCI_DEV_SATA;
+    }
+
+    return AHCI_DEV_NULL;
+}
+
+void probe_port(HBA_MEM *abar_) {
+    //Search disk in implemented ports
+    uint32_t pi = abar_->pi;
+    int i = 0;
+    while (i < 32) {
+        if (pi & 1) {
+            int dt = check_type((HBA_PORT *)&abar_->ports[i]);
+
+            if (dt == AHCI_DEV_SATA) {
+                printf("SATA drive found at port %d\n", i);
+                ahci.abar = abar_;
+                port_rebase(abar_->ports, i);
+                //read(&abar_temp->ports[0], 0, 0, 2, (uint64_t)pages_for_ahci_start + (20*4096)/8);
+                //print("\nafter read %d",((HBA_PORT *)&abar_temp->ports[i])->ssts);
+                return;
+            }
+            else {
+                printf("NULL drive found\n");
+            }
+        }
+        pi >>= 1;
+        i++;
+    }
+}
+
 void ahci_init(void) {
     bzero(&hba, sizeof(hba));
     bzero(&ahci, sizeof(ahci));
@@ -140,8 +191,6 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
 
     stop_cmd(port);
 
-    printf("CLL = %d\n", cll);
-
     port->clb = (unsigned)cll;
     if (hba.dma64)
         port->clbu = (unsigned)(cll >> 32);
@@ -160,32 +209,6 @@ void portinit(HBA_PORT *port, HBA_CMD_HEADER *cl, HBA_CMD_TBL *ctlist, HBA_FIS *
     start_cmd(port);
 }
 
-int check_type(HBA_PORT *port) {
-    uint32_t ssts = port->ssts;
-
-    uint8_t ipm = (ssts >> 8) & 0x0F;
-    uint8_t det = ssts & 0x0F;
-
-    printf("ipm %d det %d sig %d\n", ipm, det, port->sig); 
-    if (det != HBA_PORT_DET_PRESENT)    // Check drive status
-        return AHCI_DEV_NULL;
-    if (ipm != HBA_PORT_IPM_ACTIVE)
-        return AHCI_DEV_NULL;
- 
-    switch (port->sig) {
-        case SATA_SIG_ATAPI:
-            return AHCI_DEV_SATAPI;
-        case SATA_SIG_SEMB:
-            return AHCI_DEV_SEMB;
-        case SATA_SIG_PM:
-            return AHCI_DEV_PM;
-        default:
-            return AHCI_DEV_SATA;
-    }
-
-    return AHCI_DEV_NULL;
-}
-
 HBA_CMD_HEADER *get_cmdlist(HBA_PORT *port) {
     return (HBA_CMD_HEADER *)(((size_t)port->clbu << 32) + port->clb);
 }
@@ -196,11 +219,12 @@ HBA_CMD_TBL *get_cmdtbl(HBA_CMD_HEADER *cmdhdr) {
 
 int find_cmdslot(HBA_PORT *port) {
     uint32_t slots = (port->sact | port->ci);
-    unsigned slots_len = (ahci.abar->cap & 0x0F00) >> 8;
+    uint32_t slots_len = (ahci.abar->cap)&(0x1F);
+    // uint32_t slots_len = (ahci.abar->cap & 0x0F00) >> 8;
 
     int i;
     for (i = 0; i < slots_len; i++) {
-        if (!(slots & 1))
+        if ((slots & 1) == 0)
             return i;
         slots >>= 1;
     }
@@ -257,28 +281,6 @@ void port_rebase(HBA_PORT *port, int port_no) {
 
     port->is = 0;   
     port->ie = 0xFFFFFFFF;
-}
-
-void probe_port(HBA_MEM *abar_) {
-    //Search disk in implemented ports
-    uint32_t pi = abar_->pi;
-    int i = 0;
-    while (i < 32) {
-        if (pi & 1) {
-            int dt = check_type((HBA_PORT *)&abar_->ports[i]);
-
-            if (dt == AHCI_DEV_SATA) {
-                printf("SATA drive found at port %d\n", i);
-                ahci.abar = abar_;
-                port_rebase(abar_->ports, i);
-                //read(&abar_temp->ports[0], 0, 0, 2, (uint64_t)pages_for_ahci_start + (20*4096)/8);
-                //print("\nafter read %d",((HBA_PORT *)&abar_temp->ports[i])->ssts);
-                return;
-            }
-        }
-        pi >>= 1;
-        i++;
-    }
 }
 
 bool wait_busy(HBA_PORT *port, int *spin) {
@@ -417,7 +419,6 @@ bool ahci_detect() {
         hba.n_slots = ((base->cap >> 8) & 0x1F)+1;
         hba.dma64 = base->cap & (1 << 31)/* 64 bit addressing */;
         portinit(&base->ports[0], cmdlist, cmdtbls, &fisstorage);
-        printf("calzone\n");
     }
     return ahci.found;
 }

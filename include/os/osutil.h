@@ -5,7 +5,7 @@
 
 #define OS_VERSION_MAJOR 0
 #define OS_VERSION_MINOR 0
-#define OS_VERSION_PATCH 1
+#define OS_VERSION_PATCH 2
 
 #include <stdio.h>
 #include <string.h>

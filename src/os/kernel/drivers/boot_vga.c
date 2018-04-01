@@ -33,7 +33,7 @@ void bvga_clear(void) {
     bvga_cursorpos(0, 0);
     int i;
     for (i = 0; i < (BVGA_WIDTH*BVGA_HEIGHT)-1; i++) {
-        bvga_put(' ', BVGA_DEF, 0);
+        bvga_put(' ', BVGA_DEF, BVGA_HOMECURSOR);
     }
     tinfo.col = 0;
     tinfo.row = 0;
@@ -84,7 +84,10 @@ void bvga_put(char c, uint8_t colour, int flags) {
     if (!(flags & BVGA_NOMOVE)) {
         inc_x();
     }
-    bvga_cursorpos(tinfo.col, tinfo.row);    
+    bvga_cursorpos(tinfo.col, tinfo.row);
+
+    if (flags & BVGA_HOMECURSOR)
+        bvga_cursorpos(0, 0);
 }
 
 void bvga_putstr(const char *str, uint8_t colour) {

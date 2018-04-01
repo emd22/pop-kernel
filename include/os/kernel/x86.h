@@ -3,6 +3,8 @@
 
 //x86 asm functions(inb, outb, etc.)
 
+#define SYSCALL_VECTOR 0x7F
+
 #include <stdint.h>
 #include <stddef.h>
 
