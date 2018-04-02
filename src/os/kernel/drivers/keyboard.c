@@ -1,4 +1,5 @@
 #include <kernel/drivers/keyboard.h>
+#include <kernel/drivers/irq.h>
 #include <kernel/scancodes.h>
 #include <kernel/x86.h>
 
@@ -11,29 +12,20 @@
 #define KBD_PORT 0x64
 
 struct {
-    uint8_t *key_cache;
+    // uint8_t *key_cache;
     uint8_t  last_key;
     uint16_t key_loc;
     bool     shift;
     bool     enabled;
+    bool     irq_state;
 } kinfo;
 
-void keyboard_init(void) {
-    kinfo.key_cache = (uint8_t *)malloc(256);
-    kinfo.last_key  = 0;
-    kinfo.key_loc   = 0;
-    kinfo.enabled   = true;
-    kinfo.shift     = false;
-    
-    bzero(kinfo.key_cache, 256);
-}
-
 char get_scancode() {
-    char flag = inb(KBD_PORT);
+    // char flag = inb(KBD_PORT);
 
-    while(!(flag & 1)) {
-        flag = inb(KBD_PORT);
-    }
+    // while(!(flag & 1)) {
+    //     flag = inb(KBD_PORT);
+    // }
     return inb(0x60);
 }
 
@@ -103,26 +95,43 @@ uint8_t scancode_char(int keycode) {
     return 0;
 }
 
+void kbd_handler(regs_t *regs) {
+    int sc = get_scancode();
+
+    if (sc & 0x80) {
+        int sc_released = sc-0x80;
+        if (sc_released == SCANCODE_LEFT_SHIFT || sc_released == SCANCODE_RIGHT_SHIFT)
+            kinfo.shift = false;
+    }
+    if (sc != 0) {
+        if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {
+            kinfo.shift = true;
+        }
+        else {
+            char ch = scancode_char(sc);
+            kinfo.last_key = ch;
+            kinfo.irq_state = true;
+        }
+    }
+    
+    irq_ack(1);
+}
+
+void keyboard_init(void) {
+    // kinfo.key_cache = (uint8_t *)malloc(256);
+    kinfo.last_key  = 0;
+    kinfo.key_loc   = 0;
+    kinfo.enabled   = true;
+    kinfo.shift     = false;
+    kinfo.irq_state = false;
+    
+    // bzero(kinfo.key_cache, 256);
+
+    irq_install_handler(1, kbd_handler);    
+}
+
 char getkey(int flags) {
-    int sc = 0, sc_released;
-
-    if (flags & KBD_NOBLOCK) {
-        if (!(sc = get_scancode()))
-            return 0;
-    }
-    else { 
-        while (!(sc = get_scancode()));
-    }
-
-    sc_released = sc-0x80;
-
-    if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {
-        kinfo.shift = true;
-    }
-    else {
-        char ch = scancode_char(sc);
-        kinfo.shift = false;
-        return ch;
-    }
-    return 0;
+    while (!kinfo.irq_state);
+    kinfo.irq_state = false;
+    return kinfo.last_key;
 }
