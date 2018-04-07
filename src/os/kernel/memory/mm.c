@@ -6,15 +6,7 @@
 
 #define MAX_PAGE_ALIGNED_ALLOCS 32
 
-struct {
-    uint32_t last_alloc;
-    uint32_t heap_end;
-    uint32_t heap_begin;
-    uint32_t pheap_begin;
-    uint32_t pheap_end;
-    uint8_t *pheap_desc;
-    uint32_t memory_used;
-} mm_inf;
+mm_inf_t mm_inf;
 
 void mm_init(uint32_t kernel_end) {
     memset(&mm_inf, 0, sizeof(mm_inf));
@@ -79,4 +71,8 @@ void *malloc(size_t size) {
 
     memset((void *)((uint32_t)alloc + sizeof(alloc_t)), 0, size);
     return (void *)((uint32_t)alloc + sizeof(alloc_t));
+}
+
+mm_inf_t get_mm_inf(void) {
+    return mm_inf;
 }

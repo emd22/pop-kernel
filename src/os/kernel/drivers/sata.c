@@ -95,13 +95,71 @@ int check_type(HBA_PORT *port) {
     return AHCI_DEV_NULL;
 }
 
+uint32_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
+    uint32_t address;
+    uint32_t lbus  = (uint32_t)bus;
+    uint32_t lslot = (uint32_t)slot;
+    uint32_t lfunc = (uint32_t)func;
+    uint64_t tmp = 0;
+
+    address = (uint32_t)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xFC) | ((uint32_t)0x80000000));
+
+    outl(0xCF8, address);
+
+    if (offset == 0x24)
+        tmp = inl(0xCFC);
+    else
+        tmp = (uint16_t)((inl(0xCFC) >> ((offset & 2)*8)) & 0xFFFF);
+
+    return tmp;
+}
+
+uint16_t get_vendor_id(uint8_t bus, uint8_t slot) {
+    return pci_readw(bus, slot, 0, 0);
+}
+
+uint16_t get_device_id(uint8_t bus, uint8_t slot) {
+    return pci_readw(bus, slot, 0, 2);
+}
+
+uint64_t check_dev(uint8_t bus, uint8_t device) {
+    uint16_t vend_id = get_vendor_id(bus, device);
+    if(vend_id == 0xFFFF) 
+        return 0;
+
+    uint16_t dev_id = get_device_id(bus, device);
+
+    if (vend_id == 0x8086 && dev_id == 0x2922)
+        return pci_readw(bus, device, 0, 0x24);
+
+    return 0;
+}
+
+int ahci_brute_force(void) {
+    uint16_t bus;
+    uint8_t device;
+    uint64_t bar5;
+
+    for (bus = 0; bus < 256; bus++) {
+        for (device = 0; device < 32; device++) {
+            bar5 = check_dev(bus, device);
+            if (bar5 != 0)
+                return bar5;
+        }
+    }
+    return 0;
+}
+
 void probe_port(HBA_MEM *abar_) {
     //Search disk in implemented ports
     uint32_t pi = abar_->pi;
     int i = 0;
     while (i < 32) {
+        printf("boopin %d ", pi);
         if (pi & 1) {
             int dt = check_type((HBA_PORT *)&abar_->ports[i]);
+
+            printf("dt = %d\n", dt);
 
             if (dt == AHCI_DEV_SATA) {
                 printf("SATA drive found at port %d\n", i);
@@ -382,12 +440,12 @@ const char *rw(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf, 
 
         // error bit set in ata status register
         if (port->is & PORT_IS_TFES)
-            return write ? "AHCI write - error 1" : "AHCI read - error 1";
+            return write ? "AHCI write - Task file error 1" : "AHCI read - Task file error 1";
     }
 
     // check again. no idea if this is necessary, but it's in an osdev example (of dubious quality)
     if (port->is & PORT_IS_TFES)
-        return write ? "AHCI write - error 2" : "AHCI read - error 2";
+        return write ? "AHCI write - Task file error 2" : "AHCI read - Task file error 2";
 
     return NULL;
 }

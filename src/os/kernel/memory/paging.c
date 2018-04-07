@@ -1,4 +1,4 @@
-#include <kernel/memory/memory.h>
+#include <kernel/memory/paging.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>

@@ -34,14 +34,3 @@ inline unsigned inl(uint16_t port) {
     asm volatile("inl %1, %0" : "=a" (data) : "d" (port));
     return data;
 }
-
-// inline uint32_t readl(const void *addr) {
-//     uint32_t val = *(volatile const uint32_t *)addr;
-//     barrier();
-//     return val;
-// }
-
-// inline void outl(const void *addr, uint32_t val) {
-//     barrier();
-//     *(volatile uint32_t *)addr = val;
-// }

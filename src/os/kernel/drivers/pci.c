@@ -54,16 +54,6 @@ void pci_init(void) {
 //     return (uint16_t)((sysinl(0xCFC) >> ((offset & 2)*8)));
 // }
 
-// uint16_t pci_check_vendor(uint8_t bus, uint8_t slot) {
-//     uint16_t vendor, device;
-//     //try and read the first configuration register. 0xFFFF = non-existent device.
-//     if ((vendor = (pci_config_readw(bus, slot, 0, 0) & 0xFFFF)) != 0xFFFF) {
-//         device = pci_config_readw(bus, slot, 0, 2) & 0xFFFF;
-//     }
-//     //vendor code exists, so we'll return it
-//     return vendor;
-// }
-
 // bool dev_is_valid(uint8_t bus, uint8_t slot, uint8_t func) {
 //     uint16_t vendor = pci_config_readw(bus, slot, func, 0) & 0xFFFF;
 
@@ -289,9 +279,9 @@ void scan_brute_force(int (*cb)(pci_header_t *)) {
     }
 }
 
-unsigned pci_bar(pci_header_t *func, uint8_t bar) {
-    return readl(func->bus, func->slot, func->function, 0x10+4*bar);
-}
+// unsigned pci_bar(pci_header_t *func, uint8_t bar) {
+//     return readl(func->bus, func->slot, func->function, 0x10+4*bar);
+// }
 
 // void scan_brute_force(int (*cb)(pci_header_t *)) {
 //     int bus, slot, func;

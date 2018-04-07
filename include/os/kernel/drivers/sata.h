@@ -298,9 +298,7 @@ typedef struct tagHBA_CMD_TBL {
 
 void ahci_init(void);
 void probe_port(HBA_MEM *abar_);
-// void port_rebase(HBA_PORT *port, int portno);
-// bool sata_read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint16_t *buf);
-// bool sata_write(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t scount, uint64_t buf);
+int ahci_brute_force(void);
 bool ahci_detect(void);
 HBA_PORT *get_port(void);
 const char *read(uint32_t startl, uint32_t starth, uint16_t scount, uint8_t *buf);

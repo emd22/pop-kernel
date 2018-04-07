@@ -26,6 +26,7 @@ void input(char *buf) {
         }
         else {
             buf[index++] = ch;
+            buf[index+1] = 0;
             printf("%c", ch);  
         }
     }

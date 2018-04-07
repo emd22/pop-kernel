@@ -26,7 +26,9 @@ char get_scancode() {
     // while(!(flag & 1)) {
     //     flag = inb(KBD_PORT);
     // }
-    return inb(0x60);
+    if (inb(0x60) != 0)
+        return inb(0x60);
+    return -1;
 }
 
 uint8_t scancode_char(int keycode) {
@@ -98,14 +100,24 @@ uint8_t scancode_char(int keycode) {
 void kbd_handler(regs_t *regs) {
     int sc = get_scancode();
 
-    if (sc & 0x80) {
-        int sc_released = sc-0x80;
-        if (sc_released == SCANCODE_LEFT_SHIFT || sc_released == SCANCODE_RIGHT_SHIFT)
-            kinfo.shift = false;
-    }
+    if (sc == -1)
+        return;
+
+    // if (sc & 0x80) {
+    //     int sc_released = sc-0x80;
+    //     // printf("{0x%d}\n", sc_released);
+    //     if (sc_released == SCANCODE_LEFT_SHIFT || sc_released == SCANCODE_RIGHT_SHIFT)
+    //         kinfo.shift = false;
+    // }
+
+    // printf("sc={%d}", sc);
+    
     if (sc != 0) {
         if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {
             kinfo.shift = true;
+        }
+        else if (sc == -0x56 || sc == -0x4A) {
+            kinfo.shift = false;
         }
         else {
             char ch = scancode_char(sc);
