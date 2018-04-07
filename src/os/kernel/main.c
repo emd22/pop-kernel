@@ -9,7 +9,7 @@
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/boot_vga.h>
 #include <kernel/drivers/pci.h>
-#include <kernel/drivers/sata.h>
+#include <kernel/drivers/ahci.h>
 #include <kernel/drivers/mbr.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
@@ -28,7 +28,6 @@
 #include <stdint.h>
 
 #define KERN_VMBASE (0xffff808000000000ull)
-
 
 bool ahci_exists;
 uint32_t kernel_end;
@@ -81,7 +80,7 @@ void kmain(void) {
 
     bvga_init();
     keyboard_init();
-    pci_init();
+    // pci_init();
     ahci_init();
     mbr_init();
 
@@ -93,28 +92,28 @@ void kmain(void) {
     paging_map(KERN_VMBASE+bar5, bar5);
 
     HBA_MEM *abar = (HBA_MEM *)(KERN_VMBASE + bar5);
+
+    printf("abar = %d, bar5 = %d\n", abar, bar5);
     // void *abar = malloc(4096);
-    probe_port(abar);
-    ahci_exists = ahci_detect();
-    assert(ahci_exists, "AHCI not found.", NULL);
+    ahci_probe_port(abar);
 
-    uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
+    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     
-    bzero(buf_, 512);
-    const char *error;
-    if ((error = read(0, 0, 1, buf_)) != NULL) {
-        printf("AHCI ERROR: %s\n", error);
-    }
+    // bzero(buf_, 512);
+    // const char *error;
+    // if ((error = read(0, 0, 1, buf_)) != NULL) {
+    //     printf("AHCI ERROR: %s\n", error);
+    // }
 
-    int i;
-    for (i = 0; i < 512; i++) {
-        if (buf_[i] != 0) {
-            printf("[%d]", buf_[i]);
-        }
-    }
-    printf("\nREADING COMPLETED\n");
+    // int i;
+    // for (i = 0; i < 512; i++) {
+    //     if (buf_[i] != 0) {
+    //         printf("[%d]", buf_[i]);
+    //     }
+    // }
+    // printf("\nREADING COMPLETED\n");
 
-    free(buf_);
+    // free(buf_);
 
     char buf[64];
 
