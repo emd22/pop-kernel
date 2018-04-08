@@ -37,7 +37,7 @@ uint64_t pci_brute_force(void) {
 
             if (PCI_MULTI_FUNCTION(vendor_id)) {
                 printf("vendor: 0x%x device: 0x%x\n", vendor_id, device_id);
-                return pci_readw(bus, device, 0, 0x24);
+                return pci_readw(bus, device, 0, (0x24|0x00));
             }
         }
     }

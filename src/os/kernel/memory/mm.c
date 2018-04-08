@@ -27,7 +27,8 @@ void free(void *mem) {
 }
 
 void *malloc(size_t size) {
-    if(!size) return 0;
+    if (!size)
+        return 0;
 
     uint8_t *mem = (uint8_t *)mm_inf.heap_begin;
 

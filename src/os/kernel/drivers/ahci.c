@@ -24,10 +24,15 @@
 #define	SATA_SIG_SEMB   0xC33C0101	// Enclosure management bridge
 #define	SATA_SIG_PM	    0x96690101
 
+#define AHCI_ERROR_NONE 0
+#define AHCI_ERROR_NO_IPM_ACTIVE 1
+#define AHCI_ERROR_NO_DET_PRESENT 2
+
 HBA_MEM *abar;
+int error;
 
 void ahci_init() {
-
+    error = AHCI_ERROR_NONE;
 }
 
 int ahci_check_type(HBA_PORT *port) {
@@ -39,11 +44,11 @@ int ahci_check_type(HBA_PORT *port) {
     printf("ipm: %d, sig: 0x%x(%d), det: %d\n", ipm, port->sig, port->sig, det);
 
     if (det != HBA_PORT_DET_PRESENT) {
-        // printf("AHCI HBA port not present. %d\n", det);
+        error = AHCI_ERROR_NO_DET_PRESENT;
         return AHCI_DEV_NULL;
     }
-
     if (ipm != HBA_PORT_IPM_ACTIVE) {
+        error = AHCI_ERROR_NO_IPM_ACTIVE;
         return AHCI_DEV_NULL;
     }
 
@@ -65,10 +70,17 @@ void ahci_probe_port(HBA_MEM *abar_) {
     uint32_t pi = abar->pi;
     int i = 0;
 
+    int sata_found = 0;
+
+    int no_det = 0;
+    int ipm_not_active = 0;
+    int other = 0;
+
     while (i < 32) {
         if (pi & 1) {
             int dt = ahci_check_type(&abar->ports[i]);
             if (dt == AHCI_DEV_SATA) {
+                sata_found++;
                 printf("SATA drive found at port %d\n", i);
                 ahci_port_rebase(abar->ports, i);
             }
@@ -78,12 +90,23 @@ void ahci_probe_port(HBA_MEM *abar_) {
                 printf("SEMB drive found at port %d\n", i);
             else if (dt == AHCI_DEV_PM)
                 printf("PM drive found at port %d\n", i);
-            // else
-            //     printf("No drive found at port %d -> %d\n", i, dt);
+            else {
+                if (error == AHCI_ERROR_NO_DET_PRESENT)
+                    no_det++;
+                else if (error == AHCI_ERROR_NO_IPM_ACTIVE)
+                    ipm_not_active++;
+                else if (error)
+                    other++;
+            }
         }
 
         pi >>= 1;
         i++;
+    }
+
+    if (!sata_found) {
+        printf("No SATA drives connected to PCI bus.\n");
+        printf("Errors: (ipm not active: %d, no det present: %d, other: %d)\n", ipm_not_active, no_det, other);
     }
 }
 
@@ -164,17 +187,18 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
     cmdheader->w = 0;		// Read from device
     cmdheader->prdtl = (uint16_t)((count-1)>>4) + 1;	// PRDT entries count
 
-    // printf("");
-    printf("ptr: %d\n", cmdheader->ctba);
-    while(1);
+    // printf("ptr: %d\n", cmdheader->ctba);
+    // while(1);
     HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)(cmdheader->ctba);
     memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) +
          (cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
  
     // 8K bytes (16 sectors) per PRDT
+    // printf("prds = %d\n", cmdheader->prdtl-1);
     int i;
     for (i=0; i<cmdheader->prdtl-1; i++)
     {
+        // printf("prd\n");
         cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
         cmdtbl->prdt_entry[i].dbc = 8*1024-1;	// 8K bytes (this value should always be set to 1 less than the actual value)
         cmdtbl->prdt_entry[i].i = 1;
@@ -204,17 +228,15 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
  
     cmdfis->countl = count & 0xFF;
     cmdfis->counth = (count >> 8) & 0xFF;
-
  
     // The below loop waits until the port is no longer busy before issuing a new command
-    while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
+    timeout_start(5);
+    while (port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ))
     {
-        spin++;
-    }
-    if (spin == 1000000)
-    {
-        printf("Port is hung\n");
-        return false;
+        if (timeout_tick()) {
+            printf("Port is hung\n");
+            return false;
+        }
     }
  
     port->ci = 1<<slot;	// Issue command

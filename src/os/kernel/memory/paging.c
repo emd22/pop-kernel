@@ -10,6 +10,11 @@ struct {
 } page_inf;
 
 void paging_map(uint32_t virt, uint32_t phys) {
+    if (virt < 0 || phys < 0) {
+        printf("error: trying to map paging using unsigned number.\n");
+        return;
+    }
+
     uint16_t id = virt >> 22;
     int i;
     for (i = 0; i < 1024; i++) {
@@ -23,7 +28,6 @@ void paging_map(uint32_t virt, uint32_t phys) {
 
 void paging_init() {
     memset(&page_inf, 0, sizeof(page_inf));
-    printf("HOI\n");
 
     page_inf.pdir = (uint32_t *)0x400000;
     page_inf.pdir_loc = (uint32_t)page_inf.pdir;

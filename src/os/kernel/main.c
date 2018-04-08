@@ -90,10 +90,15 @@ void kmain(void) {
     uint32_t bar5 = pci_brute_force();
     paging_map(KERN_VMBASE+bar5, bar5);
 
-    HBA_MEM *abar = (HBA_MEM *)(KERN_VMBASE + bar5);
+    HBA_MEM *abar = (HBA_MEM *)(KERN_VMBASE + bar5)/* NULL */;
+
+    // abar = (HBA_MEM  *)(0xFFFFFFFF00000000+(uintptr_t)bar5);
+    printf("ABAR = %d\n", &abar);
 
     // void *abar = malloc(4096);
     ahci_probe_port(abar);
+
+    while(1);
 
     uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     

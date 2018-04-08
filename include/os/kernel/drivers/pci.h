@@ -13,5 +13,6 @@
 #define GET_VENDOR_ID(bus, slot) pci_readw(bus, slot, 0, 0);
 
 uint64_t pci_brute_force(void);
+uint32_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 
 #endif
