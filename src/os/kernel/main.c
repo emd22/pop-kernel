@@ -80,7 +80,6 @@ void kmain(void) {
 
     bvga_init();
     keyboard_init();
-    // pci_init();
     ahci_init();
     mbr_init();
 
@@ -88,39 +87,43 @@ void kmain(void) {
 
     printf("Available RAM: %d bytes\n", mm_inf.heap_end-mm_inf.heap_begin);
 
-    uint32_t bar5 = ahci_brute_force();
+    uint32_t bar5 = pci_brute_force();
     paging_map(KERN_VMBASE+bar5, bar5);
 
     HBA_MEM *abar = (HBA_MEM *)(KERN_VMBASE + bar5);
 
-    printf("abar = %d, bar5 = %d\n", abar, bar5);
     // void *abar = malloc(4096);
     ahci_probe_port(abar);
 
-    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
+    uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     
-    // bzero(buf_, 512);
+    bzero(buf_, 512);
     // const char *error;
     // if ((error = read(0, 0, 1, buf_)) != NULL) {
     //     printf("AHCI ERROR: %s\n", error);
     // }
+    if (read(&abar->ports[0], 0, 0, 1, buf_)) {
+        int i;
+        for (i = 0; i < 512; i++) {
+            if (buf_[i] != 0) {
+                printf("[%d]", buf_[i]);
+            }
+        }
+        printf("\nREADING COMPLETED\n");
+    }
 
-    // int i;
-    // for (i = 0; i < 512; i++) {
-    //     if (buf_[i] != 0) {
-    //         printf("[%d]", buf_[i]);
-    //     }
-    // }
-    // printf("\nREADING COMPLETED\n");
+    
 
-    // free(buf_);
+    free(buf_);
 
     char buf[64];
 
     char **args = alloc_2d(MAX_ARG_LEN, MAX_ARGS);
     int arg_len = 0;
 
+    bvga_set_colour(bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
+    bvga_set_colour(BVGA_DEF);
 
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));

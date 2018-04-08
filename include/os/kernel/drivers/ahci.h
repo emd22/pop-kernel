@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <kernel/drivers/pci.h>
+
 #define ATA_CMD_READ_DMA_EXT 0x25
 #define ATA_CMD_WRITE_DMA_EXT 0x35
 
@@ -297,6 +299,5 @@ void ahci_init();
 void ahci_probe_port(HBA_MEM *abar);
 void ahci_port_rebase(HBA_PORT *port, int portno);
 bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf);
-uint64_t ahci_brute_force(void);
 
 #endif

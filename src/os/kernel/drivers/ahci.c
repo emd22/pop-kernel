@@ -1,6 +1,8 @@
 #include <kernel/drivers/ahci.h>
 #include <kernel/x86.h>
 
+#include <kernel/timeout.h>
+
 #define HBA_PORT_DET_PRESENT 3
 #define HBA_PORT_IPM_ACTIVE  1
 
@@ -33,6 +35,8 @@ int ahci_check_type(HBA_PORT *port) {
 
     uint8_t ipm = (ssts >> 8) & 0x0F;
     uint8_t det = ssts & 0x0F;
+
+    printf("ipm: %d, sig: 0x%x(%d), det: %d\n", ipm, port->sig, port->sig, det);
 
     if (det != HBA_PORT_DET_PRESENT) {
         // printf("AHCI HBA port not present. %d\n", det);
@@ -74,8 +78,8 @@ void ahci_probe_port(HBA_MEM *abar_) {
                 printf("SEMB drive found at port %d\n", i);
             else if (dt == AHCI_DEV_PM)
                 printf("PM drive found at port %d\n", i);
-            else
-                printf("No drive found at port %d -> %d\n", i, dt);
+            // else
+            //     printf("No drive found at port %d -> %d\n", i, dt);
         }
 
         pi >>= 1;
@@ -121,6 +125,7 @@ void ahci_port_rebase(HBA_PORT *port, int portno) {
     for (i = 0; i < 32; i++) {
         cmd_header[i].prdtl = 8;
         cmd_header[i].ctba = AHCI_BASE+(40 << 10)+(portno << 13)+(i << 8);
+        printf("cmdheader[%d].ctba=%d\n", i, cmd_header[i].ctba);
         cmd_header[i].ctbau = 0;
         memset((void *)cmd_header[i].ctba, 0, 256);
     }
@@ -133,7 +138,9 @@ int find_cmdslot(HBA_PORT *port) {
     uint32_t slots = (port->sact | port->ci);
     int i;
 
-    int cmdslots = (abar->cap & 0x0F00) >> 8;
+    // int cmdslots = abar->cap & (0x1F);
+    int cmdslots = 32;
+    // printf("cmdslots -> %d\n", cmdslots);
 
     for (i = 0; i < cmdslots; i++) {
         if ((slots & 1) == 0)
@@ -149,14 +156,17 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
     int spin = 0; // Spin lock timeout counter
     int slot = find_cmdslot(port);
     if (slot == -1)
-        return false;
+        return false;    
  
     HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER*)port->clb;
     cmdheader += slot;
     cmdheader->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);	// Command FIS size
     cmdheader->w = 0;		// Read from device
     cmdheader->prdtl = (uint16_t)((count-1)>>4) + 1;	// PRDT entries count
- 
+
+    // printf("");
+    printf("ptr: %d\n", cmdheader->ctba);
+    while(1);
     HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)(cmdheader->ctba);
     memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) +
          (cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
@@ -194,6 +204,7 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
  
     cmdfis->countl = count & 0xFF;
     cmdfis->counth = (count >> 8) & 0xFF;
+
  
     // The below loop waits until the port is no longer busy before issuing a new command
     while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
@@ -230,71 +241,4 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
     }
  
     return true;
-}
-
-uint32_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
-    uint32_t address;
-    uint32_t lbus  = (uint32_t)bus;
-    uint32_t lslot = (uint32_t)slot;
-    uint32_t lfunc = (uint32_t)func;
-    uint64_t tmp = 0;
-
-    /* create configuration address as per Figure 1 */
-    address = (uint32_t)((lbus << 16) | (lslot << 11) |
-              (lfunc << 8) | (offset & 0xfc) | ((uint32_t)0x80000000));
-
-    /* write out the address */
-    outl (0xCF8, address);
-    /* read in the data */
-    /* (offset & 2) * 8) = 0 will choose the first word of the 32 bits register */
-    if (offset == 0x24)
-        tmp = inl(0xCFC);
-    else
-        tmp = (uint16_t)( (inl(0xCFC) >> ((offset & 2) * 8) ) & 0xffff);
-    return (tmp);
-}
-
-uint16_t get_vendor_id(uint8_t bus, uint8_t slot)
-{
-    return pci_readw(bus, slot, 0, 0);
-}
-
-uint16_t get_device_id(uint8_t bus, uint8_t slot)
-{
-    return pci_readw(bus, slot, 0, 2);
-}
-
-uint64_t check_device(uint8_t bus, uint8_t device) {
-    //uint8_t function = 0;
-
-    uint16_t vendorID = get_vendor_id(bus, device);
-    if(vendorID == 0xFFFF) return 0;        // Device doesn't exist
-    uint16_t deviceID = get_device_id(bus, device);
-
-    if (vendorID == 0x8086 && deviceID == 0x2922)
-    {
-        //printk("vendor: %d device: %d\n", vendorID, deviceID);
-        return pci_readw(bus, device, 0, 0x24);
-    }
-     //checkFunction(bus, device);
-     //headerType = getHeaderType(bus, device, function);
-    return 0;
-}
-
-uint64_t ahci_brute_force(void)
-{
-    uint16_t bus;
-    uint8_t device;
-    uint64_t bar5;
-
-    for(bus = 0; bus < 256; bus++)
-    {
-        for(device = 0; device < 32; device++)
-        {
-            bar5 = check_device(bus, device);
-            if (bar5 != 0)
-                return bar5;
-        }
-    }
-    return 0;
 }
