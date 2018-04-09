@@ -23,10 +23,11 @@
 typedef struct {
     uint8_t bus;
     uint8_t slot;
+    uint8_t function;
     int type;
 } pci_device_t;
 
 uint64_t pci_brute_force(void);
-uint16_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
+uint32_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 
 #endif
