@@ -88,17 +88,16 @@ void kmain(void) {
     printf("Available RAM: %d bytes\n", mm_inf.heap_end-mm_inf.heap_begin);
 
     uint32_t bar5 = pci_brute_force();
+    while(1);
     paging_map(KERN_VMBASE+bar5, bar5);
 
-    HBA_MEM *abar = (HBA_MEM *)(KERN_VMBASE + bar5)/* NULL */;
+    HBA_MEM *abar = /* (HBA_MEM *)(KERN_VMBASE + bar5) */NULL;
 
-    // abar = (HBA_MEM  *)(0xFFFFFFFF00000000+(uintptr_t)bar5);
-    printf("ABAR = %d\n", &abar);
+    abar = (HBA_MEM  *)(unsigned)(inl((unsigned)(bar5+0x24)));
+    printf("ABAR = %d, BAR5 = %d\n", &abar, bar5);
 
     // void *abar = malloc(4096);
     ahci_probe_port(abar);
-
-    while(1);
 
     uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     
