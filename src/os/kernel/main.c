@@ -87,8 +87,8 @@ void kmain(void) {
 
     printf("Available RAM: %d bytes\n", mm_inf.heap_end-mm_inf.heap_begin);
 
-    uint32_t bar5 = pci_brute_force();
-    while(1);
+    int bar5 = pci_brute_force();
+    // while(1);
     paging_map(KERN_VMBASE+bar5, bar5);
 
     HBA_MEM *abar = /* (HBA_MEM *)(KERN_VMBASE + bar5) */NULL;
