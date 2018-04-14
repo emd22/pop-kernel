@@ -32,13 +32,18 @@ const char *time_day_full(int day) {
     
     const char *end;
 
-    char dend = msg[strlen(msg)-1];
+    char *dend = msg[strlen(msg)-1];
 
-    if (dend == '1')
+    if (*dend == '1') {
         end = "st";
-    else if (dend == '2')
+        if (strlen(msg) > 1) {
+            if (*(dend-1) == '1')
+                end = "th";
+        }
+    }
+    else if (*dend == '2')
         end = "nd";
-    else if (dend == '3')
+    else if (*dend == '3')
         end = "rd";
     else
         end = "th";

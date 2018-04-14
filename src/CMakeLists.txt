@@ -16,7 +16,7 @@ set(CMAKE_ASM_COMPILER ${PROJECT_PATH}/cross-compiler/bin/${COMPILE_TYPE}-elf-as
 
 set(BUILD_NAME os)
 
-file(GLOB_RECURSE SOURCES "*.S" "*.c")
+file(GLOB_RECURSE SOURCES "../src/os/asm/${COMPILE_TYPE}/*.S" "*.c")
 file(GLOB_RECURSE HEADERS "../include/${BUILD_NAME}/*.h")
 
 include_directories(

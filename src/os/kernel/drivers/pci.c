@@ -12,10 +12,7 @@ uint32_t pci_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
 
     outl(0xCF8, address);
 
-    // if (offset == 0x24)
-        // tmp = inl(0xCFC);
-    // else
-        tmp = /* (uint16_t) */((inl(0xCFC) >> ((offset & 2)*8)) & 0xFFFF);
+    tmp = (uint16_t)((inl(0xCFC) >> ((offset & 2)*8)) & 0xFFFF);
     return (tmp);
 }
 
@@ -30,7 +27,7 @@ uint64_t pci_readl(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
     // address = (1 << 31) | (bus << 16) | (dev << 11) | (func << 8) | (offset & 0xFC);
 
     outl(0xCF8, address);
-    return ((inl(0xCFC)/*  >> ((offset & 2)*8) */) & 0xFFFF);
+    return ((inl(0xCFC)/*  >> ((offset & 2)*8) */)/*  & 0xFFFF */);
 }
 
 uint64_t pci_brute_force(void) {
@@ -49,19 +46,19 @@ uint64_t pci_brute_force(void) {
 
             device_id = GET_DEVICE_ID(bus, device);
 
-            if (PCI_MULTI_FUNCTION(vendor_id)) {
-                printf("vendor: 0x%x device: 0x%x\n", vendor_id, device_id);
+            if (vendor_id == 0x8080) {
                 int bar5 = 0;
                 int function = 0;
 
                 for (; function < 8; function++) {
                     bar5 = pci_readl(bus, device, function, 0x24);
-                    printf("bar5 = %d, ", bar5);
+                    // printf("bar5 = %d, ", bar5);
                     if (bar5 > 0) {
+                        printf("bar5 = %d, f = %d\n", bar5, function);
                         break;
                     }
                 }
-                printf("bar5 = %d, f = %d\n", bar5, function);
+                // printf("vendor: 0x%x device: 0x%x -> %d\n", vendor_id, device_id, bar5);
                 return bar5;
             }
         }

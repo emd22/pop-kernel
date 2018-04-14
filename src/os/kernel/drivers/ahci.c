@@ -41,7 +41,7 @@ int ahci_check_type(HBA_PORT *port) {
     uint8_t ipm = (ssts >> 8) & 0x0F;
     uint8_t det = ssts & 0x0F;
 
-    printf("ipm: %d, sig: 0x%x(%d), det: %d\n", ipm, port->sig, port->sig, det);
+    // printf("ipm: %d, sig: 0x%x(%d), det: %d\n", ipm, port->sig, port->sig, det);
 
     if (det != HBA_PORT_DET_PRESENT) {
         error = AHCI_ERROR_NO_DET_PRESENT;
