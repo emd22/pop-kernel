@@ -1,10 +1,13 @@
-echo Installing Dependencies... 
-sudo apt install gcc
+printf "Checking Dependencies... "
 #this fixes the weird grub-mkrescue fail issue
-sudo apt install grub-pc-bin
-echo Checking cross-compiler
+if [ command -v grub-pc-bin &> /dev/null ]; then
+    sudo apt install grub-pc-bin
+fi
 
-if [ ! -d x86_64-elf-4.9.1-Linux-x86_64 || i686-elf-4.9.1-Linux-x86_64 ]; then
+echo Done.
+echo Checking cross-compiler...
+
+if [ ! -d x86_64-elf-4.9.1-Linux-x86_64 ] || [ ! -d i686-elf-4.9.1-Linux-x86_64 ]; then
     # if [ -d x86_64-elf-4.9.1-Linux-x86_64 ]; then
     #     mv x86_64-elf-4.9.1-Linux-x86_64 cross-compiler
     # elif [ -d i686-elf-4.9.1-Linux-x86_64 ]; then
