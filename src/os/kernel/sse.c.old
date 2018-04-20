@@ -1,0 +1,9 @@
+#include <kernel/sse.h>
+
+//defined in sse.S
+
+extern int sse_found = 0;
+
+void sse_init() {
+    check_sse();
+}

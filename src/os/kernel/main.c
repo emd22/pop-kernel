@@ -2,9 +2,9 @@
 #error "Error: Not compiled using cross-compiler."
 #endif
 
-#if !defined(__i386__)
-#error "Error: Kernel needs an ix86 system."
-#endif
+// #if !defined(__i386__)
+// #error "Error: Kernel needs an ix86 system."
+// #endif
 
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/boot_vga.h>
@@ -20,8 +20,9 @@
 #include <kernel/debug.h>
 #include <kernel/args.h>
 #include <kernel/err.h>
-#include <kernel/drivers/gdt.h>
+// #include <kernel/drivers/gdt.h>
 #include <osutil.h>
+// #include <kernel/sse.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,10 +72,12 @@ int check_command(char **args, const char *command) {
 }
 
 void kmain(void) {
+    // sse_init();
+
     mm_init(&kernel_end);
     paging_init();
     
-    gdt_install();
+    // gdt_install();
     idt_install();
     irq_install();
 

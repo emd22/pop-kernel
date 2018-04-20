@@ -1,4 +1,4 @@
-The system is: Linux - 4.13.0-37-generic - x86_64
+The system is: Linux - 4.13.0-38-generic - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /usr/bin/cc 
 Build flags: 
@@ -10,33 +10,33 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/home/ethan/Desktop/pop-kernel/build/CMakeFiles/3.9.1/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/home/emd22/Desktop/pop-kernel/build/CMakeFiles/3.9.1/CompilerIdC/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
+Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_fe031/fast"
-/usr/bin/make -f CMakeFiles/cmTC_fe031.dir/build.make CMakeFiles/cmTC_fe031.dir/build
-make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_fe031.dir/testCCompiler.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_fe031.dir/testCCompiler.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_fe031
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fe031.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_fe031.dir/testCCompiler.c.o  -o cmTC_fe031 
-make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_7bb3d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7bb3d.dir/build.make CMakeFiles/cmTC_7bb3d.dir/build
+make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7bb3d.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_7bb3d.dir/testCCompiler.c.o   -c /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_7bb3d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7bb3d.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_7bb3d.dir/testCCompiler.c.o  -o cmTC_7bb3d 
+make[1]: Leaving directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
+Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_2cdfb/fast"
-/usr/bin/make -f CMakeFiles/cmTC_2cdfb.dir/build.make CMakeFiles/cmTC_2cdfb.dir/build
-make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_2cdfb
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2cdfb.dir/link.txt --verbose=1
-/usr/bin/cc     -v CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o  -o cmTC_2cdfb 
+Run Build Command:"/usr/bin/make" "cmTC_c7223/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c7223.dir/build.make CMakeFiles/cmTC_c7223.dir/build
+make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_c7223
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c7223.dir/link.txt --verbose=1
+/usr/bin/cc     -v CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o  -o cmTC_c7223 
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper
@@ -48,24 +48,24 @@ Thread model: posix
 gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu3.2) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_2cdfb' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccZUOnfC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_2cdfb /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_2cdfb' '-mtune=generic' '-march=x86-64'
-make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c7223' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccXjBmuB.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_c7223 /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c7223' '-mtune=generic' '-march=x86-64'
+make[1]: Leaving directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_2cdfb/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_2cdfb.dir/build.make CMakeFiles/cmTC_2cdfb.dir/build]
-  ignore line: [make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_2cdfb]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2cdfb.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o  -o cmTC_2cdfb ]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_c7223/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_c7223.dir/build.make CMakeFiles/cmTC_c7223.dir/build]
+  ignore line: [make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.9/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_c7223]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c7223.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o  -o cmTC_c7223 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper]
@@ -77,13 +77,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu3.2) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/7/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_2cdfb' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccZUOnfC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_2cdfb /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_c7223' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/7/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper -plugin-opt=-fresolution=/tmp/ccXjBmuB.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_c7223 /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/7/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/7/../../.. CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/7/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/7/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/7/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/7/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccZUOnfC.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccXjBmuB.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -102,7 +102,7 @@ Parsed C implicit link information from above output:
     arg [-znow] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_2cdfb] ==> ignore
+    arg [cmTC_c7223] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/7/crtbeginS.o] ==> ignore
@@ -114,7 +114,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/7/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/7/../../..]
-    arg [CMakeFiles/cmTC_2cdfb.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_c7223.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -142,17 +142,17 @@ Parsed C implicit link information from above output:
 
 
 Detecting C [-std=c11] compiler features compiled with the following output:
-Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
+Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_facb6/fast"
-/usr/bin/make -f CMakeFiles/cmTC_facb6.dir/build.make CMakeFiles/cmTC_facb6.dir/build
-make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_facb6.dir/feature_tests.c.o
-/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_facb6.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_facb6
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_facb6.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_facb6.dir/feature_tests.c.o  -o cmTC_facb6 
-make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_c7715/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c7715.dir/build.make CMakeFiles/cmTC_c7715.dir/build
+make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c7715.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_c7715.dir/feature_tests.c.o   -c /home/emd22/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_c7715
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c7715.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_c7715.dir/feature_tests.c.o  -o cmTC_c7715 
+make[1]: Leaving directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -162,17 +162,17 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 
 
 Detecting C [-std=c99] compiler features compiled with the following output:
-Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
+Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d91bc/fast"
-/usr/bin/make -f CMakeFiles/cmTC_d91bc.dir/build.make CMakeFiles/cmTC_d91bc.dir/build
-make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_d91bc.dir/feature_tests.c.o
-/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_d91bc.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_d91bc
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d91bc.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_d91bc.dir/feature_tests.c.o  -o cmTC_d91bc 
-make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_b1c0e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b1c0e.dir/build.make CMakeFiles/cmTC_b1c0e.dir/build
+make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b1c0e.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_b1c0e.dir/feature_tests.c.o   -c /home/emd22/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_b1c0e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b1c0e.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_b1c0e.dir/feature_tests.c.o  -o cmTC_b1c0e 
+make[1]: Leaving directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -182,17 +182,17 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 
 
 Detecting C [-std=c90] compiler features compiled with the following output:
-Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
+Change Dir: /home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_db05c/fast"
-/usr/bin/make -f CMakeFiles/cmTC_db05c.dir/build.make CMakeFiles/cmTC_db05c.dir/build
-make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_db05c.dir/feature_tests.c.o
-/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_db05c.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_db05c
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_db05c.dir/link.txt --verbose=1
-/usr/bin/cc      CMakeFiles/cmTC_db05c.dir/feature_tests.c.o  -o cmTC_db05c 
-make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_f339f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f339f.dir/build.make CMakeFiles/cmTC_f339f.dir/build
+make[1]: Entering directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f339f.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_f339f.dir/feature_tests.c.o   -c /home/emd22/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_f339f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f339f.dir/link.txt --verbose=1
+/usr/bin/cc      CMakeFiles/cmTC_f339f.dir/feature_tests.c.o  -o cmTC_f339f 
+make[1]: Leaving directory '/home/emd22/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes

@@ -120,12 +120,12 @@ int printf(const char *fmt, ...) {
                     bvga_putstr(buffer, BVGA_NONE);
                     length += strlen(buffer);
                     break;
-                case 'f':
-                    td = va_arg(args, double);
-                    ftoa_fixed(buffer, td);
-                    bvga_putstr(buffer, BVGA_NONE);
-                    length += strlen(buffer);
-                    break;
+                // case 'f':
+                //     td = va_arg(args, double);
+                //     ftoa_fixed(buffer, td);
+                //     bvga_putstr(buffer, BVGA_NONE);
+                //     length += strlen(buffer);
+                //     break;
             }
         }
         else if (ch == '\n') {
