@@ -1,4 +1,3 @@
-
 .macro pushaq
     push %rax
     push %rcx
@@ -13,7 +12,7 @@
     pop %rdi    
     pop %rsi    
     pop %rbp    
-    pop %rbx    
+    pop %rbx
     pop %rdx    
     pop %rcx
     pop %rax
@@ -161,30 +160,30 @@ irq_common_stub:
   pushaq
 
   /* Save segment registers */
-  push %ds
-  push %es
-  push %fs
-  push %gs
+  push %dx
+  push %ax
+  push %bx
+  push %cx
   mov $0x10, %ax
-  mov %ax, %ds
-  mov %ax, %es
-  mov %ax, %fs
+  mov %ax, %dx
+  mov %ax, %bx
+  mov %ax, %cx
   mov %ax, %gs
 
   /* Call interrupt handler */
-  push esp
+  push %rsp
   call irq_handler
-  add $4, %esp
+  add $4, %rsp
 
   /* Restore segment registers */
-  pop %gs
-  pop %fs
-  pop %es
-  pop %ds
+  pop %dx
+  pop %ax
+  pop %bx
+  pop %cx
 
   /* Restore all registers */
   popaq
   /* Cleanup error code and IRQ number */
-  add $8, %esp
+  add $8, %rsp
   /* pop CS, EIP, EFLAGS, SS and ESP */
   iret

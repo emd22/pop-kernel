@@ -5,10 +5,7 @@ set(CMAKE_CROSSCOMPILING TRUE)
 set(TARGET_COMPILE_TYPE x86_64)
 set(COMPILE_TYPE x86_64)
 
-#FIXME
-#CHANGE THIS      vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-set(PROJECT_PATH "/home/emd22/Desktop/pop-kernel")
-#                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+get_filename_component(PROJECT_PATH ${PROJECT_SOURCE_DIR} DIRECTORY)
 
 set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -ffreestanding -nostdlib -nostartfiles -Wall -mno-red-zone -mno-mmx -mno-sse -mno-sse2")
 

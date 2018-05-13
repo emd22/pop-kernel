@@ -20,7 +20,7 @@
 #include <kernel/debug.h>
 #include <kernel/args.h>
 #include <kernel/err.h>
-// #include <kernel/drivers/gdt.h>
+#include <kernel/drivers/gdt.h>
 #include <osutil.h>
 // #include <kernel/sse.h>
 
@@ -77,51 +77,51 @@ void kmain(void) {
     mm_init(&kernel_end);
     paging_init();
     
-    // gdt_install();
+    gdt_install();
     idt_install();
     irq_install();
 
     bvga_init();
     keyboard_init();
-    ahci_init();
-    mbr_init();
+    // ahci_init();
+    // mbr_init();
 
     mm_inf_t mm_inf = get_mm_inf();
 
     printf("Available RAM: %d bytes\n", mm_inf.heap_end-mm_inf.heap_begin);
 
-    int bar5 = pci_brute_force();
+    // int bar5 = pci_brute_force();
     // while(1);
-    paging_map(KERN_VMBASE+bar5, bar5);
+    // paging_map(KERN_VMBASE+bar5, bar5);
 
-    HBA_MEM *abar = /* (HBA_MEM *)(KERN_VMBASE + bar5) */NULL;
+    // HBA_MEM *abar = /* (HBA_MEM *)(KERN_VMBASE + bar5) */NULL;
 
-    abar = (HBA_MEM  *)(unsigned)(inl((unsigned)(bar5+0x24)));
-    printf("ABAR = %d, BAR5 = %d\n", &abar, bar5);
+    // abar = (HBA_MEM  *)(unsigned)(inl((unsigned)(bar5+0x24)));
+    // printf("ABAR = %d, BAR5 = %d\n", &abar, bar5);
 
     // void *abar = malloc(4096);
-    ahci_probe_port(abar);
+    // ahci_probe_port(abar);
 
-    uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
+    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
     
-    bzero(buf_, 512);
+    // bzero(buf_, 512);
     // const char *error;
     // if ((error = read(0, 0, 1, buf_)) != NULL) {
     //     printf("AHCI ERROR: %s\n", error);
     // }
-    if (read(&abar->ports[0], 0, 0, 1, buf_)) {
-        int i;
-        for (i = 0; i < 512; i++) {
-            if (buf_[i] != 0) {
-                printf("[%d]", buf_[i]);
-            }
-        }
-        printf("\nREADING COMPLETED\n");
-    }
+    // if (read(&abar->ports[0], 0, 0, 1, buf_)) {
+    //     int i;
+    //     for (i = 0; i < 512; i++) {
+    //         if (buf_[i] != 0) {
+    //             printf("[%d]", buf_[i]);
+    //         }
+    //     }
+    //     printf("\nREADING COMPLETED\n");
+    // }
 
     
 
-    free(buf_);
+    // free(buf_);
 
     char buf[64];
 

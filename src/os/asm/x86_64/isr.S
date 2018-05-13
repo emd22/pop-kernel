@@ -278,7 +278,7 @@ _isr31:
 isr_common_stub:
   pushaq
   mov %ds, %ax
-  push eax
+  push %rax
   mov $0x10, %ax
   mov %ax, %ds
   mov %ax, %es
@@ -287,14 +287,15 @@ isr_common_stub:
   mov %ax, %ss
   call fault_handler
 
-  pop ebx
+  pop %rbx
   mov %bx, %ds
   mov %bx, %es
   mov %bx, %fs
   mov %bx, %gs
 
   popaq
-  add $8, %esp
+  add $8, %rsp
   sti
 
   iret
+  
