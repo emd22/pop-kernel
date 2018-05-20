@@ -1,5 +1,5 @@
-extern uint8_t has_cpuid;
-extern uint8_t has_longmode;
+extern int has_cpuid;
+extern int has_longmode;
 
 extern void longmode_init_asm(void);
 

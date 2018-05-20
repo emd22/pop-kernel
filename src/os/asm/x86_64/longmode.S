@@ -1,122 +1,74 @@
-.extern has_cpuid
-.extern has_longmode
+.include "./memory.inc"
+OsCodeSeg   = 0x8
+OsDataSeg   = 0x10
+code64      = 0x18
 
-.text
+#=========================================================================
+# This file contains the code to switch the processor to 64-bit long mode
+#=========================================================================
 
-no_cpuid:
-    mov $0, $has_cpuid
+    .text
 
-no_longmode:
-    mov $0, $has_longmode
+    .global _start
 
-check_extended:
-    //look for extended capabilities for testing long mode.
-    mov $0x80000000, %eax
-    cpuid
-    cmp $0x80000001, %eax
-    jmp no_longmode
-    cmp $0, $has_longmode
-    jne check_longmode
+    .code32
 
-check_longmode:
-    mov $0x80000001, %eax
-    cpuid
-    test 1 << 29, %rdx
-    jz no_longmode
-    cmp $0, $has_longmode
-    jmp setup_paging
+#=====================
+# Protected Mode code
+#=====================
+_start:
+here:
+    mov $OsDataSeg, %eax
+    mov %eax, %ds
+    mov %eax, %ss
+    mov $tempstack, %esp
+    call InitMemManagement
+# Zero unused pages
+    mov nPages, %edx
+    mov $0, %ebx
+    mov $PageMap, %eax
+again:
+    movw (%eax), %bx
+    cmpw $0, %bx
+    jne nextpage
+    mov %eax, %edi
+    sub $PageMap,%eax
+    sal $11,%eax 
+    mov $1000, %ecx
+again2:
+    movb $0, (%eax)
+    add $1, %eax
+    sub $1, %ecx
+    cmp $0, %ecx
+    jne again2
+    mov %edi, %eax
+nextpage:
+    sub $1, %edx
+    cmp $0, %edx
+    je  finished
+    add $2, %eax
+    jmp again
+finished:
+    call HwSetup
 
-clear_paging_tables:
-    mov $0x1000, %rdi
-    mov %rdi, %cr3
-    xor %rax, %rax
-    mov $4096, %rcx
-    rep stosd
-    mov %cr3, %rdi
+    # create 64-bit page tables
+    call CreatePageDir             # task1
+    mov %eax, %cr3
 
-setup_page_tables:
-    mov $0x2003, dword (%rdi)
-    add $0x1000, %rdi
-    mov $0x3003, dword (%rdi)
-    add $0x1000, %rdi
-    mov $0x4003, dword (%rdi)
-    add $0x1000, %rdi
-    mov $0x00000003, %rbx
-    mov $512, %rcx
+    mov %cr4, %eax
+    bts $5, %eax                   # Physical Address extension bit
+    bts $7, %eax                   # Enable global pages
+    mov %eax, %cr4
 
-.set_entry:
-    mov %rbx, dword (%rdi)
-    add $0x1000, %rbx
-    add $8, %rdi
-    loop set_entry
+    mov $0xc0000080, %ecx          # These 2 instructions read the Extended Feature
+    rdmsr                          # Enable register
+    bts $0, %eax                   # This enables the syscall/sysret instructions
+    bts $8, %eax                   # bit 8 of this register is Long Mode Enable (but we won't
+    wrmsr                          # actually be in Long Mode until paging is enabled)
 
-setup_paging:
-    //disable any old paging
-    mov %cr0, %rax
-    and $0b01111111111111111111111111111111, %rax //clear bit 31
-    mov %rax, %cr0
-    jmp clear_paging_tables
-    mov %cr4, %rax
-    or 1 << 5, %rax
-    mov %rax, %cr4
+    mov %cr0, %eax
+    bts $16, %eax                  # Enable paging
+    bts $31, %eax                  # Enable write protection
+    mov %eax, %cr0
 
-check_cpuid:
-    pushfd
-    pop %rax
-    mov %rax, %rcx
-    xor 1 << 21, %rax
-    push %rax
-    popfd
-    pushfd
-    pop %rax
-    push %rcx
-    popfd
-    xor %ecx, %rax
-    jz no_cpuid
-    cmp $0, $has_cpuid
-    jne check_extended //check for extended + long mode.
-
-longmode_init_asm:
-    jmp check_cpuid
-    mov $0xC000080
-    rdmsr
-    or 1 << 8, %rax
-    wrmsr
-    mov %cr0, %rax
-    or (1 << 31), %rax
-    mov %rax, %cr0
-    lgdt (GDT64.pointer)
-    jmp GDT64.code:halt_all
-
-halt_all:
-    cli
-    hlt
-
-.data
-
-GDT64:                           // Global Descriptor Table (64-bit).
-    .null: equ $ - GDT64         // The null descriptor.
-    .int $0xFFFF                    // Limit (low).
-    .int $0                         // Base (low).
-    .byte $0                         // Base (middle)
-    .byte $0                         // Access.
-    .byte $1                         // Granularity.
-    .byte $0                         // Base (high).
-    .code: equ $ - GDT64         // The code descriptor.
-    .int $0                         // Limit (low).
-    .int $0                         // Base (low).
-    .byte $0                         // Base (middle)
-    .byte $0b10011010                 // Access (exec/read).
-    .byte $0b10101111                 // Granularity, 64 bits flag, limit19:16.
-    .byte $0                         // Base (high).
-    .data: equ $ - GDT64         // The data descriptor.
-    .int $0                         // Limit (low).
-    .int $0                         // Base (low).
-    .byte $0                         // Base (middle)
-    .byte $0b10010010                 // Access (read/write).
-    .byte $0b00000000                 // Granularity.
-    .byte $0                         // Base (high).
-    .pointer:                    // The GDT-pointer.
-    .int $ - GDT64 - 1             // Limit.
-    .long GDT64                     // Base.
-
+    jmp $code64, $start64
