@@ -1,9 +1,0 @@
-#ifndef SSE_H
-#define SSE_H
-
-extern int check_sse();
-extern void enable_sse();
-
-void sse_init();
-
-#endif

@@ -2,10 +2,6 @@
 #error "Error: Not compiled using cross-compiler."
 #endif
 
-// #if !defined(__i386__)
-// #error "Error: Kernel needs an ix86 system."
-// #endif
-
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/boot_vga.h>
 #include <kernel/drivers/pci.h>
@@ -22,13 +18,10 @@
 #include <kernel/err.h>
 #include <kernel/drivers/gdt.h>
 #include <osutil.h>
-// #include <kernel/sse.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-
-#define KERN_VMBASE (0xffff808000000000ull)
 
 bool ahci_exists;
 uint32_t kernel_end;
@@ -72,8 +65,6 @@ int check_command(char **args, const char *command) {
 }
 
 void kmain(void) {
-    // sse_init();
-
     mm_init(&kernel_end);
     paging_init();
     
@@ -83,45 +74,10 @@ void kmain(void) {
 
     bvga_init();
     keyboard_init();
-    // ahci_init();
-    // mbr_init();
 
     mm_inf_t mm_inf = get_mm_inf();
 
     printf("Available RAM: %d bytes\n", mm_inf.heap_end-mm_inf.heap_begin);
-
-    // int bar5 = pci_brute_force();
-    // while(1);
-    // paging_map(KERN_VMBASE+bar5, bar5);
-
-    // HBA_MEM *abar = /* (HBA_MEM *)(KERN_VMBASE + bar5) */NULL;
-
-    // abar = (HBA_MEM  *)(unsigned)(inl((unsigned)(bar5+0x24)));
-    // printf("ABAR = %d, BAR5 = %d\n", &abar, bar5);
-
-    // void *abar = malloc(4096);
-    // ahci_probe_port(abar);
-
-    // uint8_t *buf_ = (uint8_t *)malloc(sizeof(uint8_t)*512);
-    
-    // bzero(buf_, 512);
-    // const char *error;
-    // if ((error = read(0, 0, 1, buf_)) != NULL) {
-    //     printf("AHCI ERROR: %s\n", error);
-    // }
-    // if (read(&abar->ports[0], 0, 0, 1, buf_)) {
-    //     int i;
-    //     for (i = 0; i < 512; i++) {
-    //         if (buf_[i] != 0) {
-    //             printf("[%d]", buf_[i]);
-    //         }
-    //     }
-    //     printf("\nREADING COMPLETED\n");
-    // }
-
-    
-
-    // free(buf_);
 
     char buf[64];
 
@@ -155,16 +111,6 @@ void kmain(void) {
         else if (check_command(args, "ascii")) {
             ascii(args, arg_len);
         }
-        // else if (check_command(args, "mbrload")) {
-        //     retrieve_partitions();
-        // }
-        // else if (check_command(args, "mbrprg")) {
-        //     mbr_purge();
-        // }
-        // else if (check_command(args, "mbrfmt")) {
-        //     if (format_mbr())
-        //         mbr_write_part(get_part_entry(0), 1000, 5000, FAT32_SYSID); //4kb
-        // }
         else if (check_command(args, "td")) {
             cmos_td_t c_td = cmos_rtc_gettime();
             printf("Date: %s %s, '%d\n", time_get_month(c_td.month), time_day_full(c_td.day), c_td.year);
