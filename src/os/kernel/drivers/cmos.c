@@ -1,6 +1,6 @@
 #include <kernel/drivers/cmos.h>
 #include <kernel/drivers/idt.h>
-#include <kernel/x86.h>
+#include <kernel/arch_io.h>
 
 static int creg = 0x00; //century register
 

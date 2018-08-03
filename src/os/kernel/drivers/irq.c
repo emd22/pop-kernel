@@ -1,5 +1,5 @@
 #include <kernel/drivers/irq.h>
-#include <kernel/x86.h>
+#include <kernel/arch_io.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -83,7 +83,8 @@ void irq_handler(regs_t *r) {
         irq_handler_t handler = irq_routines[i];
         if (handler != NULL) {
             handler(r);
-        } else {
+        }
+        else {
             irq_ack(i);
         }
     }

@@ -1,5 +1,5 @@
 #include <kernel/drivers/ahci.h>
-#include <kernel/x86.h>
+#include <kernel/arch_io.h>
 
 #include <kernel/timeout.h>
 

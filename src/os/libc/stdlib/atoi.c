@@ -19,7 +19,8 @@ int atoi(const char *str) {
     if (*str == '-') {
         sign = 1;
         str += 1;
-    } else {
+    } 
+    else {
         sign = 0;
         if (*str == '+') {
             str += 1;

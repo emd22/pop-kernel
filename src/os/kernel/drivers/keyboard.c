@@ -1,7 +1,7 @@
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/scancodes.h>
-#include <kernel/x86.h>
+#include <kernel/arch_io.h>
 
 #include <stdint.h>
 #include <stdbool.h>

@@ -22,13 +22,7 @@ static struct {
     idt_ptr_t pointer;
 } idt __attribute__((used));
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern void idt_load(uintptr_t); // defined in idt_load.s
-#ifdef __cplusplus
-}
-#endif
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags) {
     idt.entries[num].base_low =    (base & 0xFFFF);

@@ -1,4 +1,8 @@
-#include <kernel/x86.h>
+#include <arch.h>
+
+#if defined(ARCH_i686)
+
+#include <kernel/arch_io.h>
 
 inline uint8_t inb(uint16_t port) {
     uint8_t ret;
@@ -34,3 +38,5 @@ inline unsigned inl(uint16_t port) {
     asm volatile("inl %1, %0" : "=a" (data) : "d" (port));
     return data;
 }
+
+#endif

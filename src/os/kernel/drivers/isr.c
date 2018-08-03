@@ -1,6 +1,6 @@
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
-#include <kernel/x86.h>
+#include <kernel/arch_io.h>
 #include <osutil.h>
 
 #include <stdio.h>
@@ -137,7 +137,8 @@ void fault_handler(regs_t *r) {
     irq_handler_t handler = isrs_routines[r->int_no];
     if (handler != NULL) {
         handler(r);
-    } else {
+    }
+    else {
         printf("Unhandled exception: [%d] %s\n", r->int_no, exception_messages[r->int_no]);
         panic("unhandled exception.", NULL);
     }
