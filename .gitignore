@@ -3,3 +3,4 @@ x86_64-elf-4.9.1-Linux-x86_64
 build
 .vscode
 os.iso
+cross-compiler
