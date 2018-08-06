@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define DWORD int32_t
-#define WORD short
-#define BYTE unsigned char
+#define dword int32_t
+#define word short
+#define uchar unsigned char
 
 #endif
