@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define SYSCALL_VECTOR 0x7F
+
 inline uint8_t  inb(uint16_t port);
 inline void     outb(uint16_t port, uint8_t val);
 inline uint16_t inw(uint16_t port);

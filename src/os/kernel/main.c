@@ -116,6 +116,10 @@ void kmain(void) {
             printf("Date: %s %s, '%d\n", time_get_month(c_td.month), time_day_full(c_td.day), c_td.year);
             printf("Time: %s\n", time_str(&c_td, TIME_HOUR | TIME_MINUTE));
         }
+        else if (check_command(args, "pci")) {
+            pci_check_busses();
+            printf("fin\n");
+        }
         else {
             invalid_command(args);
         }
