@@ -5,23 +5,14 @@
 
 #define PCI_EMPTY 0xFFFF
 
-#define SECONDARY_BUS(bus, slot, func) (uint8_t)(pci_inw(bus, slot, func, 0x18) << 8)
-#define CLASS_CODE(bus, slot, func)    (uint8_t)(pci_inw(bus, slot, func, 0x0A) << 8)
+#define SECONDARY_BUS(bus, slot, func) (uint8_t)(pci_inw(bus, slot, func, 0x18) >> 8)
+#define CLASS_CODE(bus, slot, func)    (uint8_t)(pci_inw(bus, slot, func, 0x0A) >> 8)
 #define SUBCLASS_CODE(bus, slot, func) (uint8_t)(pci_inw(bus, slot, func, 0x0A))
 #define DEVICE_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x02))
 #define VENDOR_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x00))
-#define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E) << 8)
+#define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E) >> 8)
 
-// typedef struct {
-//     uint16_t vendor_id;
-//     uint16_t device_id;
-//     uint8_t class_id;
-//     uint8_t subclass;
-//     uint8_t secondary_bus;
-//     uint8_t primary_bus;
-//     uint8_t BIST;
-//     uint8_t header_type;
-// } pci_device_t;
+#define MASS_STORAGE_CONTROLLER 0x01
 
 void pci_check_device(uint8_t bus, uint8_t slot);
 
@@ -50,6 +41,12 @@ void pci_check_function(uint8_t bus, uint8_t slot, uint8_t func) {
     uint8_t subclass = SUBCLASS_CODE(bus, slot, func);
     uint8_t secondary_bus;
 
+    switch (class_id) {
+        case MASS_STORAGE_CONTROLLER:
+            printf("found mass storage\n");
+            break;
+    };
+
     if (class_id == 0x06 && subclass == 0x04) {
         secondary_bus = SECONDARY_BUS(bus, slot, func);
         pci_check_bus(secondary_bus);
@@ -60,14 +57,21 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
     uint8_t function = 0;
     uint16_t vendor_id = VENDOR_ID(bus, slot, 0);
 
+    if (vendor_id != 0xFFFF) {
+        uint8_t class_id = CLASS_CODE(bus, slot, 0);
+        uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
+
+        printf("class: %d, sub: %d\n", class_id, subclass);
+    }
+
     if (vendor_id == PCI_EMPTY)
         return;
-    
-    printf("vid: %d, ", vendor_id);
+
     pci_check_function(bus, slot, 0);
     if ((HEADER_TYPE(bus, slot, function) & 0x80) != 0) {
         for (function = 1; function < 8; function++) {
             if (VENDOR_ID(bus, slot, function) != 0xFFFF) {
+                printf("dev exists. ");
                 pci_check_function(bus, slot, function);
             }
         }
