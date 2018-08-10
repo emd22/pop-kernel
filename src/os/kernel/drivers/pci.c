@@ -57,15 +57,13 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
     uint8_t function = 0;
     uint16_t vendor_id = VENDOR_ID(bus, slot, 0);
 
-    if (vendor_id != 0xFFFF) {
-        uint8_t class_id = CLASS_CODE(bus, slot, 0);
-        uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
-
-        printf("class: %d, sub: %d\n", class_id, subclass);
-    }
-
     if (vendor_id == PCI_EMPTY)
         return;
+
+    uint8_t class_id = CLASS_CODE(bus, slot, 0);
+    uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
+
+    printf("class: %d, sub: %d\n", class_id, subclass);
 
     pci_check_function(bus, slot, 0);
     if ((HEADER_TYPE(bus, slot, function) & 0x80) != 0) {
@@ -93,6 +91,22 @@ void pci_check_busses(void) {
                 break;
             bus = function;
             pci_check_bus(function);
+        }
+    }
+}
+
+void pci_brute_force(void) {
+    int bus, slot, func;
+    for (bus = 0; bus < 256; bus++) {
+        for (slot = 0; slot < 32; slot++) {
+            for (func = 0; func < 8; func++) {
+                if (VENDOR_ID(bus, slot, func) == 0xFFFF) 
+                    continue;
+                uint8_t class_id = CLASS_CODE(bus, slot, 0);
+                uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
+
+                printf("class: %d, sub: %d\n", class_id, subclass);   
+            }
         }
     }
 }

@@ -4,3 +4,4 @@ build
 .vscode
 os.iso
 cross-compiler
+fs.img

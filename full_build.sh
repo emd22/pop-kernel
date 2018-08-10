@@ -1,5 +1,4 @@
-#DO NOT DO THIS FOR EVERY BUILD(rebuilds cmake files, so it's slow)
-
+qemu-img create -f raw -o size=2G fs.img
 rm -r ./build/*
 cd build
 cmake ../src

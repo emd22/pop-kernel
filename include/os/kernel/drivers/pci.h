@@ -5,5 +5,6 @@
 #include <stdbool.h>
 
 void pci_check_busses(void);
+void pci_brute_force(void);
 
 #endif
