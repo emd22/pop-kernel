@@ -14,9 +14,18 @@
 #define VENDOR_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x00))
 #define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E))
 
-#define MASS_STORAGE_CONTROLLER 0x01
+#define PCI_MASS_STORAGE 0x01
+
+#define PCI_IDE_CONTROLLER 0x01
+
+static pci_dev_t *pci_devices = NULL;
+static int pci_devices_idx = 0;
 
 void pci_check_device(uint8_t bus, uint8_t slot);
+
+void pci_init(void) {
+    pci_devices = (pci_dev_t *)malloc(sizeof(pci_dev_t)*64);
+}
 
 uint16_t pci_inw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
     uint32_t config_addr;
@@ -43,11 +52,12 @@ void pci_check_function(uint8_t bus, uint8_t slot, uint8_t func) {
     uint8_t subclass = SUBCLASS_CODE(bus, slot, func);
     uint8_t secondary_bus;
 
-    switch (class_id) {
-        case MASS_STORAGE_CONTROLLER:
-            printf("found mass storage\n");
-            break;
-    };
+    pci_dev_t *dev = &pci_devices[pci_devices_idx];
+    dev->vendor_id = VENDOR_ID(bus, slot, func);
+    dev->device_id = DEVICE_ID(bus, slot, func);
+    dev->class_code = class_id;
+    dev->subclass_code = subclass;
+    pci_devices_idx++;
 
     // printf("class: %d, subclass: %d, func: %d\n", class_id, subclass, func);
 
@@ -79,8 +89,10 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
     }
 }
 
-void pci_check_busses(void) {
+void pci_recursive_check(void) {
     uint8_t bus, function;
+
+    pci_devices_idx = 0;
 
     uint8_t header_type = HEADER_TYPE(0, 0, 0);
     if ((header_type & 0x80) == 0) {
@@ -96,6 +108,11 @@ void pci_check_busses(void) {
             pci_check_bus(bus);
         }
     }
+}
+
+int pci_get_devices(pci_dev_t *pci_devices_ptr) {
+    pci_devices_ptr = pci_devices;
+    return pci_devices_idx;
 }
 
 void pci_brute_force(void) {

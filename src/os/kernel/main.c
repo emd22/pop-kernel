@@ -90,7 +90,20 @@ void kmain(void) {
 
     printf("checking pci busses...\n");
 
-    pci_check_busses();
+    // pci_init();
+    pci_recursive_check();
+
+    pci_dev_t *pci_devices;
+    int pci_devices_idx;
+    pci_devices_idx = pci_get_devices(pci_devices);
+
+    pci_dev_t dev;
+
+    int i;
+    for (i = 0; i < pci_devices_idx; i++) {
+        dev = pci_devices[i];
+        printf("pci_dev(%d/%d, %d:%d)\n", dev.class_code, dev.subclass_code, dev.vendor_id, dev.device_id);
+    }
 
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
