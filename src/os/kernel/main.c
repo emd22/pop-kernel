@@ -88,6 +88,10 @@ void kmain(void) {
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
     bvga_set_colour(BVGA_DEF);
 
+    printf("checking pci busses...\n");
+
+    pci_check_busses();
+
     for (;;) {
         bvga_putstr("Pop", bvga_get_colour(BVGA_CYAN, BVGA_BLACK));
         bvga_putstr("Kernel", bvga_get_colour(BVGA_WHITE, BVGA_BLACK));
@@ -117,7 +121,6 @@ void kmain(void) {
             printf("Time: %s\n", time_str(&c_td, TIME_HOUR | TIME_MINUTE));
         }
         else if (check_command(args, "pci")) {
-            pci_check_busses();
             printf("fin\n");
         }
         else {

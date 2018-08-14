@@ -3,6 +3,8 @@
 #include <kernel/arch_io.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #define PCI_EMPTY 0xFFFF
 
 #define SECONDARY_BUS(bus, slot, func) (uint8_t)(pci_inw(bus, slot, func, 0x18) >> 8)
@@ -10,7 +12,7 @@
 #define SUBCLASS_CODE(bus, slot, func) (uint8_t)(pci_inw(bus, slot, func, 0x0A))
 #define DEVICE_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x02))
 #define VENDOR_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x00))
-#define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E) >> 8)
+#define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E))
 
 #define MASS_STORAGE_CONTROLLER 0x01
 
@@ -47,7 +49,9 @@ void pci_check_function(uint8_t bus, uint8_t slot, uint8_t func) {
             break;
     };
 
-    if (class_id == 0x06 && subclass == 0x04) {
+    // printf("class: %d, subclass: %d, func: %d\n", class_id, subclass, func);
+
+    if ((class_id == 0x06) && (subclass == 0x04)) {
         secondary_bus = SECONDARY_BUS(bus, slot, func);
         pci_check_bus(secondary_bus);
     }
@@ -63,13 +67,12 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
     uint8_t class_id = CLASS_CODE(bus, slot, 0);
     uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
 
-    printf("class: %d, sub: %d\n", class_id, subclass);
 
     pci_check_function(bus, slot, 0);
+
     if ((HEADER_TYPE(bus, slot, function) & 0x80) != 0) {
         for (function = 1; function < 8; function++) {
             if (VENDOR_ID(bus, slot, function) != 0xFFFF) {
-                printf("dev exists. ");
                 pci_check_function(bus, slot, function);
             }
         }
@@ -90,7 +93,7 @@ void pci_check_busses(void) {
             if (VENDOR_ID(0, 0, function) != 0xFFFF)
                 break;
             bus = function;
-            pci_check_bus(function);
+            pci_check_bus(bus);
         }
     }
 }
@@ -102,10 +105,10 @@ void pci_brute_force(void) {
             for (func = 0; func < 8; func++) {
                 if (VENDOR_ID(bus, slot, func) == 0xFFFF) 
                     continue;
-                uint8_t class_id = CLASS_CODE(bus, slot, 0);
-                uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
+                uint8_t class_id = CLASS_CODE(bus, slot, func);
+                uint8_t subclass = SUBCLASS_CODE(bus, slot, func);
 
-                printf("class: %d, sub: %d\n", class_id, subclass);   
+                // printf("class: %d, sub: %d, func: %d\n", class_id, subclass, func);   
             }
         }
     }
