@@ -16,7 +16,7 @@ uint8_t get_reg(int reg) {
 
 cmos_td_t cmos_rtc_gettime() {
     while (check_updating());
-    cmos_td_t last;
+    // cmos_td_t last;
     cmos_td_t cur;
 
     cur.second  = get_reg(0x00);
@@ -28,18 +28,16 @@ cmos_td_t cmos_rtc_gettime() {
     if (creg != 0x00) {
         cur.century = get_reg(creg);
     }
-
-    int i;
-
-    do {
-        last = cur;
+    
+    // do {
+    //     last = cur;
         
-        if (creg != 0x00) {
-            cur.century = get_reg(creg);
-        }
-    } while ((last.second != cur.second) || (last.minute != cur.minute) || (last.hour != cur.hour) ||
-             (last.day != cur.day) || (last.month != cur.month) || (last.year != cur.year) ||
-             (last.century != cur.century));
+    //     if (creg != 0x00) {
+    //         cur.century = get_reg(creg);
+    //     }
+    // } while ((last.second != cur.second) || (last.minute != cur.minute) || (last.hour != cur.hour) ||
+    //          (last.day != cur.day) || (last.month != cur.month) || (last.year != cur.year) ||
+    //          (last.century != cur.century));
 
     uint8_t regb;
     regb = get_reg(0x0B);
@@ -55,10 +53,10 @@ cmos_td_t cmos_rtc_gettime() {
                 cur.century = (cur.century & 0x0F) + ((cur.century / 16) * 10);
         }
     }
-    //convert 12h clock to 24h if necessary
-    if (!(regb & 0x02) && (cur.hour & 0x80)) {
-        cur.hour = ((cur.hour & 0x7F) + 12) % 24;
-    }
+    // //convert 12h clock to 24h if necessary
+    // if (!(regb & 0x02) && (cur.hour & 0x80)) {
+    //     cur.hour = ((cur.hour & 0x7F) + 12) % 24;
+    // }
 
     return cur;
 }

@@ -88,7 +88,6 @@ int printf(const char *fmt, ...) {
 
     char tc;
     int ti;
-    double td;
     char *ts;
 
     while ((ch = *fmt++)) {

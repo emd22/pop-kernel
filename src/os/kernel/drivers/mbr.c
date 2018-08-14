@@ -1,13 +1,12 @@
 #include <kernel/drivers/mbr.h>
 #include <kernel/drivers/ata_pio.h>
-#include <kernel/debug.h>
 #include <osutil.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 static mbr_t mbr;
 
-const uint8_t template_mbr[]={
+const uint8_t template_mbr[] = {
     51,192,142,208,188,0,124,142,192,142,216,139,244,191,0,6,
     185,0,1,252,243,165,234,27,6,0,0,184,115,7,232,27,
     1,190,82,7,232,181,0,232,204,0,190,138,7,173,60,255,
@@ -133,7 +132,7 @@ bool retrieve_partitions(void) {
     ata_pio_read(0, mbr_dat);
 
     if (mbr_dat[510] != 0x55 || mbr_dat[511] != 0xAA) {
-        debug_err("Drive does not have MBR installed.\n");
+        panic("Drive does not have MBR installed.\n", NULL);
         return true;
     }
 

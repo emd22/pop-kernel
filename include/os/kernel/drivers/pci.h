@@ -15,7 +15,7 @@ typedef struct {
 } pci_dev_t;
 
 void pci_init(void);
-int pci_get_devices(pci_dev_t *pci_devices_ptr);
+pci_dev_t **pci_get_devices(int *pci_devices_idx);
 void pci_recursive_check(void);
 void pci_brute_force(void);
 

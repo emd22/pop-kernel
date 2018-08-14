@@ -4,8 +4,8 @@
 
 #define ADD_NEXT(n1, n2, max) { \
 if (n1 > max) {                 \
-    n2 += n1/max;               \
-    n1 = n1 % max;              \
+    n2 += n1-max;               \
+    n1 -= max;                  \
 }                               \
 }                               \
 
@@ -29,26 +29,6 @@ void time_normalize(cmos_td_t *ttime) {
 const char *time_day_full(int day) {
     static char msg[12];
     strcpy(msg, dec_to_str(day, msg));
-    
-    const char *end;
-
-    char *dend = msg[strlen(msg)-1];
-
-    if (*dend == '1') {
-        end = "st";
-        if (strlen(msg) > 1) {
-            if (*(dend-1) == '1')
-                end = "th";
-        }
-    }
-    else if (*dend == '2')
-        end = "nd";
-    else if (*dend == '3')
-        end = "rd";
-    else
-        end = "th";
-
-    strcat(msg, end);
 
     return msg;
 }

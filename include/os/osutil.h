@@ -18,6 +18,7 @@
 
 #define assert(cond, msg, cb) assert__((cond) ? 1 : 0, msg, cb)
 
+void input(char *buf);
 void assert__(int res, const char *msg, void (*gr_cb)(void));
 void panic(const char *msg, void (*sd_cb)(void));
 

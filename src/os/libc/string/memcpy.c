@@ -2,9 +2,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 
-typedef int word;
-
-#define wsize sizeof(word)
+#define wsize sizeof(int)
 #define wmask (wsize-1)
 
 void *memcpy(void *dst_, const void *src_, size_t length) {
@@ -44,7 +42,7 @@ void *memcpy(void *dst_, const void *src_, size_t length) {
          * Copy whole words, then mop up any trailing bytes.
          */
         t = length / wsize;
-        TLOOP(*(word *)dst = *(word *)src; src += wsize; dst += wsize);
+        TLOOP(*(int *)dst = *(int *)src; src += wsize; dst += wsize);
         t = length & wmask;
         TLOOP(*dst++ = *src++);
     }
@@ -66,7 +64,7 @@ void *memcpy(void *dst_, const void *src_, size_t length) {
             TLOOP1(*--dst = *--src);
         }
         t = length / wsize;
-        TLOOP(src -= wsize; dst -= wsize; *(word *)dst = *(word *)src);
+        TLOOP(src -= wsize; dst -= wsize; *(int *)dst = *(int *)src);
         t = length & wmask;
         TLOOP(*--dst = *--src);
     }

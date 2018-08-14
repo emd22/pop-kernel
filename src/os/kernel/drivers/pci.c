@@ -18,13 +18,17 @@
 
 #define PCI_IDE_CONTROLLER 0x01
 
-static pci_dev_t *pci_devices = NULL;
+static pci_dev_t **pci_devices = NULL;
 static int pci_devices_idx = 0;
 
 void pci_check_device(uint8_t bus, uint8_t slot);
 
 void pci_init(void) {
-    pci_devices = (pci_dev_t *)malloc(sizeof(pci_dev_t)*64);
+    pci_devices = (pci_dev_t **)malloc(sizeof(pci_dev_t)*32);
+    int i;
+    for (i = 0; i < 32; i++) {
+        pci_devices[i] = (pci_dev_t *)malloc(sizeof(pci_dev_t));
+    }
 }
 
 uint16_t pci_inw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
@@ -52,14 +56,13 @@ void pci_check_function(uint8_t bus, uint8_t slot, uint8_t func) {
     uint8_t subclass = SUBCLASS_CODE(bus, slot, func);
     uint8_t secondary_bus;
 
-    pci_dev_t *dev = &pci_devices[pci_devices_idx];
+    pci_dev_t *dev = pci_devices[pci_devices_idx++];
     dev->vendor_id = VENDOR_ID(bus, slot, func);
     dev->device_id = DEVICE_ID(bus, slot, func);
     dev->class_code = class_id;
     dev->subclass_code = subclass;
-    pci_devices_idx++;
 
-    // printf("class: %d, subclass: %d, func: %d\n", class_id, subclass, func);
+    // printf("class: %d, subclass: %d\n", dev->class_code, dev->subclass_code);
 
     if ((class_id == 0x06) && (subclass == 0x04)) {
         secondary_bus = SECONDARY_BUS(bus, slot, func);
@@ -74,10 +77,6 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
     if (vendor_id == PCI_EMPTY)
         return;
 
-    uint8_t class_id = CLASS_CODE(bus, slot, 0);
-    uint8_t subclass = SUBCLASS_CODE(bus, slot, 0);
-
-
     pci_check_function(bus, slot, 0);
 
     if ((HEADER_TYPE(bus, slot, function) & 0x80) != 0) {
@@ -90,7 +89,7 @@ void pci_check_device(uint8_t bus, uint8_t slot) {
 }
 
 void pci_recursive_check(void) {
-    uint8_t bus, function;
+    uint8_t function;
 
     pci_devices_idx = 0;
 
@@ -104,29 +103,12 @@ void pci_recursive_check(void) {
         for (function = 0; function < 8; function++) {
             if (VENDOR_ID(0, 0, function) != 0xFFFF)
                 break;
-            bus = function;
-            pci_check_bus(bus);
+            pci_check_bus(function);
         }
     }
 }
 
-int pci_get_devices(pci_dev_t *pci_devices_ptr) {
-    pci_devices_ptr = pci_devices;
-    return pci_devices_idx;
-}
-
-void pci_brute_force(void) {
-    int bus, slot, func;
-    for (bus = 0; bus < 256; bus++) {
-        for (slot = 0; slot < 32; slot++) {
-            for (func = 0; func < 8; func++) {
-                if (VENDOR_ID(bus, slot, func) == 0xFFFF) 
-                    continue;
-                uint8_t class_id = CLASS_CODE(bus, slot, func);
-                uint8_t subclass = SUBCLASS_CODE(bus, slot, func);
-
-                // printf("class: %d, sub: %d, func: %d\n", class_id, subclass, func);   
-            }
-        }
-    }
+pci_dev_t **pci_get_devices(int *amt_devices) {
+    (*amt_devices) = pci_devices_idx;
+    return pci_devices;
 }

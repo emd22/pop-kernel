@@ -16,6 +16,5 @@ typedef struct {
 typedef long cmos_ts_t;
 
 cmos_td_t cmos_rtc_gettime();
-void cmos_time_normalize(cmos_td_t *ttime);
 
 #endif
