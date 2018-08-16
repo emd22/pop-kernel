@@ -109,6 +109,18 @@ void kmain(void) {
     printf("Welcome to PopKernel v%d.%d.%d!\n\n", OS_VERSION_MAJOR, OS_VERSION_MINOR, OS_VERSION_PATCH);
     bvga_set_colour(BVGA_DEF);
 
+    pci_dev_t **pci_devices;
+    pci_dev_t *cur_dev;
+    int pci_amt_devs;
+
+    pci_devices = pci_get_devices(&pci_amt_devs);
+
+    int i;
+    for (i = 0; i < pci_amt_devs; i++) {
+        cur_dev = pci_devices[i];
+        printf("dev: 0x%x:0x%x -- 0x%x:0x%x\n", cur_dev->vendor_id, cur_dev->device_id, cur_dev->class_code, cur_dev->subclass_code);
+    }
+
     main_loop();
 
     free_2d(MAX_ARGS, args);

@@ -13,6 +13,8 @@
 #define DEVICE_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x02))
 #define VENDOR_ID(bus, slot, func)              (pci_inw(bus, slot, func, 0x00))
 #define HEADER_TYPE(bus, slot, func)   (uint8_t)(pci_inw(bus, slot, func, 0x0E))
+#define PROG_IF(bus, slot, func)       (uint8_t)(pci_inw(bus, slot, func, 0x08) >> 8)
+#define BASE_ADDR(bus, slot, func, addr_n)      (pci_inl(bus, slot, func, 0x10+(addr_n*4)))
 
 #define PCI_MASS_STORAGE 0x01
 
@@ -44,6 +46,12 @@ uint16_t pci_inw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
     return out;
 }
 
+uint32_t pci_inl(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
+    uint16_t p1 = pci_inw(bus, slot, func, offset);
+    uint16_t p2 = pci_inw(bus, slot, func, offset+0x02);
+    return (p1 << 16) | p2;
+}
+
 void pci_check_bus(uint8_t bus) {
     uint8_t slot;
     for (slot = 0; slot < 32; slot++) {
@@ -61,6 +69,11 @@ void pci_check_function(uint8_t bus, uint8_t slot, uint8_t func) {
     dev->device_id = DEVICE_ID(bus, slot, func);
     dev->class_code = class_id;
     dev->subclass_code = subclass;
+    dev->prog_if = PROG_IF(bus, slot, func);
+    int i;
+    for (i = 0; i < 6; i++) {
+        dev->bars[i] = BASE_ADDR(bus, slot, func, i);
+    }
 
     // printf("class: %d, subclass: %d\n", dev->class_code, dev->subclass_code);
 
