@@ -67,6 +67,12 @@
 #define ATA_DRV_LBA     0x40
 #define ATA_DRV_SLAVE   0x10
 
+#define ATA_DRV_NULL   0x0000
+#define ATA_DRV_PATA   0x0001
+#define ATA_DRV_SATA   0xC33C
+#define ATA_DRV_PATAPI 0xEB14
+#define ATA_DRV_SATAPI 0x9669
+
 struct ide_channel_regs {
     uint16_t base;
     uint16_t control;
@@ -99,38 +105,6 @@ void wait_400ns(unsigned bar0) {
     inb(ATA_REG_STATUS);
 }
 
-// void ide_outb(uint8_t channel, uint8_t reg, uint8_t data) {
-//     if (reg > 0x07 && reg < 0x0C)
-//         ide_write(channel, ATA_REG_CONTROL, 0x80 | channels[channel].no_interrupt);
-//     if (reg < 0x08)
-//         outb(channels[channel].base+reg-0x00, data);
-//     else if (reg < 0x0C)
-//         outb(channels[channel].base+reg-0x06, data);
-//     else if (reg < 0x0E)
-//         outb(channels[channel].control+reg-0x0A, data);
-//     else if (reg < 0x16)
-//         outb(channels[channel].bus_master_ide+reg-0x0E, data);
-//     if (reg > 0x07 && reg < 0x0C)
-//         ide_write(channel, ATA_REG_CONTROL, channels[channel].no_interrupt);
-// }
-
-// uint8_t ide_inb(uint8_t channel, uint8_t reg) {
-//     unsigned char result;
-//     if (reg > 0x07 && reg < 0x0C)
-//         ide_write(channel, ATA_REG_CONTROL, 0x80 | channels[channel].no_interrupt);
-//     if (reg < 0x08)
-//         result = inb(channels[channel].base+reg-0x00);
-//     else if (reg < 0x0C)
-//         result = inb(channels[channel].base+reg-0x06);
-//     else if (reg < 0x0E)
-//         result = inb(channels[channel].control+reg-0x0A);
-//     else if (reg < 0x16)
-//         result = inb(channels[channel].bus_master_ide+reg-0x0E);
-//     if (reg > 0x07 && reg < 0x0C)
-//         ide_write(channel, ATA_REG_CONTROL, channels[channel].nIEN);
-//     return result;
-// }
-
 void ide_select_drive(uint8_t lba_high, uint8_t set_lba) {
     if (set_lba) {
         outb(ATA_REG_DRIVE_SELECT, ATA_DRV_DEFAULT | ATA_DRV_LBA | (bus_position == ATA_SLAVE ? ATA_SLAVE : ATA_MASTER); | lba_high);
@@ -140,8 +114,41 @@ void ide_select_drive(uint8_t lba_high, uint8_t set_lba) {
     }
 }
 
-void ide_drive_discover() {
+int ide_send_command(uint8_t command) {
+    outb(ATA_REG_COMMAND, command);
+    int status, timeout = 20000000;
+    do {
+        wait_400ns();
+        status = inb(ATA_REG_CONTROL);
+    } while ((status & ATA_SR_BSY) != 0 && (status & ATA_SR_ERR) && timeout-- > 0);
 
+    if (!(status & ATA_SR_ERR) || timeout == 0)
+        return 1;
+    
+    return 0;
+}
+
+int ide_drive_discover() {
+    ide_select_drive(0, 0);
+    outb(ATA_REG_SECCOUNT0, 0);
+    outb(ATA_REG_LBA0, 0);
+    outb(ATA_REG_LBA1, 0);
+    outb(ATA_REG_LBA2, 0);
+
+    int status = ide_send_command(ATA_CMD_IDENTIFY);
+
+    if (status & ATA_SR_ERR)
+        return ATA_DRV_NULL;
+
+    uint16_t type_id;
+    type_id = (inb(ATA_REG_LBA2) << 8 | inb(ATA_REG_LBA1));
+
+    if (type_id == ATA_DRV_SATA ||
+        type_id == ATA_DRV_SATAPI ||
+        type_id == ATA_DRV_PATAPI)
+    {
+        return type_id;
+    }
 }
 
 
