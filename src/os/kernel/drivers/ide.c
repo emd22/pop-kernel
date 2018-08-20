@@ -1,6 +1,9 @@
 #include <kernel/drivers/pata.h>
 #include <kernel/drivers/pci.h>
 
+#include <stdbool.h>
+#include <string.h>
+
 #define ATA_SR_BSY  0x80
 #define ATA_SR_DRDY 0x40
 #define ATA_SR_DF   0x20
@@ -67,8 +70,8 @@
 #define ATA_DRV_LBA     0x40
 #define ATA_DRV_SLAVE   0x10
 
-#define ATA_DRV_NULL   0x0000
-#define ATA_DRV_PATA   0x0001
+#define ATA_DRV_NULL   -1
+#define ATA_DRV_PATA   0x0000
 #define ATA_DRV_SATA   0xC33C
 #define ATA_DRV_PATAPI 0xEB14
 #define ATA_DRV_SATAPI 0x9669
@@ -91,6 +94,15 @@ struct ide_device {
     unsigned size; //size in sectors
     uint8_t model[41];
 } ide_devices[4];
+
+typedef struct {
+    char *serial_number[21];
+    char *firmware_revision[9];
+    char *model_number[41];
+    int max_write_pio;
+    int blocks;
+    bool lba48;
+} ide_drive_t;
 
 uint8_t ide_buffer[2048] = { 0 };
 static uint8_t irq_invoked = 0;
@@ -128,7 +140,7 @@ int ide_send_command(uint8_t command) {
     return 0;
 }
 
-int ide_drive_discover() {
+int ide_drive_discover(void) {
     ide_select_drive(0, 0);
     outb(ATA_REG_SECCOUNT0, 0);
     outb(ATA_REG_LBA0, 0);
@@ -137,21 +149,180 @@ int ide_drive_discover() {
 
     int status = ide_send_command(ATA_CMD_IDENTIFY);
 
-    if (status & ATA_SR_ERR)
+    if (status & ATA_SR_ERR || status == 0)
         return ATA_DRV_NULL;
 
     uint16_t type_id;
     type_id = (inb(ATA_REG_LBA2) << 8 | inb(ATA_REG_LBA1));
 
-    if (type_id == ATA_DRV_SATA ||
-        type_id == ATA_DRV_SATAPI ||
-        type_id == ATA_DRV_PATAPI)
+    if (type_id == ATA_DRV_PATAPI ||
+        type_id == ATA_DRV_SATA ||
+        type_id == ATA_DRV_SATAPI)
     {
         return type_id;
     }
+
+    int status;
+    do {
+        wait_400ns();
+        status = inb(ATA_REG_STATUS);
+    } while ((status & ATA_SR_DRQ) == 0 && (status & ATA_SR_ERR) == 0);
+
+    if ((status & ATA_SR_ERR) != 0 || (status & ATA_SR_DRQ) == 0)
+        return ATA_DRV_NULL;
+
+    return ATA_DRV_PATA;
 }
 
+void select_sector(size_t sector_pos, unsigned sector_count) {
+    ide_select_drive((uint8_t)(sector_pos >> 24), 1);
 
-void ide_init(unsigned bar0, unsigned bar1, unsigned bar2, unsigned bar3, unsigned bar4) {
+    outb(ATA_REG_SECCOUNT0, sector_count);
+    outb(ATA_REG_LBA0, (sector_pos & 0xFF));
+    outb(ATA_REG_LBA1, (sector_pos & 0xFF00) >> 8);
+    outb(ATA_REG_LBA2, (sector_pos & 0xFF0000) >> 16);
+}
+
+void get_info_substr(uint16_t *buffer, int sindex, int length, char *copy_buffer) {
+    int i;
+    uint16_t cur;
+
+    for (i = 0; i < length/2; i++) {
+        //retrieve ushort from buffer
+        cur = buffer[sindex+i];
+        //split ushort into 2 bytes, push to string buffer
+        copy_buffer[i*2] = ((cur >> 8) & 0xFF);
+        copy_buffer[i*2+1] = (cur & 0xFF);
+    }
+}
+
+void remove_spaces(char *in, int length) {
+    char *out[128];
+    char cur;
+    int i, buf_index = 0;
+    for (i = 0; i < length; i++) {
+        if (in[i] == ' ')
+            continue;
+        out[buf_index++] = in[i];
+    }
+    in = out;
+}
+
+bool string_cmp_start(char *buf, const char *cmp) {
+    int i;
+    char tmp[64];
+    for (i = 0; i < strlen(cmp); i++) {
+        tmp[i] = cmp[i];
+    }
+    return strcmp(tmp);
+}
+
+int ide_init_drive(int drive_type) {
+    if (drive_type == ATA_DRV_PATAPI) {
+        const char *err = ide_reset();
+        if (err != NULL)
+            return -1;
+        ide_send_command(ATA_CMD_IDENTIFY_PACKET);
+    }
+    uint16_t dev_info_buf[256];
+
+    uint16_t buf[256];
+
+    int i;
+    for (i = 0; i < 256; i++) {
+        buf[i] = inw(ATA_REG_DATA);
+    }
+
+    ide_drive_t ide_drive;
+
+    ide_drive.max_write_pio = 0;
+
+    //copy serial number to drive structure
+    get_info_substr(buf, 10, 20, ide_drive.serial_number);
+    get_info_substr(buf, 23, 8, ide_drive.firmware_revision);
+    get_info_substr(buf, 27, 40, ide_drive.model_number);
+
+    remove_spaces(ide_drive.serial_number, 20);
+    remove_spaces(ide_drive.firmware_revision, 8);
+    remove_spaces(ide_drive.model_number, 40);
+
+    if (string_cmp_start(ide_drive.model_number, "Hitachi") == 0 || 
+        string_cmp_start(ide_drive.model_number, "FUJITSU") == 0))
+    {
+        max_write_pio = 1;
+    }
+
+    ide_drive.blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
     
+    ide_drive.lba48 = (buf[83] & 0x0400) != 0;
+
+    if (ide_drive.lba48)
+        ide_drive.blocks = (unsigned long)buf[103] << 48 | (unsigned long)buf[102] << 32 |
+                           (unsigned long)buf[101] << 16 | buf[100]) - 1;
+    return 0;
+}
+
+const char *ide_reset(void) {
+    outb(ATA_REG_CONTROL, 0x04);
+    wait_400ns();
+    outb(ATA_REG_CONTROL, 0x00);
+    int status;
+    int timeout = 20000000;
+    do {
+        wait_400ns();
+        status = inb(ATA_REG_CONTROL);
+    } while ((status & ATA_SR_BSY) != 0 && (status & ATA_SR_ERR) == 0 && timeout-- > 0);
+    
+    if ((status & ATA_SR_ERR) != 0 || timeout == 0) {
+        return timeout == 0 ? "ATA software reset timeout" : "ATA software reset error";
+    }
+
+    ide_select_drive(0, 0);
+
+    return NULL;
+}
+
+void ide_read_block(size_t block_pos, unsigned block_count, char *data) {
+    select_sector(block_pos, block_count);
+    ide_send_command(ATA_CMD_READ_DMA);
+    
+    uint16_t cur;
+    int i;
+    for (i = 0; i < sector_size/2; i++) {
+        cur = inw(ATA_REG_DATA);
+        data[i*2]  = (uint8_t)cur;
+        data[i*2+1] = (uint8_t)(cur >> 8);
+    }
+}
+
+void ide_write_block(size_t block_pos, unsigned block_count, char *data) {
+    select_sector(block_pos, block_count);
+    ide_send_command(ATA_CMD_WRITE_DMA);
+
+    int i;
+    uint16_t cur;
+    for (i = 0; i < block_count*512/2; i++) {
+        cur = (data[i*2+1] << 8) | data[i*2];
+        outw(ATA_REG_DATA, cur);
+    }
+
+    ide_send_command(ATA_CMD_CACHE_FLUSH);
+}
+
+void ide_init(void) {
+    //disable IRQs because we're polling.
+    ide_select_drive(0, 0);
+    outb(ATA_REG_CONTROL, 0x02);
+
+    int drive_type = ide_drive_discover();
+
+    switch (drive_type) {
+        case ATA_DRV_PATAPI:
+            //TODO: when SATAPI is implemented, check if PATAPI is the drive and set block size to 2048.
+        case ATA_DRV_PATA:
+            if (ide_init_drive(drive_type) == -1) {
+                printf("IDE drive init failed.\n");
+            }
+            break;
+    }
 }
