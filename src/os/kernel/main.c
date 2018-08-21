@@ -5,6 +5,7 @@
 #include <kernel/drivers/keyboard.h>
 #include <kernel/drivers/boot_vga.h>
 #include <kernel/drivers/pci.h>
+#include <kernel/drivers/ide.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
 #include <kernel/memory/mm.h>
@@ -64,6 +65,21 @@ void setup(void) {
     pci_recursive_check();
     bvga_init();
     keyboard_init();
+
+    char buf[512];
+    memset(buf, 0, 512);
+    const char *out = "THIS IS A TEST --- POOP FART";
+    int i;
+    for (i = 0; i < strlen(out); i++) {
+        buf[i] = out[i];
+    }
+    if (ide_init() != -1) {
+        // ide_write_block(0, 1, buf);
+        // memset(buf, 0, 512);
+        // ide_read_block(0, 1, buf);
+        // printf("READ BUFFER: %s\n", buf);
+        printf("it works mmkay\n");
+    }
 }
 
 void command_line(void) {
