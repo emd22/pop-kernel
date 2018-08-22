@@ -74,10 +74,11 @@ void setup(void) {
         buf[i] = out[i];
     }
     if (ide_init() != -1) {
-        // ide_write_block(0, 1, buf);
-        // memset(buf, 0, 512);
-        // ide_read_block(0, 1, buf);
-        // printf("READ BUFFER: %s\n", buf);
+        ide_write_block(0, 1, buf);
+        memset(buf, 0, 512);
+        ide_read_block(0, 1, buf);
+        ide_read_block(0, 1, buf);
+        printf("READ BUFFER: %s\n", buf);
         printf("it works mmkay\n");
     }
 }
