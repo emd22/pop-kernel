@@ -19,7 +19,7 @@
 #define LBA_MID      BAR0+4
 #define LBA_HIGH     BAR0+5
 
-#define READ_SECTORS 0x20);
+#define READ_SECTORS 0x20
 
 #define MASTER 0xE0
 #define SLAVE  0x0F

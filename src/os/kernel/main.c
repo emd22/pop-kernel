@@ -22,6 +22,8 @@
 uint32_t kernel_end;
 uint32_t kernel_base;
 
+uint8_t ata_initd = 0;
+
 static char **args;
 
 void invalid_command(char **args) {
@@ -56,6 +58,7 @@ void free_2d(int y, char **arr) {
 void setup(void) {
     mm_init((uint32_t)(&kernel_end));
     paging_init();
+    bvga_init();
     
     gdt_install();
     idt_install();
@@ -63,23 +66,22 @@ void setup(void) {
 
     pci_init();
     pci_recursive_check();
-    bvga_init();
     keyboard_init();
 
     char buf[512];
     memset(buf, 0, 512);
-    const char *out = "THIS IS A TEST --- POOP FART";
-    int i;
-    for (i = 0; i < strlen(out); i++) {
-        buf[i] = out[i];
-    }
+    // const char *out = "fart nuggie";
+    // int i;
+    // for (i = 0; i < strlen(out); i++) {
+    //     buf[i] = out[i];
+    // }
     if (ide_init() != -1) {
-        ide_write_block(0, 1, buf);
-        memset(buf, 0, 512);
-        ide_read_block(0, 1, buf);
-        ide_read_block(0, 1, buf);
-        printf("READ BUFFER: %s\n", buf);
-        printf("it works mmkay\n");
+        // ata_initd = 1;
+        // ide_write_block(0, 1, buf);
+        // memset(buf, 0, 512);
+    //     ide_read_block(0, 1, buf);
+    // //     ide_read_block(0, 1, buf);
+    //     printf("READ BUFFER: %s\n", buf);
     }
 }
 

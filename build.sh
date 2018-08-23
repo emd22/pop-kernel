@@ -3,4 +3,4 @@ make || exit 1
 cd ..
 ./genisoimg.sh
 #VBoxManage startvm "os"
-qemu-system-i386 -cdrom ./os.iso -drive file=fs.img,format=raw
+qemu-system-i386 -drive file=fs.img,format=raw -cdrom ./os.iso
