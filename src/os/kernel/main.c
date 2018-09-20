@@ -68,21 +68,23 @@ void setup(void) {
     pci_recursive_check();
     keyboard_init();
 
-    char buf[512];
-    memset(buf, 0, 512);
-    // const char *out = "fart nuggie";
-    // int i;
-    // for (i = 0; i < strlen(out); i++) {
-    //     buf[i] = out[i];
-    // }
-    if (ide_init() != -1) {
-        // ata_initd = 1;
-        // ide_write_block(0, 1, buf);
-        // memset(buf, 0, 512);
-    //     ide_read_block(0, 1, buf);
-    // //     ide_read_block(0, 1, buf);
-    //     printf("READ BUFFER: %s\n", buf);
+    ide_drive_t *ide_drives;
+    ide_drives = ide_init();
+
+    ide_drive_t *cur_drive;
+    int i;
+    for (i = 0; i < 4; i++) {
+        cur_drive = &ide_drives[i];
+        if ((cur_drive->flags & IDE_DRV_EXISTS) == 0) {
+            continue;
+        }
+        printf("drive(%d,%d) - blocks: %d\n", cur_drive->bus, cur_drive->bus_position, cur_drive->blocks);
     }
+    ide_set_bus(0, 0);
+    char buf[512];
+    memset(buf, 'P', 512);
+    strcpy(buf, "chicken nuggies");
+    ide_write_block(0, 1, buf);
 }
 
 void command_line(void) {
@@ -95,6 +97,17 @@ void command_line(void) {
     if (check_command(args, "clear")) {
         bvga_clear();
         buf[0] = 0;
+    }
+    else if (check_command(args, "drv")) {
+        if (arg_len != 3) {
+            printf("Usage: drv <0:1> <0:1>");
+            return;
+        }
+        ide_set_bus(atoi(args[1]), atoi(args[2]));
+        char buf[512];
+        memset(buf, 'P', 512);
+        strcpy(buf, "chicken nuggies");
+        ide_write_block(0, 1, buf);
     }
     else {
         invalid_command(args);
