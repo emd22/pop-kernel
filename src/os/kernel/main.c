@@ -108,6 +108,8 @@ void command_line(void) {
         memset(buf, 'P', 512);
         strcpy(buf, "chicken nuggies");
         ide_write_block(0, 1, buf);
+        memset(buf, 0, 512);        
+        ide_read_block(0, 1, buf);
     }
     else {
         invalid_command(args);
