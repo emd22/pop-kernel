@@ -23,7 +23,7 @@ typedef struct {
 
 void ide_set_bus(uint8_t _bus, uint8_t _bus_position);
 void ide_read_block(size_t block_pos, unsigned block_count, char *data);
-void ide_write_block(size_t block_pos, unsigned block_count, const char *data);
+void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data);
 ide_drive_t *ide_init(void);
 
 #endif

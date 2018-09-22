@@ -7,9 +7,13 @@
 #define ATA_REG_DATA      0x00
 #define ATA_REG_ERROR     0x01
 #define ATA_REG_SECCOUNT0 0x02
+#define ATA_REG_LBA0      0x03
+#define ATA_REG_LBA1      0x04
+#define ATA_REG_LBA2      0x05
 #define ATA_REG_HDDEVSEL  0x06
 #define ATA_REG_COMMAND   0x07
 #define ATA_REG_STATUS    0x07
+#define ATA_REG_SECCOUNT1 0x08
 #define ATA_REG_CONTROL   0x0C
 
 #define ATA_CMD_READ_PIO  0x20
@@ -66,11 +70,20 @@ void wait_400ns(void) {
     io_in(ATA_REG_STATUS);
 }
 
-void ide_select_drive(uint8_t bus_, uint8_t bus_position_) {
+void ide_select_drive(unsigned lba) {
     //if bus pos(slave/master) is 1(slave) send 0xB0(IDE slave) command to select drive. else, send 0xA0(IDE master) command.
-    io_out(ATA_REG_HDDEVSEL, (bus_position ? 0xB0 : 0xA0));
+    io_out(ATA_REG_HDDEVSEL, ((bus_position ? 0xB0 : 0xA0) | (uint8_t)((lba >> 24 & 0x0F))));
 }
 
-uint8_t ide_identify() {
-    
+void select_sector(unsigned lba, uint16_t sector_count) {
+    io_out(ATA_REG_SECCOUNT0, (uint8_t)sector_count);
+    io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count << 8));
+    io_out(ATA_REG_LBA0, (uint8_t)lba);
+    io_out(ATA_REG_LBA1, (uint8_t)(lba << 8));
+    io_out(ATA_REG_LBA2, (uint8_t)(lba << 16));
+}
+
+void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
+    ide_select_drive(lba);
+    select_sector(lba, sector_count);
 }
