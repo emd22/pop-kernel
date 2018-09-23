@@ -83,7 +83,7 @@ void setup(void) {
     // ide_set_bus(0, 0);
     uint8_t buf[512];
     memset(buf, 'O', 512);
-    memcpy(buf, "chicken nugget", 20);
+    memcpy(buf, "chicken nugget", 14);
     ide_write_block(1, 1, buf);
     memset(buf, 0, 512);
     ide_read_block(1, 1, buf);
@@ -112,8 +112,8 @@ void command_line(void) {
         // strcpy(buf, "chicken nuggies");
         // ide_write_block(1, 1, buf);
         // memset(buf, 0, 512);        
-        ide_read_block(2, 1, buf);
-        printf("buf:%s\n", buf);
+        // ide_read_block(2, 1, buf);
+        // printf("buf:%s\n", buf);
     }
     else {
         invalid_command(args);

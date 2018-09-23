@@ -88,7 +88,7 @@ void wait_400ns(void) {
 
 void ide_select_drive(unsigned lba) {
     //if bus pos(slave/master) is 1(slave) send 0xB0(IDE slave) command to select drive. else, send 0xA0(IDE master) command.
-    io_out(ATA_REG_HDDEVSEL, ((bus_position ? 0xB0 : 0xA0) | (uint8_t)((lba >> 24 & 0x0F))));
+    io_out(ATA_REG_HDDEVSEL, ((bus_position == ATA_MASTER ? 0xA0 : 0xB0) | (uint8_t)((lba >> 24 & 0x0F))));
 }
 
 void select_sector(unsigned lba, uint16_t sector_count) {
@@ -137,9 +137,14 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
         io_outw(ATA_REG_DATA, cur);
         // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     }
-    ide_select_drive(lba);
+    wait_400ns();
+    // ide_select_drive(lba);
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
-    poll_command(); 
+    poll_stat = poll_command();
+    if (poll_stat != 0) {
+        printf("stat wriet: %d\n", poll_stat);
+        return; // status failed because of error.
+    }
 }
 
 void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
@@ -151,7 +156,7 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     
     uint8_t poll_stat;
     poll_stat = poll_command();
-    if (poll_stat) {
+    if (poll_stat != 0) {
         printf("stat read: %d\n", poll_stat);
         return; // status failed because of error.
     }
@@ -167,5 +172,11 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         // printf("cur: %d|%d = %d\n", data[i+1], data[i], cur);
         
     }
-    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);    
+    wait_400ns();
+    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    poll_stat = poll_command();
+    if (poll_stat != 0) {
+        printf("stat reda: %d\n", poll_stat);
+        return; // status failed because of error.
+    } 
 }
