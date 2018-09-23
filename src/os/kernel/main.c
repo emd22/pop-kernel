@@ -68,23 +68,26 @@ void setup(void) {
     pci_recursive_check();
     keyboard_init();
 
-    ide_drive_t *ide_drives;
-    ide_drives = ide_init();
+    // ide_drive_t *ide_drives;
+    // ide_drives = ide_init();
 
-    ide_drive_t *cur_drive;
-    int i;
-    for (i = 0; i < 4; i++) {
-        cur_drive = &ide_drives[i];
-        if ((cur_drive->flags & IDE_DRV_EXISTS) == 0) {
-            continue;
-        }
-        printf("drive(%d,%d) - blocks: %d\n", cur_drive->bus, cur_drive->bus_position, cur_drive->blocks);
-    }
-    ide_set_bus(0, 0);
-    char buf[512];
-    memset(buf, 'P', 512);
-    strcpy(buf, "chicken nuggies");
-    ide_write_block(0, 1, buf);
+    // ide_drive_t *cur_drive;
+    // int i;
+    // for (i = 0; i < 4; i++) {
+    //     cur_drive = &ide_drives[i];
+    //     if ((cur_drive->flags & IDE_DRV_EXISTS) == 0) {
+    //         continue;
+    //     }
+    //     printf("drive(%d,%d) - blocks: %d\n", cur_drive->bus, cur_drive->bus_position, cur_drive->blocks);
+    // }
+    // ide_set_bus(0, 0);
+    uint8_t buf[512];
+    memset(buf, 'O', 512);
+    memcpy(buf, "chicken nugget", 20);
+    ide_write_block(1, 1, buf);
+    memset(buf, 0, 512);
+    ide_read_block(1, 1, buf);
+    printf("buf:%s\n", buf);
 }
 
 void command_line(void) {
@@ -103,13 +106,14 @@ void command_line(void) {
             printf("Usage: drv <0:1> <0:1>");
             return;
         }
-        ide_set_bus(atoi(args[1]), atoi(args[2]));
-        char buf[512];
-        memset(buf, 'P', 512);
-        strcpy(buf, "chicken nuggies");
-        ide_write_block(0, 1, buf);
-        memset(buf, 0, 512);        
-        ide_read_block(0, 1, buf);
+        // ide_set_bus(atoi(args[1]), atoi(args[2]));
+        uint8_t buf[512];
+        memset(buf, 0, 512);
+        // strcpy(buf, "chicken nuggies");
+        // ide_write_block(1, 1, buf);
+        // memset(buf, 0, 512);        
+        ide_read_block(2, 1, buf);
+        printf("buf:%s\n", buf);
     }
     else {
         invalid_command(args);
