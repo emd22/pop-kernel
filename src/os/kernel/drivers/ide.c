@@ -107,7 +107,7 @@ uint8_t poll_command(void) {
         // printf("stat:%d\n", status & ATA_SR_DRQ);
         status = io_in(ATA_REG_STATUS);
         if ((status & ATA_SR_ERR) || (!(status & ATA_SR_DRQ)))
-            return !(status & ATA_SR_DRQ) ? 3 : 2;
+            return (!(status & ATA_SR_DRQ)) ? 3 : 2;
     }
     return 0;
 }
@@ -123,7 +123,7 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     
     uint8_t poll_stat;
     poll_stat = poll_command();
-    if (poll_stat) {
+    if (poll_stat != 0) {
         printf("stat write: %d\n", poll_stat);
         return; // status failed because of error.
     }
@@ -136,10 +136,12 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
         // printf("cur: %d|%d = %d\n", data[i*2+1], data[i*2], cur);
         io_outw(ATA_REG_DATA, cur);
         // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+        wait_400ns();
+        
     }
     wait_400ns();
     // ide_select_drive(lba);
-    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     poll_stat = poll_command();
     if (poll_stat != 0) {
         printf("stat wriet: %d\n", poll_stat);
