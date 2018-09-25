@@ -81,13 +81,15 @@ void setup(void) {
     //     printf("drive(%d,%d) - blocks: %d\n", cur_drive->bus, cur_drive->bus_position, cur_drive->blocks);
     // }
     // ide_set_bus(0, 0);
+    ide_init();
+
     uint8_t buf[512];
-    memset(buf, 'O', 512);
-    memcpy(buf, "chicken nugget", 14);
-    ide_write_block(1, 1, buf);
     memset(buf, 0, 512);
     ide_read_block(1, 1, buf);
     printf("buf:%s\n", buf);
+    memset(buf, 0, 512);
+    memcpy(buf, "frick", 5);
+    ide_write_block(1, 1, buf);
 }
 
 void command_line(void) {

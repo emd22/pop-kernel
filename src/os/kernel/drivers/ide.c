@@ -20,6 +20,7 @@
 #define ATA_REG_STATUS    0x07
 #define ATA_REG_SECCOUNT1 0x08
 #define ATA_REG_CONTROL   0x0C
+#define ATA_REG_ALTSTATUS 0x0C
 
 #define ATA_CMD_CACHE_FLUSH 0xE7
 #define ATA_CMD_READ_PIO  0x20
@@ -80,10 +81,9 @@ uint16_t io_inw(uint16_t port) {
 }
 
 void wait_400ns(void) {
-    io_in(ATA_REG_STATUS);
-    io_in(ATA_REG_STATUS);
-    io_in(ATA_REG_STATUS);
-    io_in(ATA_REG_STATUS);
+    int i;
+    for (i = 0; i < 4; i++)
+        io_in(ATA_REG_ALTSTATUS);
 }
 
 void ide_select_drive(unsigned lba) {
@@ -116,7 +116,7 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     wait_400ns();
 
     ide_select_drive(lba);
-    //set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
+    //clear ATA_REG_ERROR(ATA_FEATURES)
     io_out(ATA_REG_ERROR, 0x00);
     select_sector(lba, sector_count);
     io_out(ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
@@ -175,10 +175,18 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         
     }
     wait_400ns();
-    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     poll_stat = poll_command();
     if (poll_stat != 0) {
         printf("stat reda: %d\n", poll_stat);
         return; // status failed because of error.
     } 
+}
+
+void ide_init(void) {
+    int i;
+    for (i = 0; i < 256; i++)
+        io_in(ATA_REG_DATA);
+
+    io_out(ATA_REG_CONTROL, 0x02);
 }
