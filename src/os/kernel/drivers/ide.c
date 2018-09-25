@@ -41,22 +41,18 @@
 
 // static ide_drive_t ide_drives[4] = {0, 0, 0, 0};
 
+static ide_drive_t ide_drives[4];
+
 static int bus = ATA_PRIMARY;
 static int bus_position = ATA_MASTER;
-
-// ide_drive_t *ide_drives_find(void) {
-//     return ide_drives;
-// }
 
 int get_io(int port) {
     int io = (bus == ATA_PRIMARY ? 0x1F0 : 0x170);
 
-    // #if 0
     if (port == ATA_REG_CONTROL) {
         //data field requires BAR1 instead of BAR0, increase by 204h to change the register.
         io += 0x204;
     }
-    // #endif
     return io;
 }
 
@@ -103,10 +99,10 @@ uint8_t poll_command(void) {
     wait_400ns();
     
     uint8_t status = io_in(ATA_REG_STATUS);
-    while ((status & ATA_SR_BSY) || (status & ATA_SR_ERR) || !(status & ATA_SR_DRQ)) {
+    while ((status & ATA_SR_BSY) || (status & ATA_SR_ERR)/*  || !(status & ATA_SR_DRQ) */) {
         // printf("stat:%d\n", status & ATA_SR_DRQ);
         status = io_in(ATA_REG_STATUS);
-        if ((status & ATA_SR_ERR) || (!(status & ATA_SR_DRQ)))
+        if ((status & ATA_SR_ERR) /* || (!(status & ATA_SR_DRQ)) */)
             return (!(status & ATA_SR_DRQ)) ? 3 : 2;
     }
     return 0;
@@ -131,17 +127,14 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     int i;
     uint16_t cur;
     for (i = 0; i < sector_count*(512/2); i++) {
-        // cur = (data[i+1]) | data[i];
         cur = (data[i*2+1] << 8) | data[i*2];        
-        // printf("cur: %d|%d = %d\n", data[i*2+1], data[i*2], cur);
         io_outw(ATA_REG_DATA, cur);
-        // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
         wait_400ns();
         
     }
+
     wait_400ns();
-    // ide_select_drive(lba);
-    // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     poll_stat = poll_command();
     if (poll_stat != 0) {
         printf("stat wriet: %d\n", poll_stat);
@@ -175,12 +168,34 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         
     }
     wait_400ns();
-    // io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     poll_stat = poll_command();
     if (poll_stat != 0) {
         printf("stat reda: %d\n", poll_stat);
         return; // status failed because of error.
     } 
+}
+
+ide_drive_t *ide_drives_find(void) {
+    int i, j, index = 0;
+    ide_drive_t *cur_drive;
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++, index++) {
+            ide_set_bus(i, j);
+            if (!ide_identify(i, j))
+                continue;
+
+            cur_drive = &ide_drives[index];
+
+            cur_drive->bus = i;
+            cur_drive->bus_position = j;
+            cur_drive->flags |= IDE_DRV_EXISTS;
+            ide_init_drive(cur_drive);
+        }
+    }
+
+    return ide_drives;
 }
 
 void ide_init(void) {

@@ -88,7 +88,9 @@ void setup(void) {
     ide_read_block(1, 1, buf);
     printf("buf:%s\n", buf);
     memset(buf, 0, 512);
-    memcpy(buf, "frick", 5);
+    // ide_read_block(1, 1, buf);
+    // printf("buf:%s\n", buf);
+    memcpy(buf, "fudge", 5);
     ide_write_block(1, 1, buf);
 }
 
@@ -111,11 +113,11 @@ void command_line(void) {
         // ide_set_bus(atoi(args[1]), atoi(args[2]));
         uint8_t buf[512];
         memset(buf, 0, 512);
-        // strcpy(buf, "chicken nuggies");
-        // ide_write_block(1, 1, buf);
-        // memset(buf, 0, 512);        
-        // ide_read_block(2, 1, buf);
-        // printf("buf:%s\n", buf);
+        strcpy(buf, "chicken nuggies");
+        ide_write_block(1, 1, buf);
+        memset(buf, 0, 512);        
+        ide_read_block(1, 1, buf);
+        printf("buf:%s\n", buf);
     }
     else {
         invalid_command(args);
