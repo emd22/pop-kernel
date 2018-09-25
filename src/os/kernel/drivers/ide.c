@@ -1,3 +1,4 @@
+#include <osutil.h>
 #include <kernel/drivers/ide.h>
 #include <kernel/drivers/pci.h>
 #include <kernel/arch_io.h>
@@ -105,7 +106,7 @@ uint8_t poll_command(void) {
         if ((status & ATA_SR_ERR) /* || (!(status & ATA_SR_DRQ)) */)
             return (!(status & ATA_SR_DRQ)) ? 3 : 2;
     }
-    return 0;
+    return OS_SUCCESS;
 }
 
 void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
@@ -163,7 +164,7 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         // printf("cur=%c\n", cur);
         // data[i]  = (uint8_t)cur;
         // data[i+1] = (uint8_t)(cur << 8);
-        *(uint16_t *)(data + i * 2) = cur;
+        *(uint16_t *)(data+i*2) = cur;
         // printf("cur: %d|%d = %d\n", data[i+1], data[i], cur);
         
     }
@@ -175,6 +176,123 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         return; // status failed because of error.
     } 
 }
+
+void get_info_substr(uint16_t *buffer, int sindex, int length, char *copy_buffer) {
+    int i;
+    uint16_t cur;
+
+    for (i = 0; i < length/2; i++) {
+        //retrieve ushort from buffer
+        cur = buffer[sindex+i];
+        //split ushort into 2 bytes, push to string buffer
+        copy_buffer[i*2] = ((cur >> 8) & 0xFF);
+        copy_buffer[i*2+1] = (cur & 0xFF);
+    }
+}
+
+void remove_spaces(char *in, int length) {
+    char out[128];
+    // char cur;
+    int i, buf_index = 0;
+    for (i = 0; i < length; i++) {
+        if (in[i] == ' ')
+            continue;
+        out[buf_index++] = in[i];
+    }
+    in = out;
+}
+
+bool string_cmp_start(char *buf, const char *cmp) {
+    int i;
+    char tmp[64];
+    for (i = 0; i < strlen(cmp); i++) {
+        tmp[i] = cmp[i];
+    }
+    return (bool)strcmp(tmp, cmp);
+}
+
+int ide_send_command(uint8_t command) {
+    io_out(ATA_REG_COMMAND, command);
+    int status, timeout = 100000;
+
+    do {
+        wait_400ns();
+        status = io_in(ATA_REG_STATUS);
+    } while (((status & ATA_SR_ERR) || !(status & ATA_SR_DRQ)) && timeout-- > 0);
+
+    if (timeout == 0)
+        return 1;
+    
+    return 0;
+}
+
+int ide_identify(uint8_t _bus, uint8_t drive) {
+    // ide_set_bus(_bus, drive);
+    ide_select_drive(0, false);
+
+    io_out(ATA_REG_SECCOUNT0, 0);
+    io_out(ATA_REG_LBA0, 0);
+    io_out(ATA_REG_LBA1, 0);
+    io_out(ATA_REG_LBA2, 0);
+
+    io_out(ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
+    
+    uint8_t status = io_in(ATA_REG_STATUS);
+    if (!status) {
+        printf("Drive %d:%d status failed.\n", bus, drive);
+        return 0;
+    } 
+
+    int timeout = 1000000;
+    while ((io_in(ATA_REG_STATUS) & ATA_SR_BSY) != 0 && timeout-- != 0);
+    if (timeout == 0)
+        return 0;
+
+    // int io = GET_IO_BAR1;
+    do {
+        status = io_in(ATA_REG_STATUS);
+        // printf("STATUS: %d\n", status);
+        // while (1);
+        if (status & ATA_SR_ERR) {
+            printf("Drive %d:%d error bit set!\n", bus, drive);
+            return 1;
+        }
+    } while (!(status & ATA_SR_DRQ));
+
+    printf("Drive %d:%d operational!\n", bus, drive);
+    return 0;
+}
+
+void ide_init_drive(ide_drive_t *ide_drive) {
+    uint16_t buf[256];
+
+    //read 256 shorts from IDE device
+    int i;
+    for (i = 0; i < 256; i++) {
+        buf[i] = io_inw(ATA_REG_DATA);
+    }
+
+    get_info_substr(buf, 10, 20, ide_drive->serial_number);
+    get_info_substr(buf, 23, 8, ide_drive->firmware_revision);
+    get_info_substr(buf, 27, 40, ide_drive->model_number);
+
+    remove_spaces(ide_drive->serial_number, 20);
+    remove_spaces(ide_drive->firmware_revision, 8);
+    remove_spaces(ide_drive->model_number, 40);
+
+    ide_drive->model_number[41] = 0;
+
+    ide_drive->blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
+
+    printf("blocks: %d\n", ide_drive->blocks);
+
+    if ((buf[83] & 0x400) != 0) {
+        ide_drive->flags |= IDE_DRV_LBA48;
+        ide_drive->blocks = ((unsigned long)buf[103] << 48 | (unsigned long)buf[102] << 32 |
+                             (unsigned long)buf[101] << 16 | buf[100]) - 1;
+    }
+}
+
 
 ide_drive_t *ide_drives_find(void) {
     int i, j, index = 0;

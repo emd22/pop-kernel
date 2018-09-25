@@ -7,6 +7,9 @@
 #define OS_VERSION_MINOR 0
 #define OS_VERSION_PATCH 2
 
+#define OS_FAILURE 1
+#define OS_SUCCESS 0
+
 #ifdef __i386__
 #define OS_x86
 #else
