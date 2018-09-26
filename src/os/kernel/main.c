@@ -8,11 +8,12 @@
 #include <kernel/drivers/ide.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
+#include <kernel/drivers/gdt.h>
 #include <kernel/memory/mm.h>
 #include <kernel/memory/paging.h>
 #include <kernel/time.h>
 #include <kernel/args.h>
-#include <kernel/drivers/gdt.h>
+#include <kernel/hd.h>
 #include <osutil.h>
 
 #include <stdlib.h>
@@ -68,30 +69,36 @@ void setup(void) {
     pci_recursive_check();
     keyboard_init();
 
-    // ide_drive_t *ide_drives;
-    // ide_drives = ide_init();
+    int pci_dev_amt;
+    pci_dev_t **pci_devices;
 
-    // ide_drive_t *cur_drive;
-    // int i;
-    // for (i = 0; i < 4; i++) {
-    //     cur_drive = &ide_drives[i];
-    //     if ((cur_drive->flags & IDE_DRV_EXISTS) == 0) {
-    //         continue;
-    //     }
-    //     printf("drive(%d,%d) - blocks: %d\n", cur_drive->bus, cur_drive->bus_position, cur_drive->blocks);
-    // }
-    // ide_set_bus(0, 0);
-    ide_init();
+    pci_devices = pci_get_devices(&pci_dev_amt);
+
+    hd_init(pci_devices, pci_dev_amt);
+
+    controller_t *ide;
+    ide = hd_find_controller(IDE_CONTROLLER);
+    if (ide == NULL) {
+        printf("CANNOT FIND CONTROLLER\n");
+        return;
+    }
+
+    drive_t *drive = &ide->drives[0];
+    int i;
+    for (i = 0; i < ide->drive_index; i++)
+        printf("drv %d -> %d -> %d\n", i, drive->blocks, (drive->flags & DRIVE_EXISTS));
+
+    printf("exists: %d\n", (drive->flags & DRIVE_EXISTS));
+
+    printf("blocks: %d, %d:%d\n", drive->blocks, drive->bus, drive->bus_position);
+    // ide_set_bus(drive->bus, drive->bus_position);
+    ide_set_bus(0, 0);
 
     uint8_t buf[512];
     memset(buf, 0, 512);
-    ide_read_block(1, 1, buf);
-    printf("buf:%s\n", buf);
-    memset(buf, 0, 512);
-    // ide_read_block(1, 1, buf);
-    // printf("buf:%s\n", buf);
-    memcpy(buf, "fudge", 5);
-    ide_write_block(1, 1, buf);
+
+    ide->read_block(0, 1, buf);
+    printf("buf: %s\n", buf);
 }
 
 void command_line(void) {

@@ -24,8 +24,9 @@
 #define ATA_REG_ALTSTATUS 0x0C
 
 #define ATA_CMD_CACHE_FLUSH 0xE7
-#define ATA_CMD_READ_PIO  0x20
-#define ATA_CMD_WRITE_PIO 0x30
+#define ATA_CMD_READ_PIO    0x20
+#define ATA_CMD_WRITE_PIO   0x30
+#define ATA_CMD_IDENTIFY    0xEC
 
 #define ATA_DRV_DEFAULT 0xA0
 #define ATA_DRV_LBA     0x40
@@ -40,12 +41,11 @@
 #define BAR0_PRIMARY_IO   0x1F0
 #define BAR0_SECONDARY_IO 0x170
 
-// static ide_drive_t ide_drives[4] = {0, 0, 0, 0};
-
-static ide_drive_t ide_drives[4];
+static controller_t *controller;
 
 static int bus = ATA_PRIMARY;
 static int bus_position = ATA_MASTER;
+static unsigned current_lba;
 
 int get_io(int port) {
     int io = (bus == ATA_PRIMARY ? 0x1F0 : 0x170);
@@ -110,7 +110,7 @@ uint8_t poll_command(void) {
 }
 
 void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
-    wait_400ns();
+    current_lba = lba;
 
     ide_select_drive(lba);
     //clear ATA_REG_ERROR(ATA_FEATURES)
@@ -136,14 +136,11 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
 
     wait_400ns();
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
-    poll_stat = poll_command();
-    if (poll_stat != 0) {
-        printf("stat wriet: %d\n", poll_stat);
-        return; // status failed because of error.
-    }
 }
 
 void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
+    current_lba = lba;
+
     ide_select_drive(lba);
     //set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
     io_out(ATA_REG_ERROR, 0x00);
@@ -161,20 +158,10 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     uint16_t cur;
     for (i = 0; i < sector_count*(512/2); i++) {
         cur = io_inw(ATA_REG_DATA);
-        // printf("cur=%c\n", cur);
-        // data[i]  = (uint8_t)cur;
-        // data[i+1] = (uint8_t)(cur << 8);
         *(uint16_t *)(data+i*2) = cur;
-        // printf("cur: %d|%d = %d\n", data[i+1], data[i], cur);
-        
     }
     wait_400ns();
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
-    poll_stat = poll_command();
-    if (poll_stat != 0) {
-        printf("stat reda: %d\n", poll_stat);
-        return; // status failed because of error.
-    } 
 }
 
 void get_info_substr(uint16_t *buffer, int sindex, int length, char *copy_buffer) {
@@ -211,24 +198,8 @@ bool string_cmp_start(char *buf, const char *cmp) {
     return (bool)strcmp(tmp, cmp);
 }
 
-int ide_send_command(uint8_t command) {
-    io_out(ATA_REG_COMMAND, command);
-    int status, timeout = 100000;
-
-    do {
-        wait_400ns();
-        status = io_in(ATA_REG_STATUS);
-    } while (((status & ATA_SR_ERR) || !(status & ATA_SR_DRQ)) && timeout-- > 0);
-
-    if (timeout == 0)
-        return 1;
-    
-    return 0;
-}
-
 int ide_identify(uint8_t _bus, uint8_t drive) {
-    // ide_set_bus(_bus, drive);
-    ide_select_drive(0, false);
+    ide_select_drive(current_lba);
 
     io_out(ATA_REG_SECCOUNT0, 0);
     io_out(ATA_REG_LBA0, 0);
@@ -239,31 +210,29 @@ int ide_identify(uint8_t _bus, uint8_t drive) {
     
     uint8_t status = io_in(ATA_REG_STATUS);
     if (!status) {
-        printf("Drive %d:%d status failed.\n", bus, drive);
-        return 0;
+        return OS_FAILURE;
     } 
 
+    //TODO: replace timeout with PIC timer.
     int timeout = 1000000;
     while ((io_in(ATA_REG_STATUS) & ATA_SR_BSY) != 0 && timeout-- != 0);
+    //drive has been busy too long, return as failed attempt
     if (timeout == 0)
-        return 0;
+        return OS_FAILURE;
 
-    // int io = GET_IO_BAR1;
     do {
         status = io_in(ATA_REG_STATUS);
-        // printf("STATUS: %d\n", status);
-        // while (1);
         if (status & ATA_SR_ERR) {
-            printf("Drive %d:%d error bit set!\n", bus, drive);
-            return 1;
+            //this drives error bit is set!
+            return OS_FAILURE;
         }
     } while (!(status & ATA_SR_DRQ));
 
-    printf("Drive %d:%d operational!\n", bus, drive);
-    return 0;
+    //device is fully operational, continue
+    return OS_SUCCESS;
 }
 
-void ide_init_drive(ide_drive_t *ide_drive) {
+void ide_init_drive(drive_t *drive) {
     uint16_t buf[256];
 
     //read 256 shorts from IDE device
@@ -272,54 +241,59 @@ void ide_init_drive(ide_drive_t *ide_drive) {
         buf[i] = io_inw(ATA_REG_DATA);
     }
 
-    get_info_substr(buf, 10, 20, ide_drive->serial_number);
-    get_info_substr(buf, 23, 8, ide_drive->firmware_revision);
-    get_info_substr(buf, 27, 40, ide_drive->model_number);
+    get_info_substr(buf, 10, 20, drive->serial_number);
+    get_info_substr(buf, 23, 8, drive->firmware_revision);
+    get_info_substr(buf, 27, 40, drive->model_number);
 
-    remove_spaces(ide_drive->serial_number, 20);
-    remove_spaces(ide_drive->firmware_revision, 8);
-    remove_spaces(ide_drive->model_number, 40);
+    remove_spaces(drive->serial_number, 20);
+    remove_spaces(drive->firmware_revision, 8);
+    remove_spaces(drive->model_number, 40);
 
-    ide_drive->model_number[41] = 0;
-
-    ide_drive->blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
-
-    printf("blocks: %d\n", ide_drive->blocks);
+    //null terminate model number
+    drive->model_number[41] = 0;
+    drive->blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
 
     if ((buf[83] & 0x400) != 0) {
-        ide_drive->flags |= IDE_DRV_LBA48;
-        ide_drive->blocks = ((unsigned long)buf[103] << 48 | (unsigned long)buf[102] << 32 |
-                             (unsigned long)buf[101] << 16 | buf[100]) - 1;
+        drive->flags |= IDE_DRV_LBA48;
+        drive->blocks = ((size_t)buf[103] << 48 | (size_t)buf[102] << 32 |
+                             (size_t)buf[101] << 16 | buf[100])-1;
     }
 }
 
-
-ide_drive_t *ide_drives_find(void) {
+controller_t *ide_drives_find(void) {
     int i, j, index = 0;
-    ide_drive_t *cur_drive;
+    drive_t *cur_drive;
 
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++, index++) {
-            ide_set_bus(i, j);
+            bus_position = j;
+            bus = i;
+
             if (!ide_identify(i, j))
                 continue;
 
-            cur_drive = &ide_drives[index];
-
+            cur_drive = &controller->drives[controller->drive_index++];
             cur_drive->bus = i;
             cur_drive->bus_position = j;
-            cur_drive->flags |= IDE_DRV_EXISTS;
+            cur_drive->flags |= DRIVE_EXISTS;
             ide_init_drive(cur_drive);
         }
     }
 
-    return ide_drives;
+    return controller;
 }
 
-void ide_init(void) {
-    int i;
-    for (i = 0; i < 256; i++)
-        io_in(ATA_REG_DATA);
+void ide_set_bus(int _bus, int _bus_position) {
+    bus = _bus;
+    bus_position = _bus_position;
+    ide_select_drive(current_lba);
+}
+
+controller_t *ide_init(controller_t *_controller) {
+    controller = _controller;
+    controller->drive_index = 0;
 
     io_out(ATA_REG_CONTROL, 0x02);
+
+    return ide_drives_find();
 }
