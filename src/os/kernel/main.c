@@ -74,30 +74,29 @@ void setup(void) {
 
     pci_devices = pci_get_devices(&pci_dev_amt);
 
+
     hd_init(pci_devices, pci_dev_amt);
 
-    controller_t *ide;
-    ide = hd_find_controller(IDE_CONTROLLER);
-    if (ide == NULL) {
-        printf("CANNOT FIND CONTROLLER\n");
-        return;
-    }
+    drive_t *drives;
+    int drive_index;
+    drives = hd_get_drives(&drive_index);
+    ide_init(drives, &drive_index);
 
-    drive_t *drive = &ide->drives[0];
-    int i;
-    for (i = 0; i < ide->drive_index; i++)
-        printf("drv %d -> %d -> %d\n", i, drive->blocks, (drive->flags & DRIVE_EXISTS));
 
-    printf("exists: %d\n", (drive->flags & DRIVE_EXISTS));
 
-    printf("blocks: %d, %d:%d\n", drive->blocks, drive->bus, drive->bus_position);
-    // ide_set_bus(drive->bus, drive->bus_position);
     ide_set_bus(0, 0);
 
     uint8_t buf[512];
     memset(buf, 0, 512);
 
-    ide->read_block(0, 1, buf);
+    int i;
+    drive_t *drive;
+    for (i = 0; i < drive_index; i++) {
+        drive = &drives[i];
+        printf("drive %d: blocks: %d, type: %d, pci index: %d\n", drive->blocks, drive->controller_type, drive->controller_pci_index);
+    }
+
+    drives[0].read_block(1, 1, buf);
     printf("buf: %s\n", buf);
 }
 

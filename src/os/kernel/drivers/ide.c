@@ -41,8 +41,6 @@
 #define BAR0_PRIMARY_IO   0x1F0
 #define BAR0_SECONDARY_IO 0x170
 
-static controller_t *controller;
-
 static int bus = ATA_PRIMARY;
 static int bus_position = ATA_MASTER;
 static unsigned current_lba;
@@ -258,9 +256,10 @@ void ide_init_drive(drive_t *drive) {
         drive->blocks = ((size_t)buf[103] << 48 | (size_t)buf[102] << 32 |
                              (size_t)buf[101] << 16 | buf[100])-1;
     }
+    printf("POOP: %d\n", drive->blocks);
 }
 
-controller_t *ide_drives_find(void) {
+void ide_drives_find(drive_t *drive_buf, int *drive_index) {
     int i, j, index = 0;
     drive_t *cur_drive;
 
@@ -269,18 +268,19 @@ controller_t *ide_drives_find(void) {
             bus_position = j;
             bus = i;
 
-            if (!ide_identify(i, j))
+            ide_select_drive(current_lba);
+
+            if (ide_identify(i, j))
                 continue;
 
-            cur_drive = &controller->drives[controller->drive_index++];
+            cur_drive = &drive_buf[(*drive_index)++];
+            cur_drive->flags = 0;
             cur_drive->bus = i;
             cur_drive->bus_position = j;
             cur_drive->flags |= DRIVE_EXISTS;
             ide_init_drive(cur_drive);
         }
     }
-
-    return controller;
 }
 
 void ide_set_bus(int _bus, int _bus_position) {
@@ -288,12 +288,8 @@ void ide_set_bus(int _bus, int _bus_position) {
     bus_position = _bus_position;
     ide_select_drive(current_lba);
 }
-
-controller_t *ide_init(controller_t *_controller) {
-    controller = _controller;
-    controller->drive_index = 0;
-
+void ide_init(drive_t *drive_buf, int *drive_index) {
     io_out(ATA_REG_CONTROL, 0x02);
 
-    return ide_drives_find();
+    ide_drives_find(drive_buf, drive_index);
 }

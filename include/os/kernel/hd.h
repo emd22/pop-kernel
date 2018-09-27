@@ -10,7 +10,7 @@ enum {
     SATA_CONTROLLER   = 0x06
 };
 
+drive_t *hd_get_drives(int *_drive_index);
 void hd_init(pci_dev_t **pci_devices, int pci_dev_amt);
-controller_t *hd_find_controller(int pci_type);
 
 #endif
