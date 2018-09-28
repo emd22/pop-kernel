@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <kernel/drive.h>
 
 #define EMPTY_PARTITION 0x01
 #define FEATURE_NOT_EXIST 0x02
@@ -32,12 +33,13 @@ typedef struct {
     uint8_t     signature[2];
 } mbr_t;
 
-void mbr_init(void);
-bool retrieve_partitions(void);
+void mbr_init(drive_t *_current_drive);
+bool mbr_retrieve_partitions(void);
 mbr_t *get_mbr();
 void mbr_write_part(unsigned loc, uint32_t sp, uint32_t ep, uint8_t sys_id);
-bool format_mbr(void);
-int get_part_entry(int n);
+bool mbr_format(void);
+int mbr_get_part_entry(int n);
+void mbr_debug_print(void);
 void mbr_purge();
 
 #endif

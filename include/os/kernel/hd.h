@@ -11,6 +11,7 @@ enum {
 };
 
 drive_t *hd_get_drives(int *_drive_index);
+const char *hd_get_controller_type(drive_t *drive);
 void hd_init(pci_dev_t **pci_devices, int pci_dev_amt);
 
 #endif

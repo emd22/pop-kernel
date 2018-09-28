@@ -6,6 +6,7 @@
 #include <kernel/drivers/boot_vga.h>
 #include <kernel/drivers/pci.h>
 #include <kernel/drivers/ide.h>
+#include <kernel/drivers/mbr.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
 #include <kernel/drivers/gdt.h>
@@ -74,7 +75,6 @@ void setup(void) {
 
     pci_devices = pci_get_devices(&pci_dev_amt);
 
-
     hd_init(pci_devices, pci_dev_amt);
 
     drive_t *drives;
@@ -82,22 +82,16 @@ void setup(void) {
     drives = hd_get_drives(&drive_index);
     ide_init(drives, &drive_index);
 
-
-
     ide_set_bus(0, 0);
 
     uint8_t buf[512];
     memset(buf, 0, 512);
 
-    int i;
-    drive_t *drive;
-    for (i = 0; i < drive_index; i++) {
-        drive = &drives[i];
-        printf("drive %d: blocks: %d, type: %d, pci index: %d\n", drive->blocks, drive->controller_type, drive->controller_pci_index);
-    }
-
     drives[0].read_block(1, 1, buf);
-    printf("buf: %s\n", buf);
+
+    mbr_init(&drives[0]);
+    mbr_write_part(mbr_get_part_entry(0), 20, 100, 0x0C);
+    mbr_debug_print();
 }
 
 void command_line(void) {
@@ -117,13 +111,13 @@ void command_line(void) {
             return;
         }
         // ide_set_bus(atoi(args[1]), atoi(args[2]));
-        uint8_t buf[512];
-        memset(buf, 0, 512);
-        strcpy(buf, "chicken nuggies");
-        ide_write_block(1, 1, buf);
-        memset(buf, 0, 512);        
-        ide_read_block(1, 1, buf);
-        printf("buf:%s\n", buf);
+        // uint8_t buf[512];
+        // memset(buf, 0, 512);
+        // strcpy(buf, "chicken nuggies");
+        // ide_write_block(1, 1, buf);
+        // memset(buf, 0, 512);        
+        // ide_read_block(1, 1, buf);
+        // printf("buf:%s\n", buf);
     }
     else {
         invalid_command(args);

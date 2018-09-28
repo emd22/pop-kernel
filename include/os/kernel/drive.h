@@ -1,6 +1,9 @@
 #ifndef DRIVE_H
 #define DRIVE_H
 
+#include <stdint.h>
+#include <stddef.h>
+
 #define DRIVE_EXISTS 0x01
 
 typedef struct {
@@ -18,16 +21,5 @@ typedef struct {
     void (*read_block)(unsigned, uint16_t, uint8_t *);
     void (*write_block)(unsigned, uint16_t, const uint8_t *);
 } drive_t;
-
-// typedef struct {
-//     int pci_type;
-//     int pci_index;
-
-//     drive_t drives[8];
-//     int drive_index;
-
-//     void (*read_block)(unsigned, uint16_t, uint8_t *);
-//     void (*write_block)(unsigned, uint16_t, const uint8_t *);
-// } controller_t;
 
 #endif

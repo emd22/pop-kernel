@@ -11,27 +11,20 @@ enum {
     MASS_STORAGE_DEVICE = 0x01
 };
 
+const char *drive_controller_types[] = {
+    NULL,
+    "PATA Controller",
+    "Floppy Controller",
+    NULL,
+    NULL,
+    NULL,
+    "SATA Controller",
+};
+
 static pci_dev_t *pci_devs;
-// static int selected_hd_controller = 0;
-// static int selected_hd = 0;
-// static controller_t controllers[32];
-// static int controllers_index = 0;
 
 static drive_t drives[32];
 static int drive_index = 0;
-
-// void ide_controller_init(int pci_index) {
-//     // controller_t controller;
-//     // memset(&controller, 0, sizeof(controller_t));
-//     // controller.pci_type    = IDE_CONTROLLER;
-//     // controller.pci_index   = pci_index;
-//     // controller.read_block  = ide_read_block;
-//     // controller.write_block = ide_write_block;
-
-//     // /* controller.drives = (void *) */ide_init(&controller);
-
-//     // controllers[controllers_index++] = controller;
-// }
 
 void ide_drive_init(int pci_index) {
     drive_t *drive = &drives[drive_index++];
@@ -40,6 +33,10 @@ void ide_drive_init(int pci_index) {
 
     drive->controller_type = IDE_CONTROLLER;
     drive->controller_pci_index = pci_index;
+}
+
+const char *hd_get_controller_type(drive_t *drive) {
+    return drive_controller_types[drive->controller_type];
 }
 
 void check_class_code(pci_dev_t *cur_dev, int dev_index) {

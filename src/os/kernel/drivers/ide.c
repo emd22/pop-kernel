@@ -43,7 +43,7 @@
 
 static int bus = ATA_PRIMARY;
 static int bus_position = ATA_MASTER;
-static unsigned current_lba;
+static unsigned current_lba = 0;
 
 int get_io(int port) {
     int io = (bus == ATA_PRIMARY ? 0x1F0 : 0x170);
@@ -108,6 +108,10 @@ uint8_t poll_command(void) {
 }
 
 void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
+    if (lba < 1) {
+        printf("IDE write error: LBA < 1\n");
+        return;
+    }
     current_lba = lba;
 
     ide_select_drive(lba);
@@ -137,6 +141,10 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
 }
 
 void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
+    if (lba < 1) {
+        printf("IDE read error: LBA < 1\n");
+        return;
+    }
     current_lba = lba;
 
     ide_select_drive(lba);
@@ -256,7 +264,6 @@ void ide_init_drive(drive_t *drive) {
         drive->blocks = ((size_t)buf[103] << 48 | (size_t)buf[102] << 32 |
                              (size_t)buf[101] << 16 | buf[100])-1;
     }
-    printf("POOP: %d\n", drive->blocks);
 }
 
 void ide_drives_find(drive_t *drive_buf, int *drive_index) {
@@ -273,7 +280,7 @@ void ide_drives_find(drive_t *drive_buf, int *drive_index) {
             if (ide_identify(i, j))
                 continue;
 
-            cur_drive = &drive_buf[(*drive_index)++];
+            cur_drive = &drive_buf[index];
             cur_drive->flags = 0;
             cur_drive->bus = i;
             cur_drive->bus_position = j;
