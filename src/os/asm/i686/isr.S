@@ -279,3 +279,4 @@ isr_common_stub:
   sti
 
   iret
+  

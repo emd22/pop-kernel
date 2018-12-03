@@ -259,11 +259,11 @@ void ide_init_drive(drive_t *drive) {
     drive->model_number[41] = 0;
     drive->blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
 
-    if ((buf[83] & 0x400) != 0) {
-        drive->flags |= IDE_DRV_LBA48;
-        drive->blocks = ((size_t)buf[103] << 48 | (size_t)buf[102] << 32 |
-                             (size_t)buf[101] << 16 | buf[100])-1;
-    }
+    // if ((buf[83] & 0x400) != 0) {
+    //     drive->flags |= IDE_DRV_LBA48;
+    //     drive->blocks = ((size_t)buf[103] << 48 | (size_t)buf[102] << 32 |
+    //                          (size_t)buf[101] << 16 | buf[100])-1;
+    // }
 }
 
 void ide_drives_find(drive_t *drive_buf, int *drive_index) {

@@ -12,7 +12,7 @@ typedef struct {
 } regs_t;
 
 typedef void (*irq_handler_t) (regs_t *);
-static irq_handler_t irq_routines[16] = { NULL };
+static __attribute__((unused)) irq_handler_t irq_routines[16] = { NULL };
 
 void irq_install_handler(int irq, irq_handler_t handler);
 void irq_uninstall_handler(int irq);

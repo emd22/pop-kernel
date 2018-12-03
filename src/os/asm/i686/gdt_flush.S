@@ -12,3 +12,4 @@ gdt_flush:
    ljmp $0x08, $flush2
 flush2:
    ret
+   

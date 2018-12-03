@@ -21,8 +21,6 @@ const char *drive_controller_types[] = {
     "SATA Controller",
 };
 
-static pci_dev_t *pci_devs;
-
 static drive_t drives[32];
 static int drive_index = 0;
 
