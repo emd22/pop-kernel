@@ -11,7 +11,7 @@
 
 #define KBD_PORT 0x64
 
-struct {
+volatile struct {
     // uint8_t *key_cache;
     uint8_t  last_key;
     uint16_t key_loc;
@@ -21,11 +21,6 @@ struct {
 } kinfo;
 
 char get_scancode() {
-    // char flag = inb(KBD_PORT);
-
-    // while(!(flag & 1)) {
-    //     flag = inb(KBD_PORT);
-    // }
     if (inb(0x60) != 0)
         return inb(0x60);
     return -1;
@@ -98,19 +93,10 @@ uint8_t scancode_char(int keycode) {
 }
 
 void kbd_handler(regs_t *regs) {
-    int sc = get_scancode();
+    char sc = get_scancode();
 
     if (sc == -1)
         return;
-
-    // if (sc & 0x80) {
-    //     int sc_released = sc-0x80;
-    //     // printf("{0x%d}\n", sc_released);
-    //     if (sc_released == SCANCODE_LEFT_SHIFT || sc_released == SCANCODE_RIGHT_SHIFT)
-    //         kinfo.shift = false;
-    // }
-
-    // printf("sc={%d}", sc);
     
     if (sc != 0) {
         if (sc == SCANCODE_LEFT_SHIFT || sc == SCANCODE_RIGHT_SHIFT) {

@@ -76,34 +76,40 @@ uint16_t io_inw(uint16_t port) {
 }
 
 void wait_400ns(void) {
-    int i;
-    for (i = 0; i < 4; i++)
-        io_in(ATA_REG_ALTSTATUS);
+    io_in(ATA_REG_ALTSTATUS);
+    io_in(ATA_REG_ALTSTATUS);
+    io_in(ATA_REG_ALTSTATUS);
+    io_in(ATA_REG_ALTSTATUS);
 }
 
 void ide_select_drive(unsigned lba) {
     //if bus pos(slave/master) is 1(slave) send 0xB0(IDE slave) command to select drive. else, send 0xA0(IDE master) command.
-    io_out(ATA_REG_HDDEVSEL, ((bus_position == ATA_MASTER ? 0xA0 : 0xB0) | (uint8_t)((lba >> 24 & 0x0F))));
+    
+    uint8_t val = (0xE0 | (uint8_t)bus_position << 4 | (uint8_t)((lba & 0x0F) >> 24));
+    io_out(ATA_REG_HDDEVSEL, val);
 }
 
 void select_sector(unsigned lba, uint16_t sector_count) {
     io_out(ATA_REG_SECCOUNT0, (uint8_t)sector_count);
-    io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count << 8));
+    io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count >> 8));
+
     io_out(ATA_REG_LBA0, (uint8_t)lba);
-    io_out(ATA_REG_LBA1, (uint8_t)(lba << 8));
+	io_out(ATA_REG_LBA1, (uint8_t)(lba << 8));
     io_out(ATA_REG_LBA2, (uint8_t)(lba << 16));
 }
 
 uint8_t poll_command(void) {
-    wait_400ns();
-    
     uint8_t status = io_in(ATA_REG_STATUS);
-    while ((status & ATA_SR_BSY) || (status & ATA_SR_ERR)/*  || !(status & ATA_SR_DRQ) */) {
-        // printf("stat:%d\n", status & ATA_SR_DRQ);
+    while (status & ATA_SR_BSY)
         status = io_in(ATA_REG_STATUS);
-        if ((status & ATA_SR_ERR) /* || (!(status & ATA_SR_DRQ)) */)
-            return (!(status & ATA_SR_DRQ)) ? 3 : 2;
-    }
+
+    status = io_in(ATA_REG_STATUS);
+        
+    if (status & ATA_SR_ERR)
+        return 2;
+    if (!(status & ATA_SR_DRQ))
+        return 3;
+
     return OS_SUCCESS;
 }
 
@@ -114,29 +120,21 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     }
     current_lba = lba;
 
+    io_out(ATA_REG_CONTROL, 0x02);
     ide_select_drive(lba);
     //clear ATA_REG_ERROR(ATA_FEATURES)
     io_out(ATA_REG_ERROR, 0x00);
-    select_sector(lba, sector_count);
+    select_sector(lba-1, sector_count);
     io_out(ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
-    
-    uint8_t poll_stat;
-    poll_stat = poll_command();
-    if (poll_stat != 0) {
-        printf("stat write: %d\n", poll_stat);
-        return; // status failed because of error.
-    }
-    
+
     int i;
     uint16_t cur;
+    
     for (i = 0; i < sector_count*(512/2); i++) {
         cur = (data[i*2+1] << 8) | data[i*2];        
         io_outw(ATA_REG_DATA, cur);
-        wait_400ns();
-        
     }
 
-    wait_400ns();
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
 }
 
@@ -146,27 +144,43 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         return;
     }
     current_lba = lba;
-
-    ide_select_drive(lba);
-    //set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
-    io_out(ATA_REG_ERROR, 0x00);
-    select_sector(lba, sector_count);
-    io_out(ATA_REG_COMMAND, ATA_CMD_READ_PIO);
-    
     uint8_t poll_stat;
+
+    io_out(ATA_REG_CONTROL, 0x02);
     poll_stat = poll_command();
     if (poll_stat != 0) {
         printf("stat read: %d\n", poll_stat);
-        return; // status failed because of error.
+        //return; // status failed because of error.
+    }
+    io_out(ATA_REG_ERROR, 0x00);
+    io_out(ATA_REG_SECCOUNT0, (uint8_t)(sector_count));
+    io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count >> 8));
+    ide_select_drive(lba);
+    // set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
+    select_sector(lba-1, sector_count);
+    io_out(ATA_REG_COMMAND, ATA_CMD_READ_PIO);
+    
+    poll_stat = poll_command();
+    if (poll_stat != 0) {
+        printf("stat read: %d\n", poll_stat);
+        //return; // status failed because of error.
     }
     
     int i;
     uint16_t cur;
-    for (i = 0; i < sector_count*(512/2); i++) {
+    for (i = 0; i < sector_count*256; i++) {
         cur = io_inw(ATA_REG_DATA);
         *(uint16_t *)(data+i*2) = cur;
+        io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     }
-    wait_400ns();
+    // for (i = 0; i < 50000; i++) {
+    //     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+
+    //     wait_400ns();
+    // }
+
+    poll_stat = poll_command();
+
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
 }
 

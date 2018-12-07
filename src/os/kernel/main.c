@@ -88,10 +88,11 @@ void setup(void) {
     memset(buf, 0, 512);
 
     drives[0].read_block(1, 1, buf);
+    printf("bork; %s\n", buf);
 
-    mbr_init(&drives[0]);
-    mbr_write_part(mbr_get_part_entry(0), 20, 100, 0x0C);
-    mbr_debug_print();
+    //mbr_init(&drives[0]);
+    //mbr_write_part(mbr_get_part_entry(0), 20, 100, 0x0C);
+    //mbr_debug_print();
 }
 
 void command_line(void) {
@@ -107,16 +108,32 @@ void command_line(void) {
     }
     else if (check_command(args, "drv")) {
         if (arg_len != 3) {
-            printf("Usage: drv <0:1> <0:1>");
+            printf("Usage: drv <drv index> <data>\n");
             return;
         }
-        //ide_set_bus(atoi(args[1]), atoi(args[2]));
+        drive_t *drives;
+        int drive_index;
+        drives = hd_get_drives(&drive_index);
+
+        printf("%d\n", drive_index);
+
+        int set_index = atoi(args[1]);
+        if (set_index > drive_index) {
+            printf("Drive index too great!\n");
+            return;
+        }
+        if (drives[set_index].controller_type != IDE_CONTROLLER) {
+            printf("Not IDE Hard Disk Controller!\n");
+            return;
+        }
+
         uint8_t buf[512];
         memset(buf, 0, 512);
-        strcpy(buf, "chicken nuggies");
-        ide_write_block(1, 1, buf);
-        memset(buf, 0, 512);        
-        ide_read_block(1, 1, buf);
+        strcpy((char *)buf, args[2]);
+        drives[set_index].write_block(1, 1, buf);
+
+        memset(buf, 0, 512);
+        drives[set_index].read_block(1, 1, buf);
         printf("buf:%s\n", buf);
     }
     else {
