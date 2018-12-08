@@ -2,7 +2,7 @@
 #define STDIO_H
 
 #include <kernel/memory/mm.h>
-#include <kernel/drivers/boot_vga.h>
+#include <kernel/drivers/vga_text.h>
 
 #ifndef NULL
 #define NULL ((void *)0)

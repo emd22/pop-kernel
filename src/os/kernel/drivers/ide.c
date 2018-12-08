@@ -85,7 +85,7 @@ void wait_400ns(void) {
 void ide_select_drive(unsigned lba) {
     //if bus pos(slave/master) is 1(slave) send 0xB0(IDE slave) command to select drive. else, send 0xA0(IDE master) command.
     
-    uint8_t val = (0xE0 | (uint8_t)bus_position << 4 | (uint8_t)((lba & 0x0F) >> 24));
+    uint8_t val = (0xE0 | (bus_position << 4) | ((lba >> 24) & 0x0F));
     io_out(ATA_REG_HDDEVSEL, val);
 }
 
@@ -98,17 +98,29 @@ void select_sector(unsigned lba, uint16_t sector_count) {
     io_out(ATA_REG_LBA2, (uint8_t)(lba << 16));
 }
 
-uint8_t poll_command(void) {
+void wait_busy(void) {
     uint8_t status = io_in(ATA_REG_STATUS);
     while (status & ATA_SR_BSY)
         status = io_in(ATA_REG_STATUS);
+}
 
+uint8_t poll_command(void) {
+    io_in(ATA_REG_STATUS);
+    io_in(ATA_REG_STATUS);
+    io_in(ATA_REG_STATUS);
+    io_in(ATA_REG_STATUS);
+
+    wait_busy();
+
+    uint8_t status;
+
+retry:
     status = io_in(ATA_REG_STATUS);
-        
+
     if (status & ATA_SR_ERR)
         return 2;
-    if (!(status & ATA_SR_DRQ))
-        return 3;
+    if ((status & ATA_SR_DRQ))
+        goto retry;
 
     return OS_SUCCESS;
 }
@@ -118,7 +130,10 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
         printf("IDE write error: LBA < 1\n");
         return;
     }
+
     current_lba = lba;
+
+    wait_busy();
 
     io_out(ATA_REG_CONTROL, 0x02);
     ide_select_drive(lba);
@@ -135,7 +150,9 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
         io_outw(ATA_REG_DATA, cur);
     }
 
+    wait_400ns();
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+    wait_busy();
 }
 
 void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
@@ -173,13 +190,9 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         *(uint16_t *)(data+i*2) = cur;
         io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     }
-    // for (i = 0; i < 50000; i++) {
-    //     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
-
-    //     wait_400ns();
-    // }
 
     poll_stat = poll_command();
+    wait_400ns();
 
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
 }

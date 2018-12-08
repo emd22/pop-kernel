@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <kernel/drivers/boot_vga.h>
+#include <kernel/drivers/vga_text.h>
 
 int normalize(double *val) {
     int exponent = 0;

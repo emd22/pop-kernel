@@ -36,7 +36,10 @@ void panic(const char *msg, void (*sd_cb)(void)) {
     if (sd_cb != NULL)
         sd_cb(); //shutdown callback(free objs, etc.)
 
-    for (;;);
+    __asm__ (
+        "cli\n"
+        "hlt\n"
+    );
 }
 
 void assert__(int res, const char *msg, void (*gr_cb)(void)) {

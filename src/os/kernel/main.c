@@ -3,12 +3,13 @@
 #endif
 
 #include <kernel/drivers/keyboard.h>
-#include <kernel/drivers/boot_vga.h>
+#include <kernel/drivers/vga_text.h>
 #include <kernel/drivers/pci.h>
 #include <kernel/drivers/ide.h>
 #include <kernel/drivers/mbr.h>
 #include <kernel/drivers/irq.h>
 #include <kernel/drivers/idt.h>
+#include <kernel/drivers/isrs.h>
 #include <kernel/drivers/gdt.h>
 #include <kernel/memory/mm.h>
 #include <kernel/memory/paging.h>
@@ -64,11 +65,12 @@ void setup(void) {
     
     gdt_install();
     idt_install();
+    isrs_install();
     irq_install();
+    keyboard_init();
 
     pci_init();
     pci_recursive_check();
-    keyboard_init();
 
     int pci_dev_amt;
     pci_dev_t **pci_devices;
@@ -83,16 +85,6 @@ void setup(void) {
     ide_init(drives, &drive_index);
 
     ide_set_bus(0, 0);
-
-    uint8_t buf[512];
-    memset(buf, 0, 512);
-
-    drives[0].read_block(1, 1, buf);
-    printf("bork; %s\n", buf);
-
-    //mbr_init(&drives[0]);
-    //mbr_write_part(mbr_get_part_entry(0), 20, 100, 0x0C);
-    //mbr_debug_print();
 }
 
 void command_line(void) {
@@ -106,9 +98,9 @@ void command_line(void) {
         bvga_clear();
         buf[0] = 0;
     }
-    else if (check_command(args, "drv")) {
+    else if (check_command(args, "write")) {
         if (arg_len != 3) {
-            printf("Usage: drv <drv index> <data>\n");
+            printf("Usage: write <drive index> <data>\n");
             return;
         }
         drive_t *drives;
@@ -134,7 +126,7 @@ void command_line(void) {
 
         memset(buf, 0, 512);
         drives[set_index].read_block(1, 1, buf);
-        printf("buf:%s\n", buf);
+        printf("buf:(%s)\n", buf);
     }
     else {
         invalid_command(args);
