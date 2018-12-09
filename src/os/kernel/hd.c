@@ -22,7 +22,7 @@ const char *drive_controller_types[] = {
 };
 
 static drive_t drives[32];
-static int drive_index = 0;
+static int drive_index = -1;
 
 void ide_drive_init(int pci_index) {
     drive_t *drive = &drives[drive_index++];
@@ -52,6 +52,18 @@ void check_class_code(pci_dev_t *cur_dev, int dev_index) {
 drive_t *hd_get_drives(int *_drive_index) {
     (*_drive_index) = drive_index;
     return drives;
+}
+
+void hd_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
+    if (drive_index == -1)
+        return;
+    drives[drive_index]->write_block(lba, sector_count, data);
+}
+
+void hd_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
+    if (drive_index == -1)
+        return;
+    drives[drive_index]->read_block(lba, sector_count, data);
 }
 
 void hd_init(pci_dev_t **pci_devices, int pci_dev_amt) {

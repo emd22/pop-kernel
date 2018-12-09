@@ -104,7 +104,7 @@ void wait_busy(void) {
         status = io_in(ATA_REG_STATUS);
 }
 
-uint8_t poll_command(void) {
+uint8_t poll_command(int advanced) {
     io_in(ATA_REG_STATUS);
     io_in(ATA_REG_STATUS);
     io_in(ATA_REG_STATUS);
@@ -117,11 +117,13 @@ uint8_t poll_command(void) {
 retry:
     status = io_in(ATA_REG_STATUS);
 
-    if (status & ATA_SR_ERR)
-        return 2;
-    if ((status & ATA_SR_DRQ))
-        goto retry;
-
+    if (advanced) {
+        if (status & ATA_SR_ERR)
+            return 2;
+        if (!(status & ATA_SR_DRQ))
+            goto retry;
+    }
+    
     return OS_SUCCESS;
 }
 
@@ -161,26 +163,21 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         return;
     }
     current_lba = lba;
-    uint8_t poll_stat;
 
     io_out(ATA_REG_CONTROL, 0x02);
-    poll_stat = poll_command();
-    if (poll_stat != 0) {
-        printf("stat read: %d\n", poll_stat);
-        //return; // status failed because of error.
-    }
+    poll_command(0);
+    // set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
     io_out(ATA_REG_ERROR, 0x00);
     io_out(ATA_REG_SECCOUNT0, (uint8_t)(sector_count));
     io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count >> 8));
     ide_select_drive(lba);
-    // set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
     select_sector(lba-1, sector_count);
     io_out(ATA_REG_COMMAND, ATA_CMD_READ_PIO);
     
-    poll_stat = poll_command();
+    uint8_t poll_stat = poll_command(1);
     if (poll_stat != 0) {
         printf("stat read: %d\n", poll_stat);
-        //return; // status failed because of error.
+        return;
     }
     
     int i;
@@ -191,7 +188,7 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
         io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
     }
 
-    poll_stat = poll_command();
+    poll_command(0);
     wait_400ns();
 
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
@@ -235,6 +232,7 @@ int ide_identify(uint8_t _bus, uint8_t drive) {
     ide_select_drive(current_lba);
 
     io_out(ATA_REG_SECCOUNT0, 0);
+    
     io_out(ATA_REG_LBA0, 0);
     io_out(ATA_REG_LBA1, 0);
     io_out(ATA_REG_LBA2, 0);
@@ -282,6 +280,7 @@ void ide_init_drive(drive_t *drive) {
     remove_spaces(drive->firmware_revision, 8);
     remove_spaces(drive->model_number, 40);
 
+
     //null terminate model number
     drive->model_number[41] = 0;
     drive->blocks = ((unsigned)buf[61] << 16 | buf[60])-1;
@@ -322,6 +321,7 @@ void ide_set_bus(int _bus, int _bus_position) {
     bus_position = _bus_position;
     ide_select_drive(current_lba);
 }
+
 void ide_init(drive_t *drive_buf, int *drive_index) {
     io_out(ATA_REG_CONTROL, 0x02);
 

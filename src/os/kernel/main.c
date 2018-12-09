@@ -107,8 +107,6 @@ void command_line(void) {
         int drive_index;
         drives = hd_get_drives(&drive_index);
 
-        printf("%d\n", drive_index);
-
         int set_index = atoi(args[1]);
         if (set_index > drive_index) {
             printf("Drive index too great!\n");
