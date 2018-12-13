@@ -11,6 +11,7 @@
 #include <kernel/drivers/idt.h>
 #include <kernel/drivers/isrs.h>
 #include <kernel/drivers/gdt.h>
+#include <kernel/fs/fat.h>
 #include <kernel/memory/mm.h>
 #include <kernel/memory/paging.h>
 #include <kernel/time.h>
@@ -85,6 +86,7 @@ void setup(void) {
     ide_init(drives, &drive_index);
 
     ide_set_bus(0, 0);
+
 }
 
 void command_line(void) {
@@ -97,6 +99,9 @@ void command_line(void) {
     if (check_command(args, "clear")) {
         bvga_clear();
         buf[0] = 0;
+    }
+    else if (check_command(args, "fat")) {
+        fat16_init();
     }
     else if (check_command(args, "write")) {
         if (arg_len != 3) {

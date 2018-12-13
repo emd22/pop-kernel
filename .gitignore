@@ -1,9 +1,9 @@
-i686-elf-4.9.1-Linux-x86_64
-x86_64-elf-4.9.1-Linux-x86_64
-cross-compiler
-build
-.vscode
+i686-elf-4.9.1-Linux-x86_64/*
+x86_64-elf-4.9.1-Linux-x86_64/*
+cross-compiler/*
+build/*
+.vscode/*
 os.iso
-isodir
-cross-compiler
+isodir/*
+cross-compiler/*
 fs.img

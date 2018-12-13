@@ -114,14 +114,14 @@ uint8_t poll_command(int advanced) {
 
     uint8_t status;
 
-retry:
+// retry:
     status = io_in(ATA_REG_STATUS);
 
     if (advanced) {
         if (status & ATA_SR_ERR)
             return 2;
-        if (!(status & ATA_SR_DRQ))
-            goto retry;
+        // if (!(status & ATA_SR_DRQ))
+        //     goto retry;
     }
     
     return OS_SUCCESS;

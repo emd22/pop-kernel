@@ -57,13 +57,16 @@ drive_t *hd_get_drives(int *_drive_index) {
 void hd_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     if (drive_index == -1)
         return;
-    drives[drive_index]->write_block(lba, sector_count, data);
+        
+    drives[drive_index].write_block(lba, sector_count, data);
 }
 
 void hd_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     if (drive_index == -1)
         return;
-    drives[drive_index]->read_block(lba, sector_count, data);
+    printf("dridx: %d\n", drive_index);
+
+    drives[drive_index].read_block(lba, sector_count, data);
 }
 
 void hd_init(pci_dev_t **pci_devices, int pci_dev_amt) {
