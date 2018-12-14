@@ -109,6 +109,22 @@ typedef struct {
     uint8_t sys_ident[8];
 } __attribute__ ((packed)) fat16_ebpb_t;
 
+typedef struct {
+    uint8_t  filename[8];
+    uint8_t  extension[3];
+    uint8_t  attributes;
+    uint8_t  reserved0;
+    uint8_t  create_tenths;
+    uint16_t create_time;
+    uint16_t create_date;
+    uint16_t access_date;
+    uint16_t cluster_hi;
+    uint16_t mod_time;
+    uint16_t mod_date;
+    uint16_t cluster_lo;
+    uint32_t file_size;
+} __attribute__ ((packed)) dir_entry_t;
+
 static bool mounted = false;
 
 void fat16_write_ebpb(fat16_ebpb_t *ebpb) {
@@ -123,7 +139,7 @@ void fat16_write_ebpb(fat16_ebpb_t *ebpb) {
 void fat16_write_tables(fat_settings_t *fat_settings) {
     uint8_t boot_sector[512];
     // hd_read_block(1, 1, boot_sector);
-    ide_read_block(1, 1, boot_sector);
+    ide_read_block(0, 1, boot_sector);
 
     fat_bpb_t *fat_bpb = ((fat_bpb_t *)boot_sector);
 
@@ -160,7 +176,7 @@ void fat16_write_tables(fat_settings_t *fat_settings) {
     boot_sector[510] = 0x55;
     boot_sector[511] = 0xAA;
 
-    ide_write_block(1, 1, boot_sector);
+    ide_write_block(0, 1, boot_sector);
 }
 
 void fat16_format(void) {
@@ -172,7 +188,7 @@ void fat16_format(void) {
     fat16_write_tables(&fat_settings);
 }
 
-void fat16_get_root(fat_bpb_t *bpb, fat16_ebpb_t *ebpb) {
+void fat16_ls(fat_bpb_t *bpb) {
     // if total sectors(16 bit) != 0, set to 16 bit entry, else, set to 32 bit entry.
     unsigned total_sectors = (bpb->total_sectors0) ? bpb->total_sectors1 : bpb->total_sectors0;
     unsigned fat_size = bpb->sectors_per_fat;
@@ -182,6 +198,25 @@ void fat16_get_root(fat_bpb_t *bpb, fat16_ebpb_t *ebpb) {
     unsigned amt_data_sectors = total_sectors-(bpb->reserved_sectors+(bpb->num_fats*fat_size)+root_dir_size);
 
     unsigned first_root_sector = first_data_sector-root_dir_size;
+    
+    dir_entry_t *dir_cluster;
+    uint16_t cluster_off = 0;
+
+    uint8_t clust[512];
+    
+    ide_read_block(first_root_sector, 1, clust);
+
+    dir_cluster = (dir_entry_t *)(clust);
+    int i;
+    // for (i = 0; i < 512; i++) {
+    //     printf("%x ", clust[i]);
+    // }
+    // printf("\n");
+
+    for (i = 0; i < 32; i++) {
+        if (dir_cluster[i].filename[0] != 0x00)
+            printf("found: %s\n", dir_cluster[i].filename);
+    }
 }
 
 // void fat16_addr_clusters() {
@@ -191,7 +226,7 @@ void fat16_get_root(fat_bpb_t *bpb, fat16_ebpb_t *ebpb) {
 
 void fat16_init(void) {
     uint8_t boot_sector[512];
-    ide_read_block(1, 1, boot_sector);
+    ide_read_block(0, 1, boot_sector);
     fat_bpb_t  *fat16_bpb = ((fat_bpb_t *)boot_sector);
     fat16_ebpb_t *fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
 
@@ -202,10 +237,10 @@ void fat16_init(void) {
 
     if (fat16_ebpb->signature == 0x29 || fat16_ebpb->signature == 0x28) {
         mounted = true;
-        printf("OEM NAME: %s\n", fat16_ebpb->sys_ident);
     }
     else {
         printf("Boot sector formatted as FAT16\n");
         fat16_format();
     }
+    fat16_ls(fat16_bpb);
 }

@@ -15,28 +15,28 @@ The C compiler identification is GNU, found in "/home/ethan/Desktop/pop-kernel/b
 Determining if the C compiler works passed with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_6b18e/fast"
-/usr/bin/make -f CMakeFiles/cmTC_6b18e.dir/build.make CMakeFiles/cmTC_6b18e.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_ab3b6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ab3b6.dir/build.make CMakeFiles/cmTC_ab3b6.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_6b18e.dir/testCCompiler.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_6b18e.dir/testCCompiler.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_6b18e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6b18e.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_6b18e.dir/testCCompiler.c.o  -o cmTC_6b18e 
+Building C object CMakeFiles/cmTC_ab3b6.dir/testCCompiler.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_ab3b6.dir/testCCompiler.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_ab3b6
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ab3b6.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_ab3b6.dir/testCCompiler.c.o  -o cmTC_ab3b6 
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_0fd08/fast"
-/usr/bin/make -f CMakeFiles/cmTC_0fd08.dir/build.make CMakeFiles/cmTC_0fd08.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_cfa18/fast"
+/usr/bin/make -f CMakeFiles/cmTC_cfa18.dir/build.make CMakeFiles/cmTC_cfa18.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_0fd08
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0fd08.dir/link.txt --verbose=1
-/usr/bin/cc      -v CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o  -o cmTC_0fd08  
+Building C object CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_cfa18
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cfa18.dir/link.txt --verbose=1
+/usr/bin/cc      -v CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o  -o cmTC_cfa18  
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
@@ -46,8 +46,8 @@ Thread model: posix
 gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_0fd08' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccLA8vzr.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_0fd08 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_cfa18' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyplxuy.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_cfa18 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
@@ -55,14 +55,14 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_0fd08/fast"]
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_0fd08.dir/build.make CMakeFiles/cmTC_0fd08.dir/build]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_cfa18/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_cfa18.dir/build.make CMakeFiles/cmTC_cfa18.dir/build]
   ignore line: [make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_0fd08]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0fd08.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o  -o cmTC_0fd08  ]
+  ignore line: [Building C object CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_cfa18]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cfa18.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o  -o cmTC_cfa18  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
@@ -72,13 +72,13 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_0fd08' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccLA8vzr.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_0fd08 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_cfa18' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccyplxuy.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_cfa18 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccLA8vzr.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccyplxuy.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -95,7 +95,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_0fd08] ==> ignore
+    arg [cmTC_cfa18] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -107,7 +107,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_0fd08.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_cfa18.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -141,14 +141,14 @@ Parsed C implicit link information from above output:
 Detecting C [-std=c11] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e811b/fast"
-/usr/bin/make -f CMakeFiles/cmTC_e811b.dir/build.make CMakeFiles/cmTC_e811b.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_874ed/fast"
+/usr/bin/make -f CMakeFiles/cmTC_874ed.dir/build.make CMakeFiles/cmTC_874ed.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e811b.dir/feature_tests.c.o
-/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_e811b.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_e811b
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e811b.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_e811b.dir/feature_tests.c.o  -o cmTC_e811b 
+Building C object CMakeFiles/cmTC_874ed.dir/feature_tests.c.o
+/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_874ed.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_874ed
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_874ed.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_874ed.dir/feature_tests.c.o  -o cmTC_874ed 
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
@@ -161,14 +161,14 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 Detecting C [-std=c99] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e64ca/fast"
-/usr/bin/make -f CMakeFiles/cmTC_e64ca.dir/build.make CMakeFiles/cmTC_e64ca.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_b950c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b950c.dir/build.make CMakeFiles/cmTC_b950c.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e64ca.dir/feature_tests.c.o
-/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_e64ca.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_e64ca
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e64ca.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_e64ca.dir/feature_tests.c.o  -o cmTC_e64ca 
+Building C object CMakeFiles/cmTC_b950c.dir/feature_tests.c.o
+/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_b950c.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_b950c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b950c.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_b950c.dir/feature_tests.c.o  -o cmTC_b950c 
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 
@@ -181,14 +181,14 @@ make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMak
 Detecting C [-std=c90] compiler features compiled with the following output:
 Change Dir: /home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_12b8e/fast"
-/usr/bin/make -f CMakeFiles/cmTC_12b8e.dir/build.make CMakeFiles/cmTC_12b8e.dir/build
+Run Build Command:"/usr/bin/make" "cmTC_7012b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7012b.dir/build.make CMakeFiles/cmTC_7012b.dir/build
 make[1]: Entering directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_12b8e.dir/feature_tests.c.o
-/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_12b8e.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
-Linking C executable cmTC_12b8e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_12b8e.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_12b8e.dir/feature_tests.c.o  -o cmTC_12b8e 
+Building C object CMakeFiles/cmTC_7012b.dir/feature_tests.c.o
+/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_7012b.dir/feature_tests.c.o   -c /home/ethan/Desktop/pop-kernel/build/CMakeFiles/feature_tests.c
+Linking C executable cmTC_7012b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7012b.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_7012b.dir/feature_tests.c.o  -o cmTC_7012b 
 make[1]: Leaving directory '/home/ethan/Desktop/pop-kernel/build/CMakeFiles/CMakeTmp'
 
 

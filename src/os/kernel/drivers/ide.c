@@ -128,10 +128,6 @@ uint8_t poll_command(int advanced) {
 }
 
 void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
-    if (lba < 1) {
-        printf("IDE write error: LBA < 1\n");
-        return;
-    }
 
     current_lba = lba;
 
@@ -141,7 +137,7 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     ide_select_drive(lba);
     //clear ATA_REG_ERROR(ATA_FEATURES)
     io_out(ATA_REG_ERROR, 0x00);
-    select_sector(lba-1, sector_count);
+    select_sector(lba, sector_count);
     io_out(ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
 
     int i;
@@ -158,10 +154,7 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
 }
 
 void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
-    if (lba < 1) {
-        printf("IDE read error: LBA < 1\n");
-        return;
-    }
+
     current_lba = lba;
 
     io_out(ATA_REG_CONTROL, 0x02);
@@ -171,7 +164,7 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     io_out(ATA_REG_SECCOUNT0, (uint8_t)(sector_count));
     io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count >> 8));
     ide_select_drive(lba);
-    select_sector(lba-1, sector_count);
+    select_sector(lba, sector_count);
     io_out(ATA_REG_COMMAND, ATA_CMD_READ_PIO);
     
     uint8_t poll_stat = poll_command(1);

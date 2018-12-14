@@ -57,7 +57,7 @@ void mbr_write_part(unsigned loc, uint32_t start, uint32_t end, uint8_t sys_id) 
     uint32_t sector_count = end-start;
 
     uint8_t mbr[512];
-    ide_read_block(1, 1, mbr);
+    ide_read_block(0, 1, mbr);
 
     mbr[loc+8] = (uint8_t)start;
     mbr[loc+9] = (uint8_t)(start << 8);
@@ -71,7 +71,7 @@ void mbr_write_part(unsigned loc, uint32_t start, uint32_t end, uint8_t sys_id) 
 
     mbr[loc] = sys_id;
 
-    ide_write_block(1, 1, mbr);
+    ide_write_block(0, 1, mbr);
 }
 
 mbr_t *get_mbr(void) {
@@ -81,7 +81,7 @@ mbr_t *get_mbr(void) {
 bool mbr_retrieve_partitions(void) {
     uint8_t *mbr_dat = (uint8_t *)malloc(512);
 
-    ide_read_block(1, 1, mbr_dat);
+    ide_read_block(0, 1, mbr_dat);
 
     if (mbr_dat[510] != 0x55 || mbr_dat[511] != 0xAA) {
         return OS_FAILURE;
