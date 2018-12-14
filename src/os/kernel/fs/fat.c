@@ -199,14 +199,16 @@ void fat16_ls(fat_bpb_t *bpb) {
 
     unsigned first_root_sector = first_data_sector-root_dir_size;
     
-    dir_entry_t *dir_cluster;
+    // 32 entries per sector
+    dir_entry_t dir_cluster[32];
     uint16_t cluster_off = 0;
 
-    uint8_t clust[512];
-    
-    ide_read_block(first_root_sector, 1, clust);
+    // uint8_t clust[512];
+    // memset(clust, 0, 512);
 
-    dir_cluster = (dir_entry_t *)(clust);
+    memset(dir_cluster, 0, sizeof(dir_entry_t)*32);
+    ide_read_block(first_root_sector, 1, (uint8_t *)dir_cluster);
+    // dir_cluster = (dir_entry_t *)(clust);
     int i;
     // for (i = 0; i < 512; i++) {
     //     printf("%x ", clust[i]);
@@ -214,8 +216,9 @@ void fat16_ls(fat_bpb_t *bpb) {
     // printf("\n");
 
     for (i = 0; i < 32; i++) {
-        if (dir_cluster[i].filename[0] != 0x00)
+        if (dir_cluster[i].filename[0] != 0x00) {
             printf("found: %s\n", dir_cluster[i].filename);
+        }
     }
 }
 
