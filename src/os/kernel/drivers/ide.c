@@ -127,8 +127,7 @@ uint8_t poll_command(int advanced) {
     return OS_SUCCESS;
 }
 
-void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
-
+void ide_write_sector(unsigned lba, const uint8_t *data) {
     current_lba = lba;
 
     wait_busy();
@@ -137,13 +136,13 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     ide_select_drive(lba);
     //clear ATA_REG_ERROR(ATA_FEATURES)
     io_out(ATA_REG_ERROR, 0x00);
-    select_sector(lba, sector_count);
+    select_sector(lba, 1);
     io_out(ATA_REG_COMMAND, ATA_CMD_WRITE_PIO);
 
     int i;
     uint16_t cur;
     
-    for (i = 0; i < sector_count*(512/2); i++) {
+    for (i = 0; i < 256; i++) {
         cur = (data[i*2+1] << 8) | data[i*2];        
         io_outw(ATA_REG_DATA, cur);
     }
@@ -153,18 +152,17 @@ void ide_write_block(unsigned lba, uint16_t sector_count, const uint8_t *data) {
     wait_busy();
 }
 
-void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
-
-    current_lba = lba;
+void ide_read_sector(unsigned lba, uint8_t *data) {
+        current_lba = lba;
 
     io_out(ATA_REG_CONTROL, 0x02);
     poll_command(0);
     // set ATA_REG_ERROR(ATA_FEATURES) to zero in case of an error
     io_out(ATA_REG_ERROR, 0x00);
-    io_out(ATA_REG_SECCOUNT0, (uint8_t)(sector_count));
-    io_out(ATA_REG_SECCOUNT1, (uint8_t)(sector_count >> 8));
+    io_out(ATA_REG_SECCOUNT0, 1);
+    io_out(ATA_REG_SECCOUNT1, 0);
     ide_select_drive(lba);
-    select_sector(lba, sector_count);
+    select_sector(lba, 1);
     io_out(ATA_REG_COMMAND, ATA_CMD_READ_PIO);
     
     uint8_t poll_stat = poll_command(1);
@@ -175,7 +173,7 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     
     int i;
     uint16_t cur;
-    for (i = 0; i < sector_count*256; i++) {
+    for (i = 0; i < 256; i++) {
         cur = io_inw(ATA_REG_DATA);
         *(uint16_t *)(data+i*2) = cur;
         io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
@@ -185,6 +183,20 @@ void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
     wait_400ns();
 
     io_out(ATA_REG_COMMAND, ATA_CMD_CACHE_FLUSH);
+}
+
+void ide_read_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
+    int i;
+    for (i = 0; i < sector_count; i++) {
+        ide_read_sector(lba+i, data+(i*512));
+    }
+}
+
+void ide_write_block(unsigned lba, uint16_t sector_count, uint8_t *data) {
+    int i;
+    for (i = 0; i < sector_count; i++) {
+        ide_write_sector(lba+i, data+(i*512));
+    }
 }
 
 void get_info_substr(uint16_t *buffer, int sindex, int length, char *copy_buffer) {

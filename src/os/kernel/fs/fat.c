@@ -74,8 +74,27 @@
 #include <kernel/hd.h>
 #include <kernel/drivers/ide.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#define IS_FILE 0
+#define IS_DIR  1
+
+#define FAT16_TOTAL_SECTORS   (bpb->total_sectors0 ? bpb->total_sectors1 : bpb->total_sectors0)
+#define FAT16_FAT_SIZE        (bpb->sectors_per_fat)
+#define FAT16_ROOT_DIR_SIZE   (((bpb->root_entries*32)+(bpb->sector_size-1))/bpb->sector_size)
+#define FAT16_DATA_SECTOR     (bpb->reserved_sectors+(bpb->num_fats*FAT16_FAT_SIZE)+FAT16_ROOT_DIR_SIZE)
+#define FAT16_DATA_SECTOR_AMT (FAT16_TOTAL_SECTORS \
+                                -(bpb->reserved_sectors\
+                                +(bpb->num_fats*FAT16_FAT_SIZE)\
+                                +FAT16_ROOT_DIR_SIZE) \
+                              )
+#define FAT16_ROOT_SECTOR     (FAT16_DATA_SECTOR-FAT16_ROOT_DIR_SIZE)
+#define GET_FIRST_SECTOR_OF_CLUSTER(cluster) (((cluster-2)*bpb->sectors_per_cluster)+FAT16_DATA_SECTOR)
+#define FAT16_ENTRIES_PER_SECTOR 32
+#define FAT16_IS_FILE(entry) (entry->attributes ? IS_DIR : IS_FILE)
+#define ENTRY_EMPTY(entry) (!entry->filename[0])
 
 typedef struct {
     uint32_t total_sectors;
@@ -110,8 +129,7 @@ typedef struct {
 } __attribute__ ((packed)) fat16_ebpb_t;
 
 typedef struct {
-    uint8_t  filename[8];
-    uint8_t  extension[3];
+    uint8_t  filename[11];
     uint8_t  attributes;
     uint8_t  reserved0;
     uint8_t  create_tenths;
@@ -126,6 +144,7 @@ typedef struct {
 } __attribute__ ((packed)) dir_entry_t;
 
 static bool mounted = false;
+static fat_bpb_t *bpb;
 
 void fat16_write_ebpb(fat16_ebpb_t *ebpb) {
     ebpb->drive_number = 0x80;
@@ -141,34 +160,34 @@ void fat16_write_tables(fat_settings_t *fat_settings) {
     // hd_read_block(1, 1, boot_sector);
     ide_read_block(0, 1, boot_sector);
 
-    fat_bpb_t *fat_bpb = ((fat_bpb_t *)boot_sector);
+    bpb = ((fat_bpb_t *)boot_sector);
 
     const uint8_t boot_jmp[] = {0xEB, 0x3C, 0x90};
 
-    memcpy(fat_bpb->boot_jmp, boot_jmp, 3);
-    memcpy(fat_bpb->oem_name, "T3OS 1.0", 8);
+    memcpy(bpb->boot_jmp, boot_jmp, 3);
+    memcpy(bpb->oem_name, "T3OS 1.0", 8);
 
-    fat_bpb->sector_size = 512;
-    fat_bpb->sectors_per_cluster = 32;
-    fat_bpb->reserved_sectors = fat_settings->reserved_sectors;
-    fat_bpb->num_fats = 2;
-    fat_bpb->root_entries = 512;
+    bpb->sector_size = 512;
+    bpb->sectors_per_cluster = 32;
+    bpb->reserved_sectors = fat_settings->reserved_sectors;
+    bpb->num_fats = 2;
+    bpb->root_entries = 512;
 
     if (fat_settings->total_sectors > (2^16)) {
-        fat_bpb->total_sectors0 = 0;
-        fat_bpb->total_sectors1 = fat_settings->total_sectors;
+        bpb->total_sectors0 = 0;
+        bpb->total_sectors1 = fat_settings->total_sectors;
     }
     else {
-        fat_bpb->total_sectors0 = fat_settings->total_sectors;
+        bpb->total_sectors0 = fat_settings->total_sectors;
     }
 
-    fat_bpb->media_type = 0xF8;
-    fat_bpb->sectors_per_fat = 32;
-    fat_bpb->sectors_per_track = 32;
-    fat_bpb->head_count = 64;
-    fat_bpb->start_lba = 0;
+    bpb->media_type = 0xF8;
+    bpb->sectors_per_fat = 32;
+    bpb->sectors_per_track = 32;
+    bpb->head_count = 64;
+    bpb->start_lba = 0;
 
-    if (fat_settings->bit_size == 12) {
+    if (fat_settings->bit_size == 12 || fat_settings->bit_size == 16) {
         fat16_ebpb_t *fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
         fat16_write_ebpb(fat16_ebpb);
     }
@@ -183,58 +202,83 @@ void fat16_format(void) {
     fat_settings_t fat_settings;
     fat_settings.total_sectors = 65536;
     fat_settings.reserved_sectors = 1;
-    fat_settings.bit_size = 12;
+    fat_settings.bit_size = 16;
 
     fat16_write_tables(&fat_settings);
 }
 
-void fat16_ls(fat_bpb_t *bpb) {
-    // if total sectors(16 bit) != 0, set to 16 bit entry, else, set to 32 bit entry.
-    unsigned total_sectors = (bpb->total_sectors0) ? bpb->total_sectors1 : bpb->total_sectors0;
-    unsigned fat_size = bpb->sectors_per_fat;
+uint8_t *fat16_read_file(dir_entry_t *dir_entry) {
+    uint8_t *buffer = (uint8_t *)malloc(dir_entry->file_size);
+    unsigned sec_start = GET_FIRST_SECTOR_OF_CLUSTER(dir_entry->cluster_lo);
+    unsigned sec_count = (dir_entry->file_size)/512;
+    if ((dir_entry->file_size) % 512 > 0) {
+        sec_count++;
+    }
 
-    unsigned root_dir_size = ((bpb->root_entries*32)+(bpb->sector_size-1))/bpb->sector_size;
-    unsigned first_data_sector = bpb->reserved_sectors+(bpb->num_fats*fat_size)+root_dir_size;
-    unsigned amt_data_sectors = total_sectors-(bpb->reserved_sectors+(bpb->num_fats*fat_size)+root_dir_size);
+    printf("secc: %d\n", sec_count);
+    ide_read_block(sec_start, sec_count, buffer);
 
-    unsigned first_root_sector = first_data_sector-root_dir_size;
-    
-    // 32 entries per sector
-    dir_entry_t dir_cluster[32];
-    uint16_t cluster_off = 0;
+    return buffer;
+}
 
-    // uint8_t clust[512];
-    // memset(clust, 0, 512);
-
-    memset(dir_cluster, 0, sizeof(dir_entry_t)*32);
-    ide_read_block(first_root_sector, 1, (uint8_t *)dir_cluster);
-    // dir_cluster = (dir_entry_t *)(clust);
+int fat16_find_free_dir_entry(void) {
+    dir_entry_t dir_cluster[FAT16_ENTRIES_PER_SECTOR];
+    memset(dir_cluster, 0, sizeof(dir_entry_t)*FAT16_ENTRIES_PER_SECTOR);
+    ide_read_block(FAT16_ROOT_SECTOR, 1, (uint8_t *)dir_cluster);
     int i;
-    // for (i = 0; i < 512; i++) {
-    //     printf("%x ", clust[i]);
-    // }
-    // printf("\n");
+    dir_entry_t *this_dir;
 
     for (i = 0; i < 32; i++) {
-        if (dir_cluster[i].filename[0] != 0x00) {
-            printf("found: %s\n", dir_cluster[i].filename);
+        this_dir = &dir_cluster[i];
+        if (ENTRY_EMPTY(this_dir)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void fat16_make_dir(char *fn) {
+    int file_i = fat16_find_free_dir_entry();
+    if (file_i == -1) {
+        printf("Could not find free entry.\n");
+        return;
+    }
+    dir_entry_t dir;
+    strcpy(dir.filename, fn);
+    dir.
+}
+
+void fat16_list_dir(void) {
+    // 32 entries per sector (512/sizeof(dir_entry_t)) = 32
+    dir_entry_t dir_cluster[FAT16_ENTRIES_PER_SECTOR];
+
+    memset(dir_cluster, 0, sizeof(dir_entry_t)*FAT16_ENTRIES_PER_SECTOR);
+    ide_read_block(FAT16_ROOT_SECTOR, 1, (uint8_t *)dir_cluster);
+
+    int i;
+    dir_entry_t *this_dir;
+
+    for (i = 0; i < 32; i++) {
+        this_dir = &dir_cluster[i];
+        if (ENTRY_EMPTY(this_dir)) {
+            char real_fn[12];
+            strcpy(real_fn, (char *)(this_dir->filename));
+            real_fn[11] = 0;
+            printf("%s - %d : 0x%x\n", real_fn, this_dir->cluster_lo, (GET_FIRST_SECTOR_OF_CLUSTER(this_dir->cluster_lo))*512);
         }
     }
 }
 
-// void fat16_addr_clusters() {
-//     uint8_t fat_table[512];
-//     unsigned fat_offset = 
-// }
-
 void fat16_init(void) {
     uint8_t boot_sector[512];
     ide_read_block(0, 1, boot_sector);
-    fat_bpb_t  *fat16_bpb = ((fat_bpb_t *)boot_sector);
+    bpb = ((fat_bpb_t *)boot_sector);
     fat16_ebpb_t *fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
 
     if (boot_sector[510] != 0x55 || boot_sector[511] != 0xAA) {
         printf("Boot sector formatted as FAT16\n");        
+        bpb = ((fat_bpb_t *)boot_sector);
+        fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
         fat16_format();
     }
 
@@ -243,7 +287,12 @@ void fat16_init(void) {
     }
     else {
         printf("Boot sector formatted as FAT16\n");
+        bpb = ((fat_bpb_t *)boot_sector);
+        fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
         fat16_format();
+        bpb = ((fat_bpb_t *)boot_sector);
+        fat16_ebpb = ((fat16_ebpb_t *)(boot_sector+36));
     }
-    fat16_ls(fat16_bpb);
+    if (mounted)
+        fat16_list_dir();
 }
