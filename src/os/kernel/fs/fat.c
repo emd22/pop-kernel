@@ -221,7 +221,7 @@ uint8_t *fat16_read_file(dir_entry_t *dir_entry) {
     return buffer;
 }
 
-int fat16_find_free_dir_entry(void) {
+int fat16_find_free_dir_entry(dir_entry_t *last_dir) {
     dir_entry_t dir_cluster[FAT16_ENTRIES_PER_SECTOR];
     memset(dir_cluster, 0, sizeof(dir_entry_t)*FAT16_ENTRIES_PER_SECTOR);
     ide_read_block(FAT16_ROOT_SECTOR, 1, (uint8_t *)dir_cluster);
@@ -231,21 +231,31 @@ int fat16_find_free_dir_entry(void) {
     for (i = 0; i < 32; i++) {
         this_dir = &dir_cluster[i];
         if (ENTRY_EMPTY(this_dir)) {
+            if (last_dir != NULL)
+                last_dir = this_dir;
             return i;
         }
     }
+    last_dir = NULL;
     return -1;
 }
 
 void fat16_make_dir(char *fn) {
-    int file_i = fat16_find_free_dir_entry();
+    dir_entry_t *last_dir;
+    int file_i = fat16_find_free_dir_entry(last_dir);
     if (file_i == -1) {
         printf("Could not find free entry.\n");
         return;
     }
     dir_entry_t dir;
     strcpy(dir.filename, fn);
-    dir.
+
+    unsigned sec_count = (last_dir->file_size)/512;
+    if ((last_dir->file_size) % 512 > 0) {
+        sec_count++;
+    }
+
+    dir.cluster_lo = sec_count+last_dir->cluster_lo;
 }
 
 void fat16_list_dir(void) {
