@@ -9,7 +9,7 @@ set(COMPILER_PATH ${TARGET_COMPILE_TYPE}-elf-4.9.1-Linux-${COMPILE_TYPE})
 
 get_filename_component(PROJECT_PATH ${PROJECT_SOURCE_DIR} DIRECTORY)
 
-set(CMAKE_C_FLAGS "-T ${PROJECT_PATH}/linker.ld -O0 -ffreestanding -nostdlib -nostartfiles -Wall -mno-red-zone -mno-mmx -mno-sse -mno-sse2")
+set(CMAKE_C_FLAGS "-T '${PROJECT_PATH}'/linker.ld -O0 -ffreestanding -nostdlib -nostartfiles -Wall -mno-red-zone -mno-mmx -mno-sse -mno-sse2")
 
 set(CMAKE_C_COMPILER ${PROJECT_PATH}/${COMPILER_PATH}/bin/${TARGET_COMPILE_TYPE}-elf-gcc)
 set(CMAKE_ASM_COMPILER ${PROJECT_PATH}/${COMPILER_PATH}/bin/${TARGET_COMPILE_TYPE}-elf-as)
